@@ -17,6 +17,10 @@
 /{{ hconfigs['proxy_path_admin'] }}/proxy-stats/api/ proxy_stats_api_backend
 /{{ hconfigs['proxy_path_admin'] }}/proxy-stats/ proxy_stats_ui_backend
 
+{# Speedtest must come BEFORE general panel paths #}
+{%if hconfigs['speed_test']%}
+/{{hconfigs['proxy_path_client']}}/speedtest/ nginx_dispatcher_http_h2
+{%endif%}
 /{{hconfigs['proxy_path_client']}}/static/ nginx_dispatcher_http_h2
 /{{hconfigs['proxy_path_client']}}/ hiddifypanel
 /{{hconfigs['proxy_path_admin']}}/ hiddifypanel

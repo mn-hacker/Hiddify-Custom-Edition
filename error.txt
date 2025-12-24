@@ -1,45 +1,27 @@
-Last login: Thu Dec 25 01:22:50 2025 from 37.156.156.11
-Hiddify: Command Quit
-==========================================
-root@opsopsops:/opt/hiddify-manager# journalctl -u hiddify-ssh-liberty-bridge --no-pager -n 30
-Dec 25 01:23:37 opsopsops systemd[1]: hiddify-ssh-liberty-bridge.service: Scheduled restart job, restart counter is at 91.
-Dec 25 01:23:37 opsopsops systemd[1]: Started hiddify-ssh-liberty-bridge.service.
-Dec 25 01:23:37 opsopsops ssh-liberty-bridge[88135]: 2025/12/25 01:23:37 Invalid MAX_CONNECTIONS parameter
-Dec 25 01:23:37 opsopsops systemd[1]: hiddify-ssh-liberty-bridge.service: Main process exited, code=exited, status=1/FAILURE
-Dec 25 01:23:37 opsopsops systemd[1]: hiddify-ssh-liberty-bridge.service: Failed with result 'exit-code'.
-Dec 25 01:23:42 opsopsops systemd[1]: hiddify-ssh-liberty-bridge.service: Scheduled restart job, restart counter is at 92.
-Dec 25 01:23:42 opsopsops systemd[1]: Started hiddify-ssh-liberty-bridge.service.
-Dec 25 01:23:42 opsopsops ssh-liberty-bridge[88142]: 2025/12/25 01:23:42 Invalid MAX_CONNECTIONS parameter
-Dec 25 01:23:42 opsopsops systemd[1]: hiddify-ssh-liberty-bridge.service: Main process exited, code=exited, status=1/FAILURE
-Dec 25 01:23:42 opsopsops systemd[1]: hiddify-ssh-liberty-bridge.service: Failed with result 'exit-code'.
-Dec 25 01:23:47 opsopsops systemd[1]: hiddify-ssh-liberty-bridge.service: Scheduled restart job, restart counter is at 93.
-Dec 25 01:23:47 opsopsops systemd[1]: Started hiddify-ssh-liberty-bridge.service.
-Dec 25 01:23:47 opsopsops ssh-liberty-bridge[88148]: 2025/12/25 01:23:47 Invalid MAX_CONNECTIONS parameter
-Dec 25 01:23:47 opsopsops systemd[1]: hiddify-ssh-liberty-bridge.service: Main process exited, code=exited, status=1/FAILURE
-Dec 25 01:23:47 opsopsops systemd[1]: hiddify-ssh-liberty-bridge.service: Failed with result 'exit-code'.
-Dec 25 01:23:52 opsopsops systemd[1]: hiddify-ssh-liberty-bridge.service: Scheduled restart job, restart counter is at 94.
-Dec 25 01:23:52 opsopsops systemd[1]: Started hiddify-ssh-liberty-bridge.service.
-Dec 25 01:23:52 opsopsops ssh-liberty-bridge[88157]: 2025/12/25 01:23:52 Invalid MAX_CONNECTIONS parameter
-Dec 25 01:23:52 opsopsops systemd[1]: hiddify-ssh-liberty-bridge.service: Main process exited, code=exited, status=1/FAILURE
-Dec 25 01:23:52 opsopsops systemd[1]: hiddify-ssh-liberty-bridge.service: Failed with result 'exit-code'.
-Dec 25 01:23:58 opsopsops systemd[1]: hiddify-ssh-liberty-bridge.service: Scheduled restart job, restart counter is at 95.
-Dec 25 01:23:58 opsopsops systemd[1]: Started hiddify-ssh-liberty-bridge.service.
-Dec 25 01:23:58 opsopsops ssh-liberty-bridge[88194]: 2025/12/25 01:23:58 Invalid MAX_CONNECTIONS parameter
-Dec 25 01:23:58 opsopsops systemd[1]: hiddify-ssh-liberty-bridge.service: Main process exited, code=exited, status=1/FAILURE
-Dec 25 01:23:58 opsopsops systemd[1]: hiddify-ssh-liberty-bridge.service: Failed with result 'exit-code'.
-Dec 25 01:24:03 opsopsops systemd[1]: hiddify-ssh-liberty-bridge.service: Scheduled restart job, restart counter is at 96.
-Dec 25 01:24:03 opsopsops systemd[1]: Started hiddify-ssh-liberty-bridge.service.
-Dec 25 01:24:03 opsopsops ssh-liberty-bridge[88205]: 2025/12/25 01:24:03 Invalid MAX_CONNECTIONS parameter
-Dec 25 01:24:03 opsopsops systemd[1]: hiddify-ssh-liberty-bridge.service: Main process exited, code=exited, status=1/FAILURE
-Dec 25 01:24:03 opsopsops systemd[1]: hiddify-ssh-liberty-bridge.service: Failed with result 'exit-code'.
-root@opsopsops:/opt/hiddify-manager# ls -la /opt/hiddify-manager/other/ssh/
-total 7204
-drwxr-xr-x  3 root           root    4096 Dec 25 01:19 .
-drwxr-xr-x 14 root           root    4096 Dec 25 01:09 ..
--rw-------  1 liberty-bridge root      88 Dec 25 01:19 .env
--rwxr-xr-x  1 root           root     120 Dec 25 01:09 disable.sh
--rw-r--r--  1 root           root     443 Dec 25 01:09 hiddify-ssh-liberty-bridge.service
-drwxr-xr-x  2 liberty-bridge root    4096 Dec 25 01:15 host_key
--rwxr-xr-x  1 root           root     465 Dec 25 01:09 install.sh
--rwxr-xr-x  1 root           root     536 Dec 25 01:09 run.sh
--rwx--x--x  1 root           root 7343491 Dec 25 01:15 ssh-liberty-bridge
+root@opsopsops:/opt/hiddify-manager# grep -A10 "backend hiddifypanel" /opt/hiddify-manager/haproxy/haproxy.cfg
+    use_backend hiddifypanel if { path_beg /OgOcGRGMhZcmGvls/  }
+    use_backend hiddifypanel if { path_beg /aOpOTNH6MlXKg4xHnMlmItHaN6vx/ hiddifypanel }
+    use_backend hiddifypanel if { path_beg /bzSZYlLlVwvlK3D6ez/ hiddifypanel }
+
+
+
+
+
+
+
+        use_backend sp_special_reality_tcp_http_14926 if { hdr(host) -i www.privacyinternational.org }
+
+
+--
+backend hiddifypanel
+    mode http
+    http-request set-header X-Forwarded-For %[src]
+    server hpanel 127.0.0.1:9000
+
+
+
+
+
+
+
+root@opsopsops:/opt/hiddify-manager#

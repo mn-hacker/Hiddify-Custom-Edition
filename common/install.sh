@@ -90,3 +90,6 @@ ln -sf /opt/hiddify-manager/menu.sh /usr/bin/hiddify
 
 systemctl disable --now rpcbind.socket >/dev/null 2>&1
 systemctl disable --now rpcbind >/dev/null 2>&1
+
+# Setup logrotate for Hiddify logs
+bash setup_logrotate.sh >/dev/null 2>&1

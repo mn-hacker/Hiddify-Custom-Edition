@@ -1,3 +1,11 @@
+{# Speedtest and static paths must come BEFORE general panel paths #}
+{%if hconfigs['speed_test']%}
+/{{hconfigs['proxy_path_client']}}/speedtest/ nginx_dispatcher_http_h2
+{%endif%}
+/{{hconfigs['proxy_path_client']}}/static/ nginx_dispatcher_http_h2
+/{{hconfigs['proxy_path_admin']}}/static/ nginx_dispatcher_http_h2
+/{{hconfigs['proxy_path']}}/static/ nginx_dispatcher_http_h2
+
 /{{hconfigs['proxy_path_client']}}/ hiddifypanel
 /{{hconfigs['proxy_path_admin']}}/ hiddifypanel
 /{{hconfigs['proxy_path']}}/ hiddifypanel
