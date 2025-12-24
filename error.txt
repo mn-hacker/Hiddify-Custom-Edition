@@ -1,1824 +1,809 @@
-#9 18.68 Get:11 http://archive.ubuntu.com/ubuntu noble/main amd64 libreadline8t64 amd64 8.2-4build1 [153 kB]
-#9 18.68 Get:12 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libsqlite3-0 amd64 3.45.1-1ubuntu2.5 [701 kB]
-#9 18.69 Get:13 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libpython3.12-stdlib amd64 3.12.3-1ubuntu0.9 [2068 kB]
-#9 18.71 Get:14 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 python3.12 amd64 3.12.3-1ubuntu0.9 [651 kB]
-#9 18.72 Get:15 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libpython3-stdlib amd64 3.12.3-0ubuntu2.1 [10.1 kB]
-#9 18.72 Get:16 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 python3 amd64 3.12.3-0ubuntu2.1 [23.0 kB]
-#9 18.72 Get:17 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libapparmor1 amd64 4.0.1really4.0.1-0ubuntu0.24.04.5 [50.5 kB]
-#9 18.72 Get:18 http://archive.ubuntu.com/ubuntu noble/main amd64 libargon2-1 amd64 0~20190702+dfsg-4build1 [20.8 kB]
-#9 18.75 Get:19 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libblkid1 amd64 2.39.3-9ubuntu6.4 [123 kB]
-#9 18.75 Get:20 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libudev1 amd64 255.4-1ubuntu8.12 [177 kB]
-#9 18.75 Get:21 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libdevmapper1.02.1 amd64 2:1.02.185-3ubuntu3.2 [139 kB]
-#9 18.75 Get:22 http://archive.ubuntu.com/ubuntu noble/main amd64 libjson-c5 amd64 0.17-1build1 [35.3 kB]
-#9 18.75 Get:23 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libuuid1 amd64 2.39.3-9ubuntu6.4 [35.9 kB]
-#9 18.75 Get:24 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libcryptsetup12 amd64 2:2.7.0-1ubuntu4.2 [266 kB]
-#9 18.78 Get:25 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libfdisk1 amd64 2.39.3-9ubuntu6.4 [146 kB]
-#9 18.78 Get:26 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libkmod2 amd64 31+20240202-2ubuntu7.1 [51.7 kB]
-#9 18.79 Get:27 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libmount1 amd64 2.39.3-9ubuntu6.4 [134 kB]
-#9 18.79 Get:28 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libsystemd-shared amd64 255.4-1ubuntu8.12 [2077 kB]
-#9 18.82 Get:29 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libsystemd0 amd64 255.4-1ubuntu8.12 [435 kB]
-#9 18.82 Get:30 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 systemd-dev all 255.4-1ubuntu8.12 [106 kB]
-#9 18.82 Get:31 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 systemd amd64 255.4-1ubuntu8.12 [3475 kB]
-#9 18.86 Get:32 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 systemd-sysv amd64 255.4-1ubuntu8.12 [11.9 kB]
-#9 18.86 Get:33 http://archive.ubuntu.com/ubuntu noble/main amd64 adduser all 3.137ubuntu1 [101 kB]
-#9 18.86 Get:34 http://archive.ubuntu.com/ubuntu noble/main amd64 cron-daemon-common all 3.0pl1-184ubuntu2 [13.6 kB]
-#9 18.86 Get:35 http://archive.ubuntu.com/ubuntu noble/main amd64 cron amd64 3.0pl1-184ubuntu2 [85.3 kB]
-#9 18.86 Get:36 http://archive.ubuntu.com/ubuntu noble/main amd64 libsigsegv2 amd64 2.14-1ubuntu2 [15.0 kB]
-#9 18.86 Get:37 http://archive.ubuntu.com/ubuntu noble/main amd64 gawk amd64 1:5.2.1-2build3 [463 kB]
-#9 18.86 Get:38 http://archive.ubuntu.com/ubuntu noble/main amd64 sgml-base all 1.31 [11.4 kB]
-#9 18.89 Get:39 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libsmartcols1 amd64 2.39.3-9ubuntu6.4 [65.6 kB]
-#9 18.89 Get:40 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 apt-utils amd64 2.8.3 [216 kB]
-#9 18.92 Get:41 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libdbus-1-3 amd64 1.14.10-4ubuntu4.1 [210 kB]
-#9 18.92 Get:42 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 dbus-bin amd64 1.14.10-4ubuntu4.1 [39.3 kB]
-#9 18.92 Get:43 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 dbus-session-bus-common all 1.14.10-4ubuntu4.1 [80.5 kB]
-#9 18.92 Get:44 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 dbus-daemon amd64 1.14.10-4ubuntu4.1 [118 kB]
-#9 18.92 Get:45 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 dbus-system-bus-common all 1.14.10-4ubuntu4.1 [81.6 kB]
-#9 18.92 Get:46 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 dbus amd64 1.14.10-4ubuntu4.1 [24.3 kB]
-#9 18.92 Get:47 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 distro-info-data all 0.60ubuntu0.5 [6934 B]
-#9 18.92 Get:48 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libglib2.0-0t64 amd64 2.80.0-6ubuntu3.5 [1544 kB]
-#9 18.95 Get:49 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 gir1.2-glib-2.0 amd64 2.80.0-6ubuntu3.5 [183 kB]
-#9 18.95 Get:50 http://archive.ubuntu.com/ubuntu noble/main amd64 libgirepository-1.0-1 amd64 1.80.1-1 [81.9 kB]
-#9 18.99 Get:51 http://archive.ubuntu.com/ubuntu noble/main amd64 gir1.2-girepository-2.0 amd64 1.80.1-1 [24.5 kB]
-#9 18.99 Get:52 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libelf1t64 amd64 0.190-1.1ubuntu0.1 [57.8 kB]
-#9 18.99 Get:53 http://archive.ubuntu.com/ubuntu noble/main amd64 libbpf1 amd64 1:1.3.0-2build2 [166 kB]
-#9 18.99 Get:54 http://archive.ubuntu.com/ubuntu noble/main amd64 libmnl0 amd64 1.0.5-2build1 [12.3 kB]
-#9 18.99 Get:55 http://archive.ubuntu.com/ubuntu noble/main amd64 libxtables12 amd64 1.8.10-3ubuntu2 [35.7 kB]
-#9 18.99 Get:56 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libcap2-bin amd64 1:2.66-5ubuntu2.2 [34.2 kB]
-#9 18.99 Get:57 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 iproute2 amd64 6.1.0-1ubuntu6.2 [1120 kB]
-#9 19.00 Get:58 http://archive.ubuntu.com/ubuntu noble/main amd64 iso-codes all 4.16.0-1 [3492 kB]
-#9 19.03 Get:59 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 less amd64 590-2ubuntu2.1 [142 kB]
-#9 19.03 Get:60 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libglib2.0-data all 2.80.0-6ubuntu3.5 [48.8 kB]
-#9 19.05 Get:61 http://archive.ubuntu.com/ubuntu noble/main amd64 libslang2 amd64 2.3.3-3build2 [506 kB]
-#9 19.06 Get:62 http://archive.ubuntu.com/ubuntu noble/main amd64 libnewt0.52 amd64 0.52.24-2ubuntu2 [46.8 kB]
-#9 19.06 Get:63 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libpam-systemd amd64 255.4-1ubuntu8.12 [235 kB]
-#9 19.06 Get:64 http://archive.ubuntu.com/ubuntu noble/main amd64 libpopt0 amd64 1.19+dfsg-1build1 [28.6 kB]
-#9 19.06 Get:65 http://archive.ubuntu.com/ubuntu noble/main amd64 libtirpc-common all 1.3.4+ds-1.1build1 [8094 B]
-#9 19.06 Get:66 http://archive.ubuntu.com/ubuntu noble/main amd64 libtirpc3t64 amd64 1.3.4+ds-1.1build1 [82.6 kB]
-#9 19.06 Get:67 http://archive.ubuntu.com/ubuntu noble/main amd64 libyaml-0-2 amd64 0.2.5-1build1 [51.5 kB]
-#9 19.09 Get:68 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 locales all 2.39-0ubuntu8.6 [4229 kB]
-#9 19.12 Get:69 http://archive.ubuntu.com/ubuntu noble/main amd64 lsb-release all 12.0-2 [6564 B]
-#9 19.12 Get:70 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 python-apt-common all 2.7.7ubuntu5.1 [20.8 kB]
-#9 19.12 Get:71 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 python3-apt amd64 2.7.7ubuntu5.1 [169 kB]
-#9 19.12 Get:72 http://archive.ubuntu.com/ubuntu noble/main amd64 python3-cffi-backend amd64 1.16.0-2build1 [77.3 kB]
-#9 19.12 Get:73 http://archive.ubuntu.com/ubuntu noble/main amd64 python3-dbus amd64 1.3.2-5build3 [100 kB]
-#9 19.13 Get:74 http://archive.ubuntu.com/ubuntu noble/main amd64 python3-gi amd64 3.48.2-1 [232 kB]
-#9 19.13 Get:75 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 python3-pkg-resources all 68.1.2-2ubuntu1.2 [168 kB]
-#9 19.13 Get:76 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 sudo amd64 1.9.15p5-3ubuntu5.24.04.1 [948 kB]
-#9 19.13 Get:77 http://archive.ubuntu.com/ubuntu noble/main amd64 whiptail amd64 0.52.24-2ubuntu2 [18.0 kB]
-#9 19.16 Get:78 http://archive.ubuntu.com/ubuntu noble/main amd64 libuv1t64 amd64 1.48.0-1.1build1 [97.3 kB]
-#9 19.19 Get:79 http://archive.ubuntu.com/ubuntu noble/main amd64 liblmdb0 amd64 0.9.31-1build1 [48.1 kB]
-#9 19.19 Get:80 http://archive.ubuntu.com/ubuntu noble/main amd64 libmaxminddb0 amd64 1.9.1-1build1 [24.4 kB]
-#9 19.19 Get:81 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 bind9-libs amd64 1:9.18.39-0ubuntu0.24.04.2 [1257 kB]
-#9 19.20 Get:82 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 bind9-host amd64 1:9.18.39-0ubuntu0.24.04.2 [50.5 kB]
-#9 19.20 Get:83 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 bind9-dnsutils amd64 1:9.18.39-0ubuntu0.24.04.2 [156 kB]
-#9 19.20 Get:84 http://archive.ubuntu.com/ubuntu noble/main amd64 libip4tc2 amd64 1.8.10-3ubuntu2 [23.3 kB]
-#9 19.20 Get:85 http://archive.ubuntu.com/ubuntu noble/main amd64 libip6tc2 amd64 1.8.10-3ubuntu2 [23.7 kB]
-#9 19.20 Get:86 http://archive.ubuntu.com/ubuntu noble/main amd64 libnfnetlink0 amd64 1.0.2-2build1 [14.8 kB]
-#9 19.20 Get:87 http://archive.ubuntu.com/ubuntu noble/main amd64 libnetfilter-conntrack3 amd64 1.0.9-6build1 [45.2 kB]
-#9 19.22 Get:88 http://archive.ubuntu.com/ubuntu noble/main amd64 libnftnl11 amd64 1.2.6-2build1 [66.0 kB]
-#9 19.26 Get:89 http://archive.ubuntu.com/ubuntu noble/main amd64 iptables amd64 1.8.10-3ubuntu2 [381 kB]
-#9 19.26 Get:90 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libpng16-16t64 amd64 1.6.43-5ubuntu0.1 [187 kB]
-#9 19.26 Get:91 http://archive.ubuntu.com/ubuntu noble/main amd64 lsof amd64 4.95.0-1build3 [247 kB]
-#9 19.26 Get:92 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 wget amd64 1.21.4-1ubuntu4.1 [334 kB]
-#9 19.26 Get:93 http://archive.ubuntu.com/ubuntu noble-updates/universe amd64 apt-transport-https all 2.8.3 [3970 B]
-#9 19.26 Get:94 http://archive.ubuntu.com/ubuntu noble/universe amd64 at amd64 3.2.5-2.1ubuntu3 [40.6 kB]
-#9 19.27 Get:95 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 gpgconf amd64 2.4.4-2ubuntu17.3 [104 kB]
-#9 19.27 Get:96 http://archive.ubuntu.com/ubuntu noble/main amd64 libksba8 amd64 1.6.6-1build1 [122 kB]
-#9 19.27 Get:97 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 dirmngr amd64 2.4.4-2ubuntu17.3 [323 kB]
-#9 19.29 Get:98 http://archive.ubuntu.com/ubuntu noble-updates/universe amd64 dnsutils all 1:9.18.39-0ubuntu0.24.04.2 [3684 B]
-#9 19.32 Get:99 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libpackagekit-glib2-18 amd64 1.2.8-2ubuntu1.4 [120 kB]
-#9 19.32 Get:100 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 gir1.2-packagekitglib-1.0 amd64 1.2.8-2ubuntu1.4 [25.6 kB]
-#9 19.33 Get:101 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 gnupg-utils amd64 2.4.4-2ubuntu17.3 [109 kB]
-#9 19.43 Get:102 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 gpg amd64 2.4.4-2ubuntu17.3 [565 kB]
-#9 19.65 Get:103 http://archive.ubuntu.com/ubuntu noble/main amd64 pinentry-curses amd64 1.2.1-3ubuntu5 [35.2 kB]
-#9 19.65 Get:104 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 gpg-agent amd64 2.4.4-2ubuntu17.3 [227 kB]
-#9 19.66 Get:105 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 gpgsm amd64 2.4.4-2ubuntu17.3 [232 kB]
-#9 19.67 Get:106 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 keyboxd amd64 2.4.4-2ubuntu17.3 [78.3 kB]
-#9 19.69 Get:107 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 gnupg all 2.4.4-2ubuntu17.3 [359 kB]
-#9 19.70 Get:108 http://archive.ubuntu.com/ubuntu noble-updates/universe amd64 gnupg-agent all 2.4.4-2ubuntu17.3 [4668 B]
-#9 19.70 Get:109 http://archive.ubuntu.com/ubuntu noble/main amd64 libstemmer0d amd64 2.2.0-4build1 [161 kB]
-#9 19.71 Get:110 http://archive.ubuntu.com/ubuntu noble/main amd64 libxmlb2 amd64 0.3.18-1 [67.7 kB]
-#9 19.71 Get:111 http://archive.ubuntu.com/ubuntu noble/main amd64 libappstream5 amd64 1.0.2-1build6 [238 kB]
-#9 19.72 Get:112 http://archive.ubuntu.com/ubuntu noble/main amd64 libduktape207 amd64 2.7.0+tests-0ubuntu3 [143 kB]
-#9 19.72 Get:113 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libdw1t64 amd64 0.190-1.1ubuntu0.1 [261 kB]
-#9 19.73 Get:114 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libglib2.0-bin amd64 2.80.0-6ubuntu3.5 [97.9 kB]
-#9 19.73 Get:115 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libunwind8 amd64 1.6.2-3build1.1 [55.3 kB]
-#9 19.76 Get:116 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libgstreamer1.0-0 amd64 1.24.2-1ubuntu0.1 [1165 kB]
-#9 19.77 Get:117 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libpolkit-gobject-1-0 amd64 124-2ubuntu1.24.04.2 [49.1 kB]
-#9 19.77 Get:118 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libpolkit-agent-1-0 amd64 124-2ubuntu1.24.04.2 [17.4 kB]
-#9 19.77 Get:119 http://archive.ubuntu.com/ubuntu noble/universe amd64 libqrencode4 amd64 4.1.1-1build2 [25.0 kB]
-#9 19.77 Get:120 http://archive.ubuntu.com/ubuntu noble/main amd64 xml-core all 0.19 [20.3 kB]
-#9 19.77 Get:121 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 polkitd amd64 124-2ubuntu1.24.04.2 [95.2 kB]
-#9 19.79 Get:122 http://archive.ubuntu.com/ubuntu noble/main amd64 python3-blinker all 1.7.0-1 [14.3 kB]
-#9 19.79 Get:123 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 python3-cryptography amd64 41.0.7-4ubuntu0.1 [810 kB]
-#9 19.80 Get:124 http://archive.ubuntu.com/ubuntu noble/main amd64 python3-pyparsing all 3.1.1-1 [86.2 kB]
-#9 19.80 Get:125 http://archive.ubuntu.com/ubuntu noble/main amd64 python3-httplib2 all 0.20.4-3 [30.4 kB]
-#9 19.82 Get:126 http://archive.ubuntu.com/ubuntu noble/main amd64 python3-jwt all 2.7.0-1 [20.9 kB]
-#9 19.82 Get:127 http://archive.ubuntu.com/ubuntu noble/main amd64 python3-lazr.uri all 1.0.6-3 [13.5 kB]
-#9 19.82 Get:128 http://archive.ubuntu.com/ubuntu noble/main amd64 python3-wadllib all 1.3.6-5 [35.9 kB]
-#9 19.82 Get:129 http://archive.ubuntu.com/ubuntu noble/main amd64 python3-distro all 1.9.0-1 [19.0 kB]
-#9 19.82 Get:130 http://archive.ubuntu.com/ubuntu noble/main amd64 python3-oauthlib all 3.2.2-1 [89.7 kB]
-#9 19.83 Get:131 http://archive.ubuntu.com/ubuntu noble/main amd64 python3-lazr.restfulclient all 0.14.6-1 [50.8 kB]
-#9 19.86 Get:132 http://archive.ubuntu.com/ubuntu noble/main amd64 python3-six all 1.16.0-4 [12.4 kB]
-#9 19.86 Get:133 http://archive.ubuntu.com/ubuntu noble/main amd64 python3-launchpadlib all 1.11.0-6 [127 kB]
-#9 19.86 Get:134 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 python3-software-properties all 0.99.49.3 [29.9 kB]
-#9 19.86 Get:135 http://archive.ubuntu.com/ubuntu noble/universe amd64 qrencode amd64 4.1.1-1build2 [26.1 kB]
-#9 19.89 Get:136 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 packagekit amd64 1.2.8-2ubuntu1.4 [434 kB]
-#9 19.89 Get:137 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 software-properties-common all 0.99.49.3 [14.4 kB]
-#9 19.89 Get:138 http://archive.ubuntu.com/ubuntu noble-updates/universe amd64 gnupg2 all 2.4.4-2ubuntu17.3 [4748 B]
-#9 20.01 debconf: delaying package configuration, since apt-utils is not installed
-#9 20.04 Fetched 40.7 MB in 2s (24.5 MB/s)
-#9 20.05 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 12791 files and directories currently installed.)
-#9 20.06 Preparing to unpack .../bsdutils_1%3a2.39.3-9ubuntu6.4_amd64.deb ...
-#9 20.06 Unpacking bsdutils (1:2.39.3-9ubuntu6.4) over (1:2.39.3-9ubuntu6.3) ...
-#9 20.10 Setting up bsdutils (1:2.39.3-9ubuntu6.4) ...
-#9 20.11 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 12791 files and directories currently installed.)
-#9 20.12 Preparing to unpack .../util-linux_2.39.3-9ubuntu6.4_amd64.deb ...
-#9 20.13 Unpacking util-linux (2.39.3-9ubuntu6.4) over (2.39.3-9ubuntu6.3) ...
-#9 20.30 Setting up util-linux (2.39.3-9ubuntu6.4) ...
-#9 20.43 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 12791 files and directories currently installed.)
-#9 20.44 Preparing to unpack .../mount_2.39.3-9ubuntu6.4_amd64.deb ...
-#9 20.44 Unpacking mount (2.39.3-9ubuntu6.4) over (2.39.3-9ubuntu6.3) ...
-#9 20.47 Selecting previously unselected package libpython3.12-minimal:amd64.
-#9 20.47 Preparing to unpack .../libpython3.12-minimal_3.12.3-1ubuntu0.9_amd64.deb ...
-#9 20.47 Unpacking libpython3.12-minimal:amd64 (3.12.3-1ubuntu0.9) ...
-#9 20.54 Selecting previously unselected package python3.12-minimal.
-#9 20.54 Preparing to unpack .../python3.12-minimal_3.12.3-1ubuntu0.9_amd64.deb ...
-#9 20.55 Unpacking python3.12-minimal (3.12.3-1ubuntu0.9) ...
-#9 20.59 Setting up libpython3.12-minimal:amd64 (3.12.3-1ubuntu0.9) ...
-#9 20.60 Setting up python3.12-minimal (3.12.3-1ubuntu0.9) ...
-#9 21.29 Selecting previously unselected package python3-minimal.
-#9 21.29 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 13102 files and directories currently installed.)
-#9 21.30 Preparing to unpack .../0-python3-minimal_3.12.3-0ubuntu2.1_amd64.deb ...
-#9 21.30 Unpacking python3-minimal (3.12.3-0ubuntu2.1) ...
-#9 21.31 Selecting previously unselected package media-types.
-#9 21.31 Preparing to unpack .../1-media-types_10.1.0_all.deb ...
-#9 21.32 Unpacking media-types (10.1.0) ...
-#9 21.33 Selecting previously unselected package netbase.
-#9 21.33 Preparing to unpack .../2-netbase_6.4_all.deb ...
-#9 21.33 Unpacking netbase (6.4) ...
-#9 21.35 Selecting previously unselected package tzdata.
-#9 21.35 Preparing to unpack .../3-tzdata_2025b-0ubuntu0.24.04.1_all.deb ...
-#9 21.35 Unpacking tzdata (2025b-0ubuntu0.24.04.1) ...
-#9 21.44 Selecting previously unselected package readline-common.
-#9 21.45 Preparing to unpack .../4-readline-common_8.2-4build1_all.deb ...
-#9 21.45 Unpacking readline-common (8.2-4build1) ...
-#9 21.46 Selecting previously unselected package libreadline8t64:amd64.
-#9 21.47 Preparing to unpack .../5-libreadline8t64_8.2-4build1_amd64.deb ...
-#9 21.47 Adding 'diversion of /lib/x86_64-linux-gnu/libhistory.so.8 to /lib/x86_64-linux-gnu/libhistory.so.8.usr-is-merged by libreadline8t64'
-#9 21.48 Adding 'diversion of /lib/x86_64-linux-gnu/libhistory.so.8.2 to /lib/x86_64-linux-gnu/libhistory.so.8.2.usr-is-merged by libreadline8t64'
-#9 21.48 Adding 'diversion of /lib/x86_64-linux-gnu/libreadline.so.8 to /lib/x86_64-linux-gnu/libreadline.so.8.usr-is-merged by libreadline8t64'
-#9 21.49 Adding 'diversion of /lib/x86_64-linux-gnu/libreadline.so.8.2 to /lib/x86_64-linux-gnu/libreadline.so.8.2.usr-is-merged by libreadline8t64'
-#9 21.49 Unpacking libreadline8t64:amd64 (8.2-4build1) ...
-#9 21.50 Selecting previously unselected package libsqlite3-0:amd64.
-#9 21.51 Preparing to unpack .../6-libsqlite3-0_3.45.1-1ubuntu2.5_amd64.deb ...
-#9 21.51 Unpacking libsqlite3-0:amd64 (3.45.1-1ubuntu2.5) ...
-#9 21.53 Selecting previously unselected package libpython3.12-stdlib:amd64.
-#9 21.53 Preparing to unpack .../7-libpython3.12-stdlib_3.12.3-1ubuntu0.9_amd64.deb ...
-#9 21.53 Unpacking libpython3.12-stdlib:amd64 (3.12.3-1ubuntu0.9) ...
-#9 21.62 Selecting previously unselected package python3.12.
-#9 21.63 Preparing to unpack .../8-python3.12_3.12.3-1ubuntu0.9_amd64.deb ...
-#9 21.63 Unpacking python3.12 (3.12.3-1ubuntu0.9) ...
-#9 21.64 Selecting previously unselected package libpython3-stdlib:amd64.
-#9 21.65 Preparing to unpack .../9-libpython3-stdlib_3.12.3-0ubuntu2.1_amd64.deb ...
-#9 21.65 Unpacking libpython3-stdlib:amd64 (3.12.3-0ubuntu2.1) ...
-#9 21.67 Setting up python3-minimal (3.12.3-0ubuntu2.1) ...
-#9 21.79 Selecting previously unselected package python3.
-#9 21.79 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 14108 files and directories currently installed.)
-#9 21.80 Preparing to unpack .../python3_3.12.3-0ubuntu2.1_amd64.deb ...
-#9 21.80 Unpacking python3 (3.12.3-0ubuntu2.1) ...
-#9 21.82 Selecting previously unselected package libapparmor1:amd64.
-#9 21.82 Preparing to unpack .../libapparmor1_4.0.1really4.0.1-0ubuntu0.24.04.5_amd64.deb ...
-#9 21.82 Unpacking libapparmor1:amd64 (4.0.1really4.0.1-0ubuntu0.24.04.5) ...
-#9 21.84 Selecting previously unselected package libargon2-1:amd64.
-#9 21.84 Preparing to unpack .../libargon2-1_0~20190702+dfsg-4build1_amd64.deb ...
-#9 21.84 Unpacking libargon2-1:amd64 (0~20190702+dfsg-4build1) ...
-#9 21.86 Preparing to unpack .../libblkid1_2.39.3-9ubuntu6.4_amd64.deb ...
-#9 21.87 Unpacking libblkid1:amd64 (2.39.3-9ubuntu6.4) over (2.39.3-9ubuntu6.3) ...
-#9 21.89 Setting up libblkid1:amd64 (2.39.3-9ubuntu6.4) ...
-#9 21.91 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 14138 files and directories currently installed.)
-#9 21.92 Preparing to unpack .../libudev1_255.4-1ubuntu8.12_amd64.deb ...
-#9 21.92 Unpacking libudev1:amd64 (255.4-1ubuntu8.12) over (255.4-1ubuntu8.11) ...
-#9 21.94 Setting up libudev1:amd64 (255.4-1ubuntu8.12) ...
-#9 21.96 Selecting previously unselected package libdevmapper1.02.1:amd64.
-#9 21.96 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 14138 files and directories currently installed.)
-#9 21.97 Preparing to unpack .../libdevmapper1.02.1_2%3a1.02.185-3ubuntu3.2_amd64.deb ...
-#9 21.97 Unpacking libdevmapper1.02.1:amd64 (2:1.02.185-3ubuntu3.2) ...
-#9 21.99 Selecting previously unselected package libjson-c5:amd64.
-#9 21.99 Preparing to unpack .../libjson-c5_0.17-1build1_amd64.deb ...
-#9 21.99 Unpacking libjson-c5:amd64 (0.17-1build1) ...
-#9 22.01 Preparing to unpack .../libuuid1_2.39.3-9ubuntu6.4_amd64.deb ...
-#9 22.01 Unpacking libuuid1:amd64 (2.39.3-9ubuntu6.4) over (2.39.3-9ubuntu6.3) ...
-#9 22.03 Setting up libuuid1:amd64 (2.39.3-9ubuntu6.4) ...
-#9 22.05 Selecting previously unselected package libcryptsetup12:amd64.
-#9 22.05 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 14149 files and directories currently installed.)
-#9 22.06 Preparing to unpack .../libcryptsetup12_2%3a2.7.0-1ubuntu4.2_amd64.deb ...
-#9 22.06 Unpacking libcryptsetup12:amd64 (2:2.7.0-1ubuntu4.2) ...
-#9 22.08 Selecting previously unselected package libfdisk1:amd64.
-#9 22.08 Preparing to unpack .../libfdisk1_2.39.3-9ubuntu6.4_amd64.deb ...
-#9 22.08 Unpacking libfdisk1:amd64 (2.39.3-9ubuntu6.4) ...
-#9 22.10 Selecting previously unselected package libkmod2:amd64.
-#9 22.10 Preparing to unpack .../libkmod2_31+20240202-2ubuntu7.1_amd64.deb ...
-#9 22.10 Unpacking libkmod2:amd64 (31+20240202-2ubuntu7.1) ...
-#9 22.12 Preparing to unpack .../libmount1_2.39.3-9ubuntu6.4_amd64.deb ...
-#9 22.13 Unpacking libmount1:amd64 (2.39.3-9ubuntu6.4) over (2.39.3-9ubuntu6.3) ...
-#9 22.15 Setting up libmount1:amd64 (2.39.3-9ubuntu6.4) ...
-#9 22.17 Selecting previously unselected package libsystemd-shared:amd64.
-#9 22.17 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 14169 files and directories currently installed.)
-#9 22.18 Preparing to unpack .../libsystemd-shared_255.4-1ubuntu8.12_amd64.deb ...
-#9 22.18 Unpacking libsystemd-shared:amd64 (255.4-1ubuntu8.12) ...
-#9 22.22 Preparing to unpack .../libsystemd0_255.4-1ubuntu8.12_amd64.deb ...
-#9 22.22 Unpacking libsystemd0:amd64 (255.4-1ubuntu8.12) over (255.4-1ubuntu8.11) ...
-#9 22.25 Setting up libsystemd0:amd64 (255.4-1ubuntu8.12) ...
-#9 22.26 Selecting previously unselected package systemd-dev.
-#9 22.26 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 14177 files and directories currently installed.)
-#9 22.27 Preparing to unpack .../systemd-dev_255.4-1ubuntu8.12_all.deb ...
-#9 22.27 Unpacking systemd-dev (255.4-1ubuntu8.12) ...
-#9 22.30 Selecting previously unselected package systemd.
-#9 22.30 Preparing to unpack .../systemd_255.4-1ubuntu8.12_amd64.deb ...
-#9 22.31 Unpacking systemd (255.4-1ubuntu8.12) ...
-#9 22.46 Setting up libapparmor1:amd64 (4.0.1really4.0.1-0ubuntu0.24.04.5) ...
-#9 22.47 Setting up libargon2-1:amd64 (0~20190702+dfsg-4build1) ...
-#9 22.47 Setting up libdevmapper1.02.1:amd64 (2:1.02.185-3ubuntu3.2) ...
-#9 22.47 Setting up libjson-c5:amd64 (0.17-1build1) ...
-#9 22.48 Setting up libcryptsetup12:amd64 (2:2.7.0-1ubuntu4.2) ...
-#9 22.48 Setting up libfdisk1:amd64 (2.39.3-9ubuntu6.4) ...
-#9 22.48 Setting up libkmod2:amd64 (31+20240202-2ubuntu7.1) ...
-#9 22.48 Setting up libsystemd-shared:amd64 (255.4-1ubuntu8.12) ...
-#9 22.49 Setting up systemd-dev (255.4-1ubuntu8.12) ...
-#9 22.49 Setting up mount (2.39.3-9ubuntu6.4) ...
-#9 22.49 Setting up systemd (255.4-1ubuntu8.12) ...
-#9 22.51 Created symlink /etc/systemd/system/getty.target.wants/getty@tty1.service → /usr/lib/systemd/system/getty@.service.
-#9 22.51 Created symlink /etc/systemd/system/multi-user.target.wants/remote-fs.target → /usr/lib/systemd/system/remote-fs.target.
-#9 22.51 Created symlink /etc/systemd/system/sysinit.target.wants/systemd-pstore.service → /usr/lib/systemd/system/systemd-pstore.service.
-#9 22.52 Initializing machine ID from random generator.
-#9 22.54 /usr/lib/tmpfiles.d/systemd-network.conf:10: Failed to resolve user 'systemd-network': No such process
-#9 22.54 /usr/lib/tmpfiles.d/systemd-network.conf:11: Failed to resolve user 'systemd-network': No such process
-#9 22.54 /usr/lib/tmpfiles.d/systemd-network.conf:12: Failed to resolve user 'systemd-network': No such process
-#9 22.54 /usr/lib/tmpfiles.d/systemd-network.conf:13: Failed to resolve user 'systemd-network': No such process
-#9 22.54 /usr/lib/tmpfiles.d/systemd.conf:22: Failed to resolve group 'systemd-journal': No such process
-#9 22.54 /usr/lib/tmpfiles.d/systemd.conf:23: Failed to resolve group 'systemd-journal': No such process
-#9 22.54 /usr/lib/tmpfiles.d/systemd.conf:28: Failed to resolve group 'systemd-journal': No such process
-#9 22.54 /usr/lib/tmpfiles.d/systemd.conf:29: Failed to resolve group 'systemd-journal': No such process
-#9 22.54 /usr/lib/tmpfiles.d/systemd.conf:30: Failed to resolve group 'systemd-journal': No such process
-#9 22.55 Creating group 'systemd-journal' with GID 999.
-#9 22.55 Creating group 'systemd-network' with GID 998.
-#9 22.55 Creating user 'systemd-network' (systemd Network Management) with UID 998 and GID 998.
-#9 22.58 Selecting previously unselected package systemd-sysv.
-#9 22.58 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 15155 files and directories currently installed.)
-#9 22.59 Preparing to unpack .../systemd-sysv_255.4-1ubuntu8.12_amd64.deb ...
-#9 22.59 Unpacking systemd-sysv (255.4-1ubuntu8.12) ...
-#9 22.61 Selecting previously unselected package adduser.
-#9 22.62 Preparing to unpack .../adduser_3.137ubuntu1_all.deb ...
-#9 22.62 Unpacking adduser (3.137ubuntu1) ...
-#9 22.65 Setting up adduser (3.137ubuntu1) ...
-#9 22.67 Selecting previously unselected package cron-daemon-common.
-#9 22.67 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 15221 files and directories currently installed.)
-#9 22.68 Preparing to unpack .../cron-daemon-common_3.0pl1-184ubuntu2_all.deb ...
-#9 22.68 Unpacking cron-daemon-common (3.0pl1-184ubuntu2) ...
-#9 22.70 Setting up cron-daemon-common (3.0pl1-184ubuntu2) ...
-#9 22.71 Creating group 'crontab' with GID 997.
-#9 22.74 Selecting previously unselected package cron.
-#9 22.74 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 15240 files and directories currently installed.)
-#9 22.75 Preparing to unpack .../cron_3.0pl1-184ubuntu2_amd64.deb ...
-#9 22.75 Unpacking cron (3.0pl1-184ubuntu2) ...
-#9 22.77 Selecting previously unselected package libsigsegv2:amd64.
-#9 22.77 Preparing to unpack .../libsigsegv2_2.14-1ubuntu2_amd64.deb ...
-#9 22.78 Unpacking libsigsegv2:amd64 (2.14-1ubuntu2) ...
-#9 22.79 Setting up readline-common (8.2-4build1) ...
-#9 22.80 Setting up libreadline8t64:amd64 (8.2-4build1) ...
-#9 22.80 Setting up libsigsegv2:amd64 (2.14-1ubuntu2) ...
-#9 22.82 Selecting previously unselected package gawk.
-#9 22.82 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 15276 files and directories currently installed.)
-#9 22.83 Preparing to unpack .../gawk_1%3a5.2.1-2build3_amd64.deb ...
-#9 22.83 Unpacking gawk (1:5.2.1-2build3) ...
-#9 22.87 Selecting previously unselected package sgml-base.
-#9 22.87 Preparing to unpack .../sgml-base_1.31_all.deb ...
-#9 22.87 Unpacking sgml-base (1.31) ...
-#9 22.89 Preparing to unpack .../libsmartcols1_2.39.3-9ubuntu6.4_amd64.deb ...
-#9 22.90 Unpacking libsmartcols1:amd64 (2.39.3-9ubuntu6.4) over (2.39.3-9ubuntu6.3) ...
-#9 22.92 Setting up libsmartcols1:amd64 (2.39.3-9ubuntu6.4) ...
-#9 22.94 Selecting previously unselected package apt-utils.
-#9 22.94 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 15470 files and directories currently installed.)
-#9 22.95 Preparing to unpack .../00-apt-utils_2.8.3_amd64.deb ...
-#9 22.95 Unpacking apt-utils (2.8.3) ...
-#9 22.97 Selecting previously unselected package libdbus-1-3:amd64.
-#9 22.97 Preparing to unpack .../01-libdbus-1-3_1.14.10-4ubuntu4.1_amd64.deb ...
-#9 22.98 Unpacking libdbus-1-3:amd64 (1.14.10-4ubuntu4.1) ...
-#9 22.99 Selecting previously unselected package dbus-bin.
-#9 22.99 Preparing to unpack .../02-dbus-bin_1.14.10-4ubuntu4.1_amd64.deb ...
-#9 22.99 Unpacking dbus-bin (1.14.10-4ubuntu4.1) ...
-#9 23.01 Selecting previously unselected package dbus-session-bus-common.
-#9 23.01 Preparing to unpack .../03-dbus-session-bus-common_1.14.10-4ubuntu4.1_all.deb ...
-#9 23.01 Unpacking dbus-session-bus-common (1.14.10-4ubuntu4.1) ...
-#9 23.03 Selecting previously unselected package dbus-daemon.
-#9 23.03 Preparing to unpack .../04-dbus-daemon_1.14.10-4ubuntu4.1_amd64.deb ...
-#9 23.03 Unpacking dbus-daemon (1.14.10-4ubuntu4.1) ...
-#9 23.05 Selecting previously unselected package dbus-system-bus-common.
-#9 23.05 Preparing to unpack .../05-dbus-system-bus-common_1.14.10-4ubuntu4.1_all.deb ...
-#9 23.05 Unpacking dbus-system-bus-common (1.14.10-4ubuntu4.1) ...
-#9 23.07 Selecting previously unselected package dbus.
-#9 23.07 Preparing to unpack .../06-dbus_1.14.10-4ubuntu4.1_amd64.deb ...
-#9 23.07 Unpacking dbus (1.14.10-4ubuntu4.1) ...
-#9 23.09 Selecting previously unselected package distro-info-data.
-#9 23.09 Preparing to unpack .../07-distro-info-data_0.60ubuntu0.5_all.deb ...
-#9 23.09 Unpacking distro-info-data (0.60ubuntu0.5) ...
-#9 23.11 Selecting previously unselected package libglib2.0-0t64:amd64.
-#9 23.11 Preparing to unpack .../08-libglib2.0-0t64_2.80.0-6ubuntu3.5_amd64.deb ...
-#9 23.12 Unpacking libglib2.0-0t64:amd64 (2.80.0-6ubuntu3.5) ...
-#9 23.16 Selecting previously unselected package gir1.2-glib-2.0:amd64.
-#9 23.16 Preparing to unpack .../09-gir1.2-glib-2.0_2.80.0-6ubuntu3.5_amd64.deb ...
-#9 23.16 Unpacking gir1.2-glib-2.0:amd64 (2.80.0-6ubuntu3.5) ...
-#9 23.18 Selecting previously unselected package libgirepository-1.0-1:amd64.
-#9 23.18 Preparing to unpack .../10-libgirepository-1.0-1_1.80.1-1_amd64.deb ...
-#9 23.18 Unpacking libgirepository-1.0-1:amd64 (1.80.1-1) ...
-#9 23.20 Selecting previously unselected package gir1.2-girepository-2.0:amd64.
-#9 23.20 Preparing to unpack .../11-gir1.2-girepository-2.0_1.80.1-1_amd64.deb ...
-#9 23.20 Unpacking gir1.2-girepository-2.0:amd64 (1.80.1-1) ...
-#9 23.22 Selecting previously unselected package libelf1t64:amd64.
-#9 23.22 Preparing to unpack .../12-libelf1t64_0.190-1.1ubuntu0.1_amd64.deb ...
-#9 23.22 Unpacking libelf1t64:amd64 (0.190-1.1ubuntu0.1) ...
-#9 23.24 Selecting previously unselected package libbpf1:amd64.
-#9 23.24 Preparing to unpack .../13-libbpf1_1%3a1.3.0-2build2_amd64.deb ...
-#9 23.25 Unpacking libbpf1:amd64 (1:1.3.0-2build2) ...
-#9 23.26 Selecting previously unselected package libmnl0:amd64.
-#9 23.27 Preparing to unpack .../14-libmnl0_1.0.5-2build1_amd64.deb ...
-#9 23.27 Unpacking libmnl0:amd64 (1.0.5-2build1) ...
-#9 23.28 Selecting previously unselected package libxtables12:amd64.
-#9 23.28 Preparing to unpack .../15-libxtables12_1.8.10-3ubuntu2_amd64.deb ...
-#9 23.29 Unpacking libxtables12:amd64 (1.8.10-3ubuntu2) ...
-#9 23.30 Selecting previously unselected package libcap2-bin.
-#9 23.30 Preparing to unpack .../16-libcap2-bin_1%3a2.66-5ubuntu2.2_amd64.deb ...
-#9 23.30 Unpacking libcap2-bin (1:2.66-5ubuntu2.2) ...
-#9 23.32 Selecting previously unselected package iproute2.
-#9 23.33 Preparing to unpack .../17-iproute2_6.1.0-1ubuntu6.2_amd64.deb ...
-#9 23.33 Unpacking iproute2 (6.1.0-1ubuntu6.2) ...
-#9 23.37 Selecting previously unselected package iso-codes.
-#9 23.37 Preparing to unpack .../18-iso-codes_4.16.0-1_all.deb ...
-#9 23.37 Unpacking iso-codes (4.16.0-1) ...
-#9 23.52 Selecting previously unselected package less.
-#9 23.52 Preparing to unpack .../19-less_590-2ubuntu2.1_amd64.deb ...
-#9 23.53 Unpacking less (590-2ubuntu2.1) ...
-#9 23.54 Selecting previously unselected package libglib2.0-data.
-#9 23.55 Preparing to unpack .../20-libglib2.0-data_2.80.0-6ubuntu3.5_all.deb ...
-#9 23.55 Unpacking libglib2.0-data (2.80.0-6ubuntu3.5) ...
-#9 23.56 Selecting previously unselected package libslang2:amd64.
-#9 23.56 Preparing to unpack .../21-libslang2_2.3.3-3build2_amd64.deb ...
-#9 23.56 Unpacking libslang2:amd64 (2.3.3-3build2) ...
-#9 23.59 Selecting previously unselected package libnewt0.52:amd64.
-#9 23.59 Preparing to unpack .../22-libnewt0.52_0.52.24-2ubuntu2_amd64.deb ...
-#9 23.59 Unpacking libnewt0.52:amd64 (0.52.24-2ubuntu2) ...
-#9 23.61 Selecting previously unselected package libpam-systemd:amd64.
-#9 23.61 Preparing to unpack .../23-libpam-systemd_255.4-1ubuntu8.12_amd64.deb ...
-#9 23.62 Unpacking libpam-systemd:amd64 (255.4-1ubuntu8.12) ...
-#9 23.65 Selecting previously unselected package libpopt0:amd64.
-#9 23.65 Preparing to unpack .../24-libpopt0_1.19+dfsg-1build1_amd64.deb ...
-#9 23.65 Unpacking libpopt0:amd64 (1.19+dfsg-1build1) ...
-#9 23.66 Selecting previously unselected package libtirpc-common.
-#9 23.67 Preparing to unpack .../25-libtirpc-common_1.3.4+ds-1.1build1_all.deb ...
-#9 23.67 Unpacking libtirpc-common (1.3.4+ds-1.1build1) ...
-#9 23.69 Selecting previously unselected package libtirpc3t64:amd64.
-#9 23.69 Preparing to unpack .../26-libtirpc3t64_1.3.4+ds-1.1build1_amd64.deb ...
-#9 23.69 Adding 'diversion of /lib/x86_64-linux-gnu/libtirpc.so.3 to /lib/x86_64-linux-gnu/libtirpc.so.3.usr-is-merged by libtirpc3t64'
-#9 23.70 Adding 'diversion of /lib/x86_64-linux-gnu/libtirpc.so.3.0.0 to /lib/x86_64-linux-gnu/libtirpc.so.3.0.0.usr-is-merged by libtirpc3t64'
-#9 23.70 Unpacking libtirpc3t64:amd64 (1.3.4+ds-1.1build1) ...
-#9 23.72 Selecting previously unselected package libyaml-0-2:amd64.
-#9 23.72 Preparing to unpack .../27-libyaml-0-2_0.2.5-1build1_amd64.deb ...
-#9 23.73 Unpacking libyaml-0-2:amd64 (0.2.5-1build1) ...
-#9 23.75 Selecting previously unselected package locales.
-#9 23.75 Preparing to unpack .../28-locales_2.39-0ubuntu8.6_all.deb ...
-#9 23.76 Unpacking locales (2.39-0ubuntu8.6) ...
-#9 23.93 Selecting previously unselected package lsb-release.
-#9 23.93 Preparing to unpack .../29-lsb-release_12.0-2_all.deb ...
-#9 23.93 Unpacking lsb-release (12.0-2) ...
-#9 23.94 Selecting previously unselected package python-apt-common.
-#9 23.95 Preparing to unpack .../30-python-apt-common_2.7.7ubuntu5.1_all.deb ...
-#9 23.95 Unpacking python-apt-common (2.7.7ubuntu5.1) ...
-#9 23.97 Selecting previously unselected package python3-apt.
-#9 23.98 Preparing to unpack .../31-python3-apt_2.7.7ubuntu5.1_amd64.deb ...
-#9 23.98 Unpacking python3-apt (2.7.7ubuntu5.1) ...
-#9 24.00 Selecting previously unselected package python3-cffi-backend:amd64.
-#9 24.00 Preparing to unpack .../32-python3-cffi-backend_1.16.0-2build1_amd64.deb ...
-#9 24.00 Unpacking python3-cffi-backend:amd64 (1.16.0-2build1) ...
-#9 24.02 Selecting previously unselected package python3-dbus.
-#9 24.02 Preparing to unpack .../33-python3-dbus_1.3.2-5build3_amd64.deb ...
-#9 24.02 Unpacking python3-dbus (1.3.2-5build3) ...
-#9 24.04 Selecting previously unselected package python3-gi.
-#9 24.04 Preparing to unpack .../34-python3-gi_3.48.2-1_amd64.deb ...
-#9 24.05 Unpacking python3-gi (3.48.2-1) ...
-#9 24.07 Selecting previously unselected package python3-pkg-resources.
-#9 24.07 Preparing to unpack .../35-python3-pkg-resources_68.1.2-2ubuntu1.2_all.deb ...
-#9 24.07 Unpacking python3-pkg-resources (68.1.2-2ubuntu1.2) ...
-#9 24.10 Selecting previously unselected package sudo.
-#9 24.10 Preparing to unpack .../36-sudo_1.9.15p5-3ubuntu5.24.04.1_amd64.deb ...
-#9 24.11 Unpacking sudo (1.9.15p5-3ubuntu5.24.04.1) ...
-#9 24.14 Selecting previously unselected package whiptail.
-#9 24.14 Preparing to unpack .../37-whiptail_0.52.24-2ubuntu2_amd64.deb ...
-#9 24.14 Unpacking whiptail (0.52.24-2ubuntu2) ...
-#9 24.16 Selecting previously unselected package libuv1t64:amd64.
-#9 24.16 Preparing to unpack .../38-libuv1t64_1.48.0-1.1build1_amd64.deb ...
-#9 24.16 Unpacking libuv1t64:amd64 (1.48.0-1.1build1) ...
-#9 24.18 Selecting previously unselected package liblmdb0:amd64.
-#9 24.18 Preparing to unpack .../39-liblmdb0_0.9.31-1build1_amd64.deb ...
-#9 24.19 Unpacking liblmdb0:amd64 (0.9.31-1build1) ...
-#9 24.20 Selecting previously unselected package libmaxminddb0:amd64.
-#9 24.21 Preparing to unpack .../40-libmaxminddb0_1.9.1-1build1_amd64.deb ...
-#9 24.21 Unpacking libmaxminddb0:amd64 (1.9.1-1build1) ...
-#9 24.22 Selecting previously unselected package bind9-libs:amd64.
-#9 24.22 Preparing to unpack .../41-bind9-libs_1%3a9.18.39-0ubuntu0.24.04.2_amd64.deb ...
-#9 24.22 Unpacking bind9-libs:amd64 (1:9.18.39-0ubuntu0.24.04.2) ...
-#9 24.26 Selecting previously unselected package bind9-host.
-#9 24.26 Preparing to unpack .../42-bind9-host_1%3a9.18.39-0ubuntu0.24.04.2_amd64.deb ...
-#9 24.26 Unpacking bind9-host (1:9.18.39-0ubuntu0.24.04.2) ...
-#9 24.27 Selecting previously unselected package bind9-dnsutils.
-#9 24.28 Preparing to unpack .../43-bind9-dnsutils_1%3a9.18.39-0ubuntu0.24.04.2_amd64.deb ...
-#9 24.28 Unpacking bind9-dnsutils (1:9.18.39-0ubuntu0.24.04.2) ...
-#9 24.30 Selecting previously unselected package libip4tc2:amd64.
-#9 24.30 Preparing to unpack .../44-libip4tc2_1.8.10-3ubuntu2_amd64.deb ...
-#9 24.30 Unpacking libip4tc2:amd64 (1.8.10-3ubuntu2) ...
-#9 24.32 Selecting previously unselected package libip6tc2:amd64.
-#9 24.32 Preparing to unpack .../45-libip6tc2_1.8.10-3ubuntu2_amd64.deb ...
-#9 24.32 Unpacking libip6tc2:amd64 (1.8.10-3ubuntu2) ...
-#9 24.34 Selecting previously unselected package libnfnetlink0:amd64.
-#9 24.34 Preparing to unpack .../46-libnfnetlink0_1.0.2-2build1_amd64.deb ...
-#9 24.34 Unpacking libnfnetlink0:amd64 (1.0.2-2build1) ...
-#9 24.36 Selecting previously unselected package libnetfilter-conntrack3:amd64.
-#9 24.36 Preparing to unpack .../47-libnetfilter-conntrack3_1.0.9-6build1_amd64.deb ...
-#9 24.36 Unpacking libnetfilter-conntrack3:amd64 (1.0.9-6build1) ...
-#9 24.38 Selecting previously unselected package libnftnl11:amd64.
-#9 24.38 Preparing to unpack .../48-libnftnl11_1.2.6-2build1_amd64.deb ...
-#9 24.38 Unpacking libnftnl11:amd64 (1.2.6-2build1) ...
-#9 24.40 Selecting previously unselected package iptables.
-#9 24.40 Preparing to unpack .../49-iptables_1.8.10-3ubuntu2_amd64.deb ...
-#9 24.40 Unpacking iptables (1.8.10-3ubuntu2) ...
-#9 24.45 Selecting previously unselected package libpng16-16t64:amd64.
-#9 24.45 Preparing to unpack .../50-libpng16-16t64_1.6.43-5ubuntu0.1_amd64.deb ...
-#9 24.45 Unpacking libpng16-16t64:amd64 (1.6.43-5ubuntu0.1) ...
-#9 24.47 Selecting previously unselected package lsof.
-#9 24.47 Preparing to unpack .../51-lsof_4.95.0-1build3_amd64.deb ...
-#9 24.47 Unpacking lsof (4.95.0-1build3) ...
-#9 24.49 Selecting previously unselected package wget.
-#9 24.49 Preparing to unpack .../52-wget_1.21.4-1ubuntu4.1_amd64.deb ...
-#9 24.50 Unpacking wget (1.21.4-1ubuntu4.1) ...
-#9 24.51 Selecting previously unselected package apt-transport-https.
-#9 24.52 Preparing to unpack .../53-apt-transport-https_2.8.3_all.deb ...
-#9 24.52 Unpacking apt-transport-https (2.8.3) ...
-#9 24.54 Selecting previously unselected package at.
-#9 24.54 Preparing to unpack .../54-at_3.2.5-2.1ubuntu3_amd64.deb ...
-#9 24.54 Unpacking at (3.2.5-2.1ubuntu3) ...
-#9 24.56 Selecting previously unselected package gpgconf.
-#9 24.56 Preparing to unpack .../55-gpgconf_2.4.4-2ubuntu17.3_amd64.deb ...
-#9 24.56 Unpacking gpgconf (2.4.4-2ubuntu17.3) ...
-#9 24.58 Selecting previously unselected package libksba8:amd64.
-#9 24.59 Preparing to unpack .../56-libksba8_1.6.6-1build1_amd64.deb ...
-#9 24.59 Unpacking libksba8:amd64 (1.6.6-1build1) ...
-#9 24.61 Selecting previously unselected package dirmngr.
-#9 24.61 Preparing to unpack .../57-dirmngr_2.4.4-2ubuntu17.3_amd64.deb ...
-#9 24.62 Unpacking dirmngr (2.4.4-2ubuntu17.3) ...
-#9 24.64 Selecting previously unselected package dnsutils.
-#9 24.64 Preparing to unpack .../58-dnsutils_1%3a9.18.39-0ubuntu0.24.04.2_all.deb ...
-#9 24.64 Unpacking dnsutils (1:9.18.39-0ubuntu0.24.04.2) ...
-#9 24.66 Selecting previously unselected package libpackagekit-glib2-18:amd64.
-#9 24.66 Preparing to unpack .../59-libpackagekit-glib2-18_1.2.8-2ubuntu1.4_amd64.deb ...
-#9 24.66 Unpacking libpackagekit-glib2-18:amd64 (1.2.8-2ubuntu1.4) ...
-#9 24.68 Selecting previously unselected package gir1.2-packagekitglib-1.0.
-#9 24.68 Preparing to unpack .../60-gir1.2-packagekitglib-1.0_1.2.8-2ubuntu1.4_amd64.deb ...
-#9 24.68 Unpacking gir1.2-packagekitglib-1.0 (1.2.8-2ubuntu1.4) ...
-#9 24.70 Selecting previously unselected package gnupg-utils.
-#9 24.70 Preparing to unpack .../61-gnupg-utils_2.4.4-2ubuntu17.3_amd64.deb ...
-#9 24.70 Unpacking gnupg-utils (2.4.4-2ubuntu17.3) ...
-#9 24.72 Selecting previously unselected package gpg.
-#9 24.72 Preparing to unpack .../62-gpg_2.4.4-2ubuntu17.3_amd64.deb ...
-#9 24.72 Unpacking gpg (2.4.4-2ubuntu17.3) ...
-#9 24.74 Selecting previously unselected package pinentry-curses.
-#9 24.75 Preparing to unpack .../63-pinentry-curses_1.2.1-3ubuntu5_amd64.deb ...
-#9 24.75 Unpacking pinentry-curses (1.2.1-3ubuntu5) ...
-#9 24.77 Selecting previously unselected package gpg-agent.
-#9 24.77 Preparing to unpack .../64-gpg-agent_2.4.4-2ubuntu17.3_amd64.deb ...
-#9 24.77 Unpacking gpg-agent (2.4.4-2ubuntu17.3) ...
-#9 24.80 Selecting previously unselected package gpgsm.
-#9 24.80 Preparing to unpack .../65-gpgsm_2.4.4-2ubuntu17.3_amd64.deb ...
-#9 24.80 Unpacking gpgsm (2.4.4-2ubuntu17.3) ...
-#9 24.82 Selecting previously unselected package keyboxd.
-#9 24.82 Preparing to unpack .../66-keyboxd_2.4.4-2ubuntu17.3_amd64.deb ...
-#9 24.82 Unpacking keyboxd (2.4.4-2ubuntu17.3) ...
-#9 24.84 Selecting previously unselected package gnupg.
-#9 24.84 Preparing to unpack .../67-gnupg_2.4.4-2ubuntu17.3_all.deb ...
-#9 24.84 Unpacking gnupg (2.4.4-2ubuntu17.3) ...
-#9 24.86 Selecting previously unselected package gnupg-agent.
-#9 24.86 Preparing to unpack .../68-gnupg-agent_2.4.4-2ubuntu17.3_all.deb ...
-#9 24.86 Unpacking gnupg-agent (2.4.4-2ubuntu17.3) ...
-#9 24.88 Selecting previously unselected package libstemmer0d:amd64.
-#9 24.88 Preparing to unpack .../69-libstemmer0d_2.2.0-4build1_amd64.deb ...
-#9 24.88 Unpacking libstemmer0d:amd64 (2.2.0-4build1) ...
-#9 24.90 Selecting previously unselected package libxmlb2:amd64.
-#9 24.90 Preparing to unpack .../70-libxmlb2_0.3.18-1_amd64.deb ...
-#9 24.90 Unpacking libxmlb2:amd64 (0.3.18-1) ...
-#9 24.92 Selecting previously unselected package libappstream5:amd64.
-#9 24.92 Preparing to unpack .../71-libappstream5_1.0.2-1build6_amd64.deb ...
-#9 24.92 Unpacking libappstream5:amd64 (1.0.2-1build6) ...
-#9 24.94 Selecting previously unselected package libduktape207:amd64.
-#9 24.95 Preparing to unpack .../72-libduktape207_2.7.0+tests-0ubuntu3_amd64.deb ...
-#9 24.95 Unpacking libduktape207:amd64 (2.7.0+tests-0ubuntu3) ...
-#9 24.97 Selecting previously unselected package libdw1t64:amd64.
-#9 24.97 Preparing to unpack .../73-libdw1t64_0.190-1.1ubuntu0.1_amd64.deb ...
-#9 24.97 Unpacking libdw1t64:amd64 (0.190-1.1ubuntu0.1) ...
-#9 24.99 Selecting previously unselected package libglib2.0-bin.
-#9 24.99 Preparing to unpack .../74-libglib2.0-bin_2.80.0-6ubuntu3.5_amd64.deb ...
-#9 24.99 Unpacking libglib2.0-bin (2.80.0-6ubuntu3.5) ...
-#9 25.01 Selecting previously unselected package libunwind8:amd64.
-#9 25.01 Preparing to unpack .../75-libunwind8_1.6.2-3build1.1_amd64.deb ...
-#9 25.01 Unpacking libunwind8:amd64 (1.6.2-3build1.1) ...
-#9 25.03 Selecting previously unselected package libgstreamer1.0-0:amd64.
-#9 25.03 Preparing to unpack .../76-libgstreamer1.0-0_1.24.2-1ubuntu0.1_amd64.deb ...
-#9 25.03 Unpacking libgstreamer1.0-0:amd64 (1.24.2-1ubuntu0.1) ...
-#9 25.07 Selecting previously unselected package libpolkit-gobject-1-0:amd64.
-#9 25.07 Preparing to unpack .../77-libpolkit-gobject-1-0_124-2ubuntu1.24.04.2_amd64.deb ...
-#9 25.07 Unpacking libpolkit-gobject-1-0:amd64 (124-2ubuntu1.24.04.2) ...
-#9 25.09 Selecting previously unselected package libpolkit-agent-1-0:amd64.
-#9 25.09 Preparing to unpack .../78-libpolkit-agent-1-0_124-2ubuntu1.24.04.2_amd64.deb ...
-#9 25.09 Unpacking libpolkit-agent-1-0:amd64 (124-2ubuntu1.24.04.2) ...
-#9 25.11 Selecting previously unselected package libqrencode4:amd64.
-#9 25.11 Preparing to unpack .../79-libqrencode4_4.1.1-1build2_amd64.deb ...
-#9 25.11 Unpacking libqrencode4:amd64 (4.1.1-1build2) ...
-#9 25.13 Selecting previously unselected package xml-core.
-#9 25.13 Preparing to unpack .../80-xml-core_0.19_all.deb ...
-#9 25.13 Unpacking xml-core (0.19) ...
-#9 25.15 Selecting previously unselected package polkitd.
-#9 25.16 Preparing to unpack .../81-polkitd_124-2ubuntu1.24.04.2_amd64.deb ...
-#9 25.18 Unpacking polkitd (124-2ubuntu1.24.04.2) ...
-#9 25.20 Selecting previously unselected package python3-blinker.
-#9 25.20 Preparing to unpack .../82-python3-blinker_1.7.0-1_all.deb ...
-#9 25.20 Unpacking python3-blinker (1.7.0-1) ...
-#9 25.22 Selecting previously unselected package python3-cryptography.
-#9 25.22 Preparing to unpack .../83-python3-cryptography_41.0.7-4ubuntu0.1_amd64.deb ...
-#9 25.23 Unpacking python3-cryptography (41.0.7-4ubuntu0.1) ...
-#9 25.28 Selecting previously unselected package python3-pyparsing.
-#9 25.28 Preparing to unpack .../84-python3-pyparsing_3.1.1-1_all.deb ...
-#9 25.28 Unpacking python3-pyparsing (3.1.1-1) ...
-#9 25.30 Selecting previously unselected package python3-httplib2.
-#9 25.30 Preparing to unpack .../85-python3-httplib2_0.20.4-3_all.deb ...
-#9 25.31 Unpacking python3-httplib2 (0.20.4-3) ...
-#9 25.34 Selecting previously unselected package python3-jwt.
-#9 25.34 Preparing to unpack .../86-python3-jwt_2.7.0-1_all.deb ...
-#9 25.34 Unpacking python3-jwt (2.7.0-1) ...
-#9 25.36 Selecting previously unselected package python3-lazr.uri.
-#9 25.36 Preparing to unpack .../87-python3-lazr.uri_1.0.6-3_all.deb ...
-#9 25.36 Unpacking python3-lazr.uri (1.0.6-3) ...
-#9 25.38 Selecting previously unselected package python3-wadllib.
-#9 25.39 Preparing to unpack .../88-python3-wadllib_1.3.6-5_all.deb ...
-#9 25.39 Unpacking python3-wadllib (1.3.6-5) ...
-#9 25.41 Selecting previously unselected package python3-distro.
-#9 25.42 Preparing to unpack .../89-python3-distro_1.9.0-1_all.deb ...
-#9 25.42 Unpacking python3-distro (1.9.0-1) ...
-#9 25.43 Selecting previously unselected package python3-oauthlib.
-#9 25.44 Preparing to unpack .../90-python3-oauthlib_3.2.2-1_all.deb ...
-#9 25.44 Unpacking python3-oauthlib (3.2.2-1) ...
-#9 25.47 Selecting previously unselected package python3-lazr.restfulclient.
-#9 25.47 Preparing to unpack .../91-python3-lazr.restfulclient_0.14.6-1_all.deb ...
-#9 25.47 Unpacking python3-lazr.restfulclient (0.14.6-1) ...
-#9 25.49 Selecting previously unselected package python3-six.
-#9 25.49 Preparing to unpack .../92-python3-six_1.16.0-4_all.deb ...
-#9 25.49 Unpacking python3-six (1.16.0-4) ...
-#9 25.51 Selecting previously unselected package python3-launchpadlib.
-#9 25.51 Preparing to unpack .../93-python3-launchpadlib_1.11.0-6_all.deb ...
-#9 25.52 Unpacking python3-launchpadlib (1.11.0-6) ...
-#9 25.54 Selecting previously unselected package python3-software-properties.
-#9 25.54 Preparing to unpack .../94-python3-software-properties_0.99.49.3_all.deb ...
-#9 25.54 Unpacking python3-software-properties (0.99.49.3) ...
-#9 25.56 Selecting previously unselected package qrencode.
-#9 25.56 Preparing to unpack .../95-qrencode_4.1.1-1build2_amd64.deb ...
-#9 25.56 Unpacking qrencode (4.1.1-1build2) ...
-#9 25.58 Selecting previously unselected package packagekit.
-#9 25.58 Preparing to unpack .../96-packagekit_1.2.8-2ubuntu1.4_amd64.deb ...
-#9 25.58 Unpacking packagekit (1.2.8-2ubuntu1.4) ...
-#9 25.62 Selecting previously unselected package software-properties-common.
-#9 25.62 Preparing to unpack .../97-software-properties-common_0.99.49.3_all.deb ...
-#9 25.62 Unpacking software-properties-common (0.99.49.3) ...
-#9 25.64 Selecting previously unselected package gnupg2.
-#9 25.64 Preparing to unpack .../98-gnupg2_2.4.4-2ubuntu17.3_all.deb ...
-#9 25.64 Unpacking gnupg2 (2.4.4-2ubuntu17.3) ...
-#9 25.66 Setting up libip4tc2:amd64 (1.8.10-3ubuntu2) ...
-#9 25.66 Setting up libksba8:amd64 (1.6.6-1build1) ...
-#9 25.67 Setting up pinentry-curses (1.2.1-3ubuntu5) ...
-#9 25.67 Setting up media-types (10.1.0) ...
-#9 25.68 Setting up liblmdb0:amd64 (0.9.31-1build1) ...
-#9 25.68 Setting up systemd-sysv (255.4-1ubuntu8.12) ...
-#9 25.70 Setting up apt-utils (2.8.3) ...
-#9 25.70 Setting up wget (1.21.4-1ubuntu4.1) ...
-#9 25.70 Setting up apt-transport-https (2.8.3) ...
-#9 25.71 Setting up libqrencode4:amd64 (4.1.1-1build2) ...
-#9 25.71 Setting up at (3.2.5-2.1ubuntu3) ...
-#9 25.82 Created symlink /etc/systemd/system/multi-user.target.wants/atd.service → /usr/lib/systemd/system/atd.service.
-#9 25.84 invoke-rc.d: could not determine current runlevel
-#9 25.84 invoke-rc.d: policy-rc.d denied execution of start.
-#9 25.84 Setting up gawk (1:5.2.1-2build3) ...
-#9 25.85 Setting up libyaml-0-2:amd64 (0.2.5-1build1) ...
-#9 25.86 Setting up libip6tc2:amd64 (1.8.10-3ubuntu2) ...
-#9 25.86 Setting up distro-info-data (0.60ubuntu0.5) ...
-#9 25.86 Setting up libtirpc-common (1.3.4+ds-1.1build1) ...
-#9 25.86 Setting up libmaxminddb0:amd64 (1.9.1-1build1) ...
-#9 25.87 Setting up libsqlite3-0:amd64 (3.45.1-1ubuntu2.5) ...
-#9 25.87 Setting up cron (3.0pl1-184ubuntu2) ...
-#9 25.89 invoke-rc.d: could not determine current runlevel
-#9 25.89 invoke-rc.d: policy-rc.d denied execution of start.
-#9 26.00 Created symlink /etc/systemd/system/multi-user.target.wants/cron.service → /usr/lib/systemd/system/cron.service.
-#9 26.00 Setting up libuv1t64:amd64 (1.48.0-1.1build1) ...
-#9 26.00 Setting up less (590-2ubuntu2.1) ...
-#9 26.01 Setting up locales (2.39-0ubuntu8.6) ...
-#9 26.48 Generating locales (this might take a while)...
-#9 26.49 Generation complete.
-#9 26.50 Setting up libunwind8:amd64 (1.6.2-3build1.1) ...
-#9 26.50 Setting up libelf1t64:amd64 (0.190-1.1ubuntu0.1) ...
-#9 26.51 Setting up libdw1t64:amd64 (0.190-1.1ubuntu0.1) ...
-#9 26.51 Setting up tzdata (2025b-0ubuntu0.24.04.1) ...
-#9 26.58 
-#9 26.58 Current default time zone: 'Etc/UTC'
-#9 26.58 Local time is now:      Wed Dec 24 14:11:23 UTC 2025.
-#9 26.58 Universal Time is now:  Wed Dec 24 14:11:23 UTC 2025.
-#9 26.58 Run 'dpkg-reconfigure tzdata' if you wish to change it.
-#9 26.58 
-#9 26.59 Setting up libcap2-bin (1:2.66-5ubuntu2.2) ...
-#9 26.59 Setting up libglib2.0-0t64:amd64 (2.80.0-6ubuntu3.5) ...
-#9 26.60 No schema files found: doing nothing.
-#9 26.60 Setting up libglib2.0-data (2.80.0-6ubuntu3.5) ...
-#9 26.60 Setting up libslang2:amd64 (2.3.3-3build2) ...
-#9 26.61 Setting up libdbus-1-3:amd64 (1.14.10-4ubuntu4.1) ...
-#9 26.61 Setting up libpng16-16t64:amd64 (1.6.43-5ubuntu0.1) ...
-#9 26.61 Setting up libmnl0:amd64 (1.0.5-2build1) ...
-#9 26.62 Setting up sudo (1.9.15p5-3ubuntu5.24.04.1) ...
-#9 26.63 Setting up gir1.2-glib-2.0:amd64 (2.80.0-6ubuntu3.5) ...
-#9 26.63 Setting up libxtables12:amd64 (1.8.10-3ubuntu2) ...
-#9 26.64 Setting up python-apt-common (2.7.7ubuntu5.1) ...
-#9 26.64 Setting up libduktape207:amd64 (2.7.0+tests-0ubuntu3) ...
-#9 26.65 Setting up libnfnetlink0:amd64 (1.0.2-2build1) ...
-#9 26.65 Setting up dbus-session-bus-common (1.14.10-4ubuntu4.1) ...
-#9 26.65 Setting up gpgconf (2.4.4-2ubuntu17.3) ...
-#9 26.65 Setting up libgirepository-1.0-1:amd64 (1.80.1-1) ...
-#9 26.66 Setting up netbase (6.4) ...
-#9 26.66 Setting up sgml-base (1.31) ...
-#9 26.69 Setting up libstemmer0d:amd64 (2.2.0-4build1) ...
-#9 26.69 Setting up lsb-release (12.0-2) ...
-#9 26.69 Setting up dbus-system-bus-common (1.14.10-4ubuntu4.1) ...
-#9 26.75 Setting up iso-codes (4.16.0-1) ...
-#9 26.76 Setting up dbus-bin (1.14.10-4ubuntu4.1) ...
-#9 26.76 Setting up gpg (2.4.4-2ubuntu17.3) ...
-#9 26.76 Setting up libpolkit-gobject-1-0:amd64 (124-2ubuntu1.24.04.2) ...
-#9 26.76 Setting up libbpf1:amd64 (1:1.3.0-2build2) ...
-#9 26.77 Setting up libgstreamer1.0-0:amd64 (1.24.2-1ubuntu0.1) ...
-#9 26.77 Setcap worked! gst-ptp-helper is not suid!
-#9 26.77 Setting up libpopt0:amd64 (1.19+dfsg-1build1) ...
-#9 26.78 Setting up gnupg-utils (2.4.4-2ubuntu17.3) ...
-#9 26.78 Setting up libnewt0.52:amd64 (0.52.24-2ubuntu2) ...
-#9 26.78 update-alternatives: using /etc/newt/palette.ubuntu to provide /etc/newt/palette (newt-palette) in auto mode
-#9 26.79 Setting up gpg-agent (2.4.4-2ubuntu17.3) ...
-#9 26.90 Created symlink /etc/systemd/user/sockets.target.wants/gpg-agent.socket → /usr/lib/systemd/user/gpg-agent.socket.
-#9 27.00 Created symlink /etc/systemd/user/sockets.target.wants/gpg-agent-ssh.socket → /usr/lib/systemd/user/gpg-agent-ssh.socket.
-#9 27.11 Created symlink /etc/systemd/user/sockets.target.wants/gpg-agent-extra.socket → /usr/lib/systemd/user/gpg-agent-extra.socket.
-#9 27.21 Created symlink /etc/systemd/user/sockets.target.wants/gpg-agent-browser.socket → /usr/lib/systemd/user/gpg-agent-browser.socket.
-#9 27.22 Setting up libpython3.12-stdlib:amd64 (3.12.3-1ubuntu0.9) ...
-#9 27.22 Setting up bind9-libs:amd64 (1:9.18.39-0ubuntu0.24.04.2) ...
-#9 27.22 Setting up libtirpc3t64:amd64 (1.3.4+ds-1.1build1) ...
-#9 27.23 Setting up qrencode (4.1.1-1build2) ...
-#9 27.23 Setting up iproute2 (6.1.0-1ubuntu6.2) ...
-#9 27.30 Setting up libxmlb2:amd64 (0.3.18-1) ...
-#9 27.31 Setting up python3.12 (3.12.3-1ubuntu0.9) ...
-#9 28.08 Setting up gpgsm (2.4.4-2ubuntu17.3) ...
-#9 28.08 Setting up libglib2.0-bin (2.80.0-6ubuntu3.5) ...
-#9 28.09 Setting up libpackagekit-glib2-18:amd64 (1.2.8-2ubuntu1.4) ...
-#9 28.09 Setting up libappstream5:amd64 (1.0.2-1build6) ...
-#9 28.09 Setting up libnftnl11:amd64 (1.2.6-2build1) ...
-#9 28.10 Setting up dbus-daemon (1.14.10-4ubuntu4.1) ...
-#9 28.11 Setting up dirmngr (2.4.4-2ubuntu17.3) ...
-#9 28.22 Created symlink /etc/systemd/user/sockets.target.wants/dirmngr.socket → /usr/lib/systemd/user/dirmngr.socket.
-#9 28.24 Setting up gir1.2-packagekitglib-1.0 (1.2.8-2ubuntu1.4) ...
-#9 28.24 Setting up gir1.2-girepository-2.0:amd64 (1.80.1-1) ...
-#9 28.24 Setting up dbus (1.14.10-4ubuntu4.1) ...
-#9 28.26 Setting up gnupg-agent (2.4.4-2ubuntu17.3) ...
-#9 28.26 Setting up keyboxd (2.4.4-2ubuntu17.3) ...
-#9 28.37 Created symlink /etc/systemd/user/sockets.target.wants/keyboxd.socket → /usr/lib/systemd/user/keyboxd.socket.
-#9 28.37 Setting up lsof (4.95.0-1build3) ...
-#9 28.37 Setting up whiptail (0.52.24-2ubuntu2) ...
-#9 28.38 Setting up libnetfilter-conntrack3:amd64 (1.0.9-6build1) ...
-#9 28.38 Setting up xml-core (0.19) ...
-#9 28.53 Setting up gnupg (2.4.4-2ubuntu17.3) ...
-#9 28.53 Setting up libpam-systemd:amd64 (255.4-1ubuntu8.12) ...
-#9 28.63 Setting up libpolkit-agent-1-0:amd64 (124-2ubuntu1.24.04.2) ...
-#9 28.63 Setting up bind9-host (1:9.18.39-0ubuntu0.24.04.2) ...
-#9 28.63 Setting up libpython3-stdlib:amd64 (3.12.3-0ubuntu2.1) ...
-#9 28.63 Setting up gnupg2 (2.4.4-2ubuntu17.3) ...
-#9 28.64 Setting up iptables (1.8.10-3ubuntu2) ...
-#9 28.64 update-alternatives: using /usr/sbin/iptables-legacy to provide /usr/sbin/iptables (iptables) in auto mode
-#9 28.64 update-alternatives: using /usr/sbin/ip6tables-legacy to provide /usr/sbin/ip6tables (ip6tables) in auto mode
-#9 28.65 update-alternatives: using /usr/sbin/iptables-nft to provide /usr/sbin/iptables (iptables) in auto mode
-#9 28.65 update-alternatives: using /usr/sbin/ip6tables-nft to provide /usr/sbin/ip6tables (ip6tables) in auto mode
-#9 28.65 update-alternatives: using /usr/sbin/arptables-nft to provide /usr/sbin/arptables (arptables) in auto mode
-#9 28.65 update-alternatives: using /usr/sbin/ebtables-nft to provide /usr/sbin/ebtables (ebtables) in auto mode
-#9 28.66 Setting up python3 (3.12.3-0ubuntu2.1) ...
-#9 28.74 Setting up python3-six (1.16.0-4) ...
-#9 28.83 Setting up python3-pyparsing (3.1.1-1) ...
-#9 28.97 Setting up python3-gi (3.48.2-1) ...
-#9 29.11 Setting up python3-httplib2 (0.20.4-3) ...
-#9 29.21 Setting up bind9-dnsutils (1:9.18.39-0ubuntu0.24.04.2) ...
-#9 29.22 Setting up python3-cffi-backend:amd64 (1.16.0-2build1) ...
-#9 29.22 Setting up python3-blinker (1.7.0-1) ...
-#9 29.31 Setting up python3-pkg-resources (68.1.2-2ubuntu1.2) ...
-#9 29.49 Setting up python3-dbus (1.3.2-5build3) ...
-#9 29.59 Setting up python3-distro (1.9.0-1) ...
-#9 29.68 Setting up python3-jwt (2.7.0-1) ...
-#9 29.79 Setting up python3-apt (2.7.7ubuntu5.1) ...
-#9 29.91 Setting up python3-lazr.uri (1.0.6-3) ...
-#9 30.00 Setting up dnsutils (1:9.18.39-0ubuntu0.24.04.2) ...
-#9 30.01 Setting up python3-cryptography (41.0.7-4ubuntu0.1) ...
-#9 30.20 Setting up python3-wadllib (1.3.6-5) ...
-#9 30.30 Setting up python3-oauthlib (3.2.2-1) ...
-#9 30.44 Setting up python3-lazr.restfulclient (0.14.6-1) ...
-#9 30.54 Setting up python3-launchpadlib (1.11.0-6) ...
-#9 30.75 Created symlink /etc/systemd/user/timers.target.wants/launchpadlib-cache-clean.timer → /usr/lib/systemd/user/launchpadlib-cache-clean.timer.
-#9 30.76 Setting up python3-software-properties (0.99.49.3) ...
-#9 30.86 Processing triggers for libc-bin (2.39-0ubuntu8.6) ...
-#9 30.88 Processing triggers for sgml-base (1.31) ...
-#9 30.89 Setting up polkitd (124-2ubuntu1.24.04.2) ...
-#9 30.89 Creating group 'polkitd' with GID 996.
-#9 30.89 Creating user 'polkitd' (User for polkitd) with UID 996 and GID 996.
-#9 30.92 invoke-rc.d: could not determine current runlevel
-#9 30.92 invoke-rc.d: policy-rc.d denied execution of reload.
-#9 31.02 start-stop-daemon: unable to stat /usr/libexec/polkitd (No such file or directory)
-#9 31.02 Setting up packagekit (1.2.8-2ubuntu1.4) ...
-#9 31.03 invoke-rc.d: could not determine current runlevel
-#9 31.03 invoke-rc.d: policy-rc.d denied execution of force-reload.
-#9 31.03 Failed to open connection to "system" message bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
-#9 31.14 Created symlink /etc/systemd/user/sockets.target.wants/pk-debconf-helper.socket → /usr/lib/systemd/user/pk-debconf-helper.socket.
-#9 31.14 Setting up software-properties-common (0.99.49.3) ...
-#9 31.23 Processing triggers for dbus (1.14.10-4ubuntu4.1) ...
-#9 31.30 Using Python 3.13.11 environment at: /opt/hiddify-manager/.venv313
-#9 31.40 Using Python 3.13.11 environment at: /opt/hiddify-manager/.venv313
-#9 31.56 Resolved 1 package in 154ms
-#9 31.71 Prepared 1 package in 147ms
-#9 31.71 Installed 1 package in 2ms
-#9 31.71  + pyyaml==6.0.3
-#9 31.79 sysctl: setting key "net.ipv6.conf.all.disable_ipv6", ignoring: Read-only file system
-#9 31.79 net.ipv6.conf.all.disable_ipv6 = 0
-#9 31.79 sysctl: setting key "net.ipv6.conf.default.disable_ipv6", ignoring: Read-only file system
-#9 31.79 net.ipv6.conf.default.disable_ipv6 = 0
-#9 31.79 sysctl: setting key "net.ipv6.conf.lo.disable_ipv6", ignoring: Read-only file system
-#9 31.79 net.ipv6.conf.lo.disable_ipv6 = 0
-#9 31.88  * Reloading configuration files for periodic command scheduler cron
-#9 31.88    ...done.
-#9 31.90 ======================hiddify-panel====================================={
-#9 31.90 ===install.sh hiddify-panel
-#9 31.96 ssh version  is not installed.
-#9 31.97 
-#9 31.97 WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
-#9 31.97 
-#9 31.97 Reading package lists...
-#9 32.73 Building dependency tree...
-#9 32.91 Reading state information...
-#9 33.07 The following additional packages will be installed:
-#9 33.07   libcbor0.10 libfido2-1 libwrap0 openssh-client openssh-server
-#9 33.07   openssh-sftp-server ucf
-#9 33.07 Suggested packages:
-#9 33.07   keychain libpam-ssh monkeysphere ssh-askpass molly-guard ufw
-#9 33.07 Recommended packages:
-#9 33.07   xauth ncurses-term ssh-import-id
-#9 33.10 The following NEW packages will be installed:
-#9 33.10   libcbor0.10 libfido2-1 libwrap0 openssh-client openssh-server
-#9 33.10   openssh-sftp-server ssh ucf
-#9 33.44 0 upgraded, 8 newly installed, 0 to remove and 0 not upgraded.
-#9 33.44 Need to get 1671 kB of archives.
-#9 33.44 After this operation, 6591 kB of additional disk space will be used.
-#9 33.44 Get:1 http://archive.ubuntu.com/ubuntu noble/main amd64 libcbor0.10 amd64 0.10.2-1.2ubuntu2 [25.8 kB]
-#9 33.77 Get:2 http://archive.ubuntu.com/ubuntu noble/main amd64 libfido2-1 amd64 1.14.0-1build3 [83.5 kB]
-#9 34.03 Get:3 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 openssh-client amd64 1:9.6p1-3ubuntu13.14 [906 kB]
-#9 34.52 Get:4 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 openssh-sftp-server amd64 1:9.6p1-3ubuntu13.14 [37.3 kB]
-#9 34.53 Get:5 http://archive.ubuntu.com/ubuntu noble/main amd64 ucf all 3.0043+nmu1 [56.5 kB]
-#9 34.54 Get:6 http://archive.ubuntu.com/ubuntu noble/main amd64 libwrap0 amd64 7.6.q-33 [47.9 kB]
-#9 34.55 Get:7 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 openssh-server amd64 1:9.6p1-3ubuntu13.14 [510 kB]
-#9 34.63 Get:8 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 ssh all 1:9.6p1-3ubuntu13.14 [4646 B]
-#9 35.47 Preconfiguring packages ...
-#9 35.52 Fetched 1671 kB in 2s (1100 kB/s)
-#9 35.53 Selecting previously unselected package libcbor0.10:amd64.
-#9 35.53 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 19466 files and directories currently installed.)
-#9 35.55 Preparing to unpack .../0-libcbor0.10_0.10.2-1.2ubuntu2_amd64.deb ...
-#9 35.55 Unpacking libcbor0.10:amd64 (0.10.2-1.2ubuntu2) ...
-#9 35.56 Selecting previously unselected package libfido2-1:amd64.
-#9 35.57 Preparing to unpack .../1-libfido2-1_1.14.0-1build3_amd64.deb ...
-#9 35.57 Unpacking libfido2-1:amd64 (1.14.0-1build3) ...
-#9 35.59 Selecting previously unselected package openssh-client.
-#9 35.59 Preparing to unpack .../2-openssh-client_1%3a9.6p1-3ubuntu13.14_amd64.deb ...
-#9 35.59 Unpacking openssh-client (1:9.6p1-3ubuntu13.14) ...
-#9 35.62 Selecting previously unselected package openssh-sftp-server.
-#9 35.63 Preparing to unpack .../3-openssh-sftp-server_1%3a9.6p1-3ubuntu13.14_amd64.deb ...
-#9 35.63 Unpacking openssh-sftp-server (1:9.6p1-3ubuntu13.14) ...
-#9 35.64 Selecting previously unselected package ucf.
-#9 35.64 Preparing to unpack .../4-ucf_3.0043+nmu1_all.deb ...
-#9 35.65 Moving old data out of the way
-#9 35.65 Unpacking ucf (3.0043+nmu1) ...
-#9 35.67 Selecting previously unselected package libwrap0:amd64.
-#9 35.67 Preparing to unpack .../5-libwrap0_7.6.q-33_amd64.deb ...
-#9 35.67 Unpacking libwrap0:amd64 (7.6.q-33) ...
-#9 35.69 Selecting previously unselected package openssh-server.
-#9 35.69 Preparing to unpack .../6-openssh-server_1%3a9.6p1-3ubuntu13.14_amd64.deb ...
-#9 35.70 Unpacking openssh-server (1:9.6p1-3ubuntu13.14) ...
-#9 35.72 Selecting previously unselected package ssh.
-#9 35.73 Preparing to unpack .../7-ssh_1%3a9.6p1-3ubuntu13.14_all.deb ...
-#9 35.73 Unpacking ssh (1:9.6p1-3ubuntu13.14) ...
-#9 35.75 Setting up libcbor0.10:amd64 (0.10.2-1.2ubuntu2) ...
-#9 35.75 Setting up libwrap0:amd64 (7.6.q-33) ...
-#9 35.76 Setting up ucf (3.0043+nmu1) ...
-#9 35.82 Setting up libfido2-1:amd64 (1.14.0-1build3) ...
-#9 35.82 Setting up openssh-client (1:9.6p1-3ubuntu13.14) ...
-#9 35.87 Setting up openssh-sftp-server (1:9.6p1-3ubuntu13.14) ...
-#9 35.87 Setting up openssh-server (1:9.6p1-3ubuntu13.14) ...
-#9 35.97 
-#9 35.97 Creating config file /etc/ssh/sshd_config with new version
-#9 35.99 Creating SSH2 RSA key; this may take some time ...
-#9 36.43 3072 SHA256:eNqKhAQelaj1E93oIDKi8n/lGJRIaOavfSGphjhv21E root@buildkitsandbox (RSA)
-#9 36.44 Creating SSH2 ECDSA key; this may take some time ...
-#9 36.44 256 SHA256:kSGS6efXrk+EnWEC5V1jjrc/qaCeuaEF3QOyNRFgfbk root@buildkitsandbox (ECDSA)
-#9 36.45 Creating SSH2 ED25519 key; this may take some time ...
-#9 36.45 256 SHA256:EuDPvHqteYAG+VKtBhmkd5da1YXLq1QVrXeLG9oyJqw root@buildkitsandbox (ED25519)
-#9 36.51 invoke-rc.d: could not determine current runlevel
-#9 36.52 invoke-rc.d: policy-rc.d denied execution of start.
-#9 36.62 Created symlink /etc/systemd/system/sockets.target.wants/ssh.socket → /usr/lib/systemd/system/ssh.socket.
-#9 36.62 Created symlink /etc/systemd/system/ssh.service.requires/ssh.socket → /usr/lib/systemd/system/ssh.socket.
-#9 36.70 Setting up ssh (1:9.6p1-3ubuntu13.14) ...
-#9 36.71 Processing triggers for libc-bin (2.39-0ubuntu8.6) ...
-#9 36.80 Created symlink /etc/systemd/system/multi-user.target.wants/hiddify-panel.service → /opt/hiddify-manager/hiddify-panel/hiddify-panel.service.
-#9 36.80 Created symlink /etc/systemd/system/multi-user.target.wants/hiddify-panel-background-tasks.service → /opt/hiddify-manager/hiddify-panel/hiddify-panel-background-tasks.service.
-#9 38.55 }========================hiddify-panel===================================
-#9 38.55 Cleaning up deprecated components...
-#9 38.58 Deprecated components cleanup completed.
-#9 38.58 ####10####Configuring...####System and Firewall settings####
-#9 38.58 ####15####Installing...####Nginx####
-#9 38.58 ####35####Installing...####Personal SpeedTest####
-#9 38.58 ======================nginx====================================={
-#9 38.58 ===install.sh nginx
-#9 38.58 ####40####Installing...####Telegram Proxy####
-#9 38.58 ####45####Installing...####FakeTlS Proxy####
-#9 38.58 ####55####Installing...####SSH Proxy####
-#9 38.58 ####70####Installing...####Warp####
-#9 38.58 ####20####Installing...####Haproxy for Spliting Traffic####
-#9 38.58 ======================haproxy====================================={
-#9 38.58 ===install.sh haproxy
-#9 38.58 panel config file not found
-#9 38.58 panel config file not found
-#9 38.58 ####75####Installing...####Xray####
-#9 38.58 ####80####Installing...####HiddifyCli####
-#9 38.58 ####85####Installing...####Wireguard####
-#9 38.58 ####95####Installing...####Singbox####
-#9 38.58 ======================other/ssh====================================={
-#9 38.58 ####98####Installing...####Almost Finished####
-#9 38.58 panel config file not found
-#9 38.58 ======================singbox====================================={
-#9 38.59 ======================other/warp====================================={
-#9 38.59 ===install.sh singbox
-#9 38.59 ===install.sh other/warp
-#9 38.59 ======================xray====================================={
-#9 38.59 ===install.sh xray
-#9 38.59 panel config file not found
-#9 38.59 ===install.sh other/ssh
-#9 38.59 panel config file not found
-#9 38.59 ======================other/wireguard====================================={
-#9 38.59 }========================other/wireguard===================================
-#9 38.59 ======================other/hiddify-cli====================================={
-#9 38.59 }========================other/hiddify-cli===================================
-#9 38.59 panel config file not found
-#9 38.59 panel config file not found
-#9 38.59 ======================other/speedtest====================================={
-#9 38.59 ===install.sh other/speedtest
-#9 38.59 ======================other/ssfaketls====================================={
-#9 38.59 ===install.sh other/ssfaketls
-#9 38.59 ======================other/telegram====================================={
-#9 38.59 }========================other/telegram===================================
-#9 38.62 shadowsocks-libev version  is not installed.
-#9 38.64 haproxy version 3.2 is not installed.
-#9 38.64 Adding PPA for haproxy-3.2
-#9 38.64 Downloading package xray version 25.12.8 for amd64... current version is 
-#9 38.64   % TDownloading package ssh-liberty-bridge version 1.3.0 for amd64... current version is 
-#9 38.64 otal    % Received % Xferd  Average Speed   Time    Time     Time  Current
-#9 38.65                                  Dload  Upload   Total   Spent    Left  Speed
-#9 38.65 
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0simple-obfs version  is not installed.
-#9 38.66 Downloading package singbox version 1.8.8.h4 for amd64... current version is 
-#9 38.66 Downloading package wgcf version 2.2.28 for amd64... current version is 
-#9 38.66 
-#9 38.67 WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
-#9 38.67 
-#9 38.67 Reading package lists...}========================other/speedtest===================================
-#9 38.88 
-100 11809  100 11809    0     0  50223      0 --:--:-- --:--:-- --:--:-- 50251
-#9 38.90 deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg]     http://nginx.org/packages/ubuntu noble nginx
-#9 38.93 
-#9 38.93 WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
-#9 38.93 
-#9 39.06 Package wgcf version 2.2.28 downloaded successfully to wgcf.
-#9 39.08 Set installed version of wgcf to 2.2.28.
-#9 39.08 Hit:1 http://security.ubuntu.com/ubuntu noble-security InRelease
-#9 39.08 }========================other/warp===================================
-#9 39.09 Package ssh-liberty-bridge version 1.3.0 downloaded successfully to ssh-liberty-bridge.
-#9 39.14 Set installed version of ssh-liberty-bridge to 1.3.0.
-#9 39.14 }========================other/ssh===================================
-#9 39.15 Package singbox version 1.8.8.h4 downloaded successfully to sb.zip.
-#9 39.16 unzip version  is not installed.
-#9 39.17 
-#9 39.17 WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
-#9 39.17 
-#9 39.21 Package xray version 25.12.8 downloaded successfully to sb.zip.
-#9 39.23 unzip version  is not installed.
-#9 39.23 
-#9 39.23 WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
-#9 39.23 
-#9 39.24 Hit:2 http://archive.ubuntu.com/ubuntu noble InRelease
-#9 39.25 Get:3 http://nginx.org/packages/ubuntu noble InRelease [3275 B]
-#9 39.34 Hit:4 http://archive.ubuntu.com/ubuntu noble-updates InRelease
-#9 39.38 Get:5 http://nginx.org/packages/ubuntu noble/nginx amd64 Packages [23.1 kB]
-#9 39.44 Hit:6 http://archive.ubuntu.com/ubuntu noble-backports InRelease
-#9 39.51 Fetched 26.3 kB in 1s (47.7 kB/s)
-#9 39.51 Reading package lists...
-#9 39.70 Building dependency tree...
-#9 39.96 Reading state information...
-#9 40.14 The following additional packages will be installed:
-#9 40.14   libbloom1 libcares2 libcork16 libcorkipset1 libjsonparser1.1
-#9 40.14   libmbedcrypto7t64 libpcre3 libsodium23
-#9 40.14 Suggested packages:
-#9 40.14   haveged kcptun
-#9 40.18 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 7403 (apt)...The following NEW packages will be installed:
-#9 40.19   libbloom1 libcares2 libcork16 libcorkipset1 libjsonparser1.1
-#9 40.19   libmbedcrypto7t64 libpcre3 libsodium23 shadowsocks-libev simple-obfs
-#9 40.23 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 7403 (apt)...
-#9 40.34 Building dependency tree...0 upgraded, 10 newly installed, 0 to remove and 0 not upgraded.
-#9 40.36 Need to get 1004 kB of archives.
-#9 40.36 After this operation, 3000 kB of additional disk space will be used.
-#9 40.36 Get:1 http://archive.ubuntu.com/ubuntu noble/universe amd64 libbloom1 amd64 1.6-7 [6916 B]
-#9 40.40 Get:2 http://archive.ubuntu.com/ubuntu noble/main amd64 libcares2 amd64 1.27.0-1.0ubuntu1 [73.7 kB]
-#9 40.46 Get:3 http://archive.ubuntu.com/ubuntu noble/universe amd64 libcork16 amd64 1.0.0~rc3-3build1 [44.4 kB]
-#9 40.49 Get:4 http://archive.ubuntu.com/ubuntu noble/universe amd64 libcorkipset1 amd64 1.1.1+git20171111.6842a63-2build1 [16.9 kB]
-#9 40.49 Get:5 http://archive.ubuntu.com/ubuntu noble/universe amd64 libjsonparser1.1 amd64 1.1.0-2 [8540 B]
-#9 40.50 Get:6 http://archive.ubuntu.com/ubuntu noble/universe amd64 libmbedcrypto7t64 amd64 2.28.8-1 [209 kB]
-#9 40.54 Get:7 http://archive.ubuntu.com/ubuntu noble/universe amd64 libpcre3 amd64 2:8.39-15build1 [248 kB]
-#9 40.54 
-#9 40.54 Reading state information...
-#9 40.56 All packages are up to date.
-#9 40.56 Get:8 http://archive.ubuntu.com/ubuntu noble/main amd64 libsodium23 amd64 1.0.18-1build3 [161 kB]
-#9 40.57 nginx version 1.26.* is not installed.
-#9 40.58 
-#9 40.58 WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
-#9 40.58 
-#9 40.58 Get:9 http://archive.ubuntu.com/ubuntu noble/universe amd64 shadowsocks-libev amd64 3.3.5+ds-10build3 [184 kB]
-#9 40.59 Get:10 http://archive.ubuntu.com/ubuntu noble/universe amd64 simple-obfs amd64 0.0.5-6build2 [50.4 kB]
-#9 41.18 
-#9 41.18 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 7403 (apt)...Hit:1 http://nginx.org/packages/ubuntu noble InRelease
-#9 41.23 
-#9 41.23 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 7403 (apt)...Hit:2 http://archive.ubuntu.com/ubuntu noble InRelease
-#9 41.39 Hit:3 http://security.ubuntu.com/ubuntu noble-security InRelease
-#9 41.51 Hit:4 http://archive.ubuntu.com/ubuntu noble-updates InRelease
-#9 41.58 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 7403 (apt)...Fetched 1004 kB in 0s (2620 kB/s)
-#9 41.65 Hit:5 http://archive.ubuntu.com/ubuntu noble-backports InRelease
-#9 41.70 Get:6 https://ppa.launchpadcontent.net/vbernat/haproxy-3.2/ubuntu noble InRelease [24.1 kB]
-#9 42.16 Selecting previously unselected package libbloom1:amd64.
-#9 42.16 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-#9 42.18 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 7403 (apt)...(Reading database ... 100%
-(Reading database ... 19616 files and directories currently installed.)
-#9 42.18 Preparing to unpack .../0-libbloom1_1.6-7_amd64.deb ...
-#9 42.23 
-#9 42.23 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 7403 (apt)...Get:7 https://ppa.launchpadcontent.net/vbernat/haproxy-3.2/ubuntu noble/main amd64 Packages [965 B]
-#9 42.47 Unpacking libbloom1:amd64 (1.6-7) ...
-#9 42.48 Fetched 25.1 kB in 1s (19.9 kB/s)
-#9 42.48 Reading package lists...dpkg: error processing archive /tmp/apt-dpkg-install-SbGLUB/1-libcares2_1.27.0-1.0ubuntu1_amd64.deb (--unpack):
-#9 42.48  cannot access archive '/tmp/apt-dpkg-install-SbGLUB/1-libcares2_1.27.0-1.0ubuntu1_amd64.deb': No such file or directory
-#9 42.48 dpkg: error processing archive /tmp/apt-dpkg-install-SbGLUB/2-libcork16_1.0.0~rc3-3build1_amd64.deb (--unpack):
-#9 42.48  cannot access archive '/tmp/apt-dpkg-install-SbGLUB/2-libcork16_1.0.0~rc3-3build1_amd64.deb': No such file or directory
-#9 42.48 dpkg: error processing archive /tmp/apt-dpkg-install-SbGLUB/3-libcorkipset1_1.1.1+git20171111.6842a63-2build1_amd64.deb (--unpack):
-#9 42.48  cannot access archive '/tmp/apt-dpkg-install-SbGLUB/3-libcorkipset1_1.1.1+git20171111.6842a63-2build1_amd64.deb': No such file or directory
-#9 42.48 dpkg: error processing archive /tmp/apt-dpkg-install-SbGLUB/4-libjsonparser1.1_1.1.0-2_amd64.deb (--unpack):
-#9 42.48  cannot access archive '/tmp/apt-dpkg-install-SbGLUB/4-libjsonparser1.1_1.1.0-2_amd64.deb': No such file or directory
-#9 42.48 dpkg: error processing archive /tmp/apt-dpkg-install-SbGLUB/5-libmbedcrypto7t64_2.28.8-1_amd64.deb (--unpack):
-#9 42.48  cannot access archive '/tmp/apt-dpkg-install-SbGLUB/5-libmbedcrypto7t64_2.28.8-1_amd64.deb': No such file or directory
-#9 42.48 dpkg: error processing archive /tmp/apt-dpkg-install-SbGLUB/6-libpcre3_2%3a8.39-15build1_amd64.deb (--unpack):
-#9 42.48  cannot access archive '/tmp/apt-dpkg-install-SbGLUB/6-libpcre3_2%3a8.39-15build1_amd64.deb': No such file or directory
-#9 42.48 dpkg: error processing archive /tmp/apt-dpkg-install-SbGLUB/7-libsodium23_1.0.18-1build3_amd64.deb (--unpack):
-#9 42.48  cannot access archive '/tmp/apt-dpkg-install-SbGLUB/7-libsodium23_1.0.18-1build3_amd64.deb': No such file or directory
-#9 42.48 dpkg: error processing archive /tmp/apt-dpkg-install-SbGLUB/8-shadowsocks-libev_3.3.5+ds-10build3_amd64.deb (--unpack):
-#9 42.48  cannot access archive '/tmp/apt-dpkg-install-SbGLUB/8-shadowsocks-libev_3.3.5+ds-10build3_amd64.deb': No such file or directory
-#9 42.48 dpkg: error processing archive /tmp/apt-dpkg-install-SbGLUB/9-simple-obfs_0.0.5-6build2_amd64.deb (--unpack):
-#9 42.48  cannot access archive '/tmp/apt-dpkg-install-SbGLUB/9-simple-obfs_0.0.5-6build2_amd64.deb': No such file or directory
-#9 42.49 Errors were encountered while processing:
-#9 42.49  /tmp/apt-dpkg-install-SbGLUB/1-libcares2_1.27.0-1.0ubuntu1_amd64.deb
-#9 42.49  /tmp/apt-dpkg-install-SbGLUB/2-libcork16_1.0.0~rc3-3build1_amd64.deb
-#9 42.49  /tmp/apt-dpkg-install-SbGLUB/3-libcorkipset1_1.1.1+git20171111.6842a63-2build1_amd64.deb
-#9 42.49  /tmp/apt-dpkg-install-SbGLUB/4-libjsonparser1.1_1.1.0-2_amd64.deb
-#9 42.49  /tmp/apt-dpkg-install-SbGLUB/5-libmbedcrypto7t64_2.28.8-1_amd64.deb
-#9 42.49  /tmp/apt-dpkg-install-SbGLUB/6-libpcre3_2%3a8.39-15build1_amd64.deb
-#9 42.49  /tmp/apt-dpkg-install-SbGLUB/7-libsodium23_1.0.18-1build3_amd64.deb
-#9 42.49  /tmp/apt-dpkg-install-SbGLUB/8-shadowsocks-libev_3.3.5+ds-10build3_amd64.deb
-#9 42.49  /tmp/apt-dpkg-install-SbGLUB/9-simple-obfs_0.0.5-6build2_amd64.deb
-#9 42.50 E: Sub-process /usr/bin/dpkg returned an error code (1)
-#9 42.50 
-#9 42.50 WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
-#9 42.50 
-#9 42.50 Reading package lists...
-#9 42.58 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 7403 (apt)...
-#9 43.18 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 7403 (apt)...
-#9 43.23 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 7403 (apt)...
-#9 43.27 PPA publishes dbgsym, you may need to include 'main/debug' component
-#9 43.27 Repository: 'Types: deb
-#9 43.27 URIs: https://ppa.launchpadcontent.net/vbernat/haproxy-3.2/ubuntu/
-#9 43.27 Suites: noble
-#9 43.27 Components: main
-#9 43.27 '
-#9 43.27 Description:
-#9 43.27 HAProxy is a free, very fast and reliable solution offering high availability, load balancing, and proxying for TCP and HTTP-based applications. It is particularly suited for web sites crawling under very high loads while needing persistence or Layer7 processing. Supporting tens of thousands of connections is clearly realistic with todays hardware. Its mode of operation makes its integration into existing architectures very easy and riskless, while still offering the possibility not to expose fragile web servers to the Net.
-#9 43.27 
-#9 43.27 This PPA contains packages for HAProxy 3.2.
-#9 43.27 More info: https://launchpad.net/~vbernat/+archive/ubuntu/haproxy-3.2
-#9 43.27 Adding repository.
-#9 43.29 
-#9 43.31 Building dependency tree...Installing haproxy 3.2
-#9 43.35 haproxy version 3.2.* is not installed.
-#9 43.35 
-#9 43.35 WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
-#9 43.35 
-#9 43.48 
-#9 43.48 Reading state information...
-#9 43.58 
-#9 43.58 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 8004 (apt)...The following package was automatically installed and is no longer required:
-#9 43.63   libbloom1
-#9 43.63 Use 'apt autoremove' to remove it.
-#9 43.78 0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
-#9 43.78 1 not fully installed or removed.
-#9 43.78 After this operation, 0 B of additional disk space will be used.
-#9 43.78 Setting up libbloom1:amd64 (1.6-7) ...
-#9 43.79 Processing triggers for libc-bin (2.39-0ubuntu8.6) ...
-#9 43.81 
-#9 43.81 WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
-#9 43.81 
-#9 43.98 Hit:1 http://archive.ubuntu.com/ubuntu noble InRelease
-#9 43.98 Hit:2 http://security.ubuntu.com/ubuntu noble-security InRelease
-#9 44.01 Hit:3 http://archive.ubuntu.com/ubuntu noble-updates InRelease
-#9 44.04 Hit:4 http://nginx.org/packages/ubuntu noble InRelease
-#9 44.04 Hit:5 http://archive.ubuntu.com/ubuntu noble-backports InRelease
-#9 44.18 
-#9 44.18 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 8004 (apt)...
-#9 44.18 Reading package lists...
-#9 44.23 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 8004 (apt)...Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 8004 (apt)...Hit:6 https://ppa.launchpadcontent.net/vbernat/haproxy-3.2/ubuntu noble InRelease
-#9 44.52 Reading package lists...
-#9 44.58 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 8004 (apt)...
-#9 44.95 Building dependency tree...
-#9 45.15 Reading state information...
-#9 45.23 
-#9 45.23 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 7578 (apt)...
-#9 45.30 Building dependency tree...The following package was automatically installed and is no longer required:
-#9 45.31   libbloom1
-#9 45.31 Use 'apt autoremove' to remove it.
-#9 45.31 Suggested packages:
-#9 45.31   zip
-#9 45.33 The following NEW packages will be installed:
-#9 45.33   unzip
-#9 45.35 
-#9 45.35 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 7578 (apt)...0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
-#9 45.46 Need to get 174 kB of archives.
-#9 45.46 After this operation, 384 kB of additional disk space will be used.
-#9 45.46 Get:1 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 unzip amd64 6.0-28ubuntu4.1 [174 kB]
-#9 45.48 
-#9 45.48 Reading state information...
-#9 45.49 All packages are up to date.
-#9 45.50 
-#9 45.50 WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
-#9 45.50 
-#9 45.58 
-#9 45.58 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 7578 (apt)...
-#9 46.23 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 7578 (apt)...
-#9 46.36 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 7578 (apt)...Fetched 174 kB in 0s (720 kB/s)
-#9 46.48 Selecting previously unselected package unzip.
-#9 46.48 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 19621 files and directories currently installed.)
-#9 46.49 Preparing to unpack .../unzip_6.0-28ubuntu4.1_amd64.deb ...
-#9 46.49 Unpacking unzip (6.0-28ubuntu4.1) ...
-#9 46.50 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 7578 (apt)...Setting up unzip (6.0-28ubuntu4.1) ...
-#9 46.58 
-#9 46.58 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 7578 (apt)...
-#9 46.58 Reading package lists...}========================singbox===================================
-#9 47.23 
-#9 47.23 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 7578 (apt)...
-#9 47.35 Building dependency tree...
-#9 47.36 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 7578 (apt)...
-#9 47.50 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 7578 (apt)...
-#9 47.52 Reading state information...
-#9 47.67 The following package was automatically installed and is no longer required:
-#9 47.67   libbloom1
-#9 47.67 Use 'apt autoremove' to remove it.
-#9 47.67 Recommended packages:
-#9 47.67   logrotate
-#9 47.69 The following NEW packages will be installed:
-#9 47.69   nginx
-#9 47.97 0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
-#9 47.97 Need to get 1127 kB of archives.
-#9 47.97 After this operation, 3640 kB of additional disk space will be used.
-#9 47.97 Get:1 http://nginx.org/packages/ubuntu noble/nginx amd64 nginx amd64 1.26.3-1~noble [1127 kB]
-#9 48.23 
-#9 48.23 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 7752 (apt)...
-#9 48.36 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 7752 (apt)...
-#9 48.50 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 7752 (apt)...Fetched 1127 kB in 0s (2591 kB/s)
-#9 49.02 Selecting previously unselected package nginx.
-#9 49.02 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 19639 files and directories currently installed.)
-#9 49.04 Preparing to unpack .../nginx_1.26.3-1~noble_amd64.deb ...
-#9 49.04 ----------------------------------------------------------------------
-#9 49.04 
-#9 49.04 Thanks for using nginx!
-#9 49.04 
-#9 49.04 Please find the official documentation for nginx here:
-#9 49.04 * https://nginx.org/en/docs/
-#9 49.04 
-#9 49.04 Please subscribe to nginx-announce mailing list to get
-#9 49.04 the most important news about nginx:
-#9 49.04 * https://nginx.org/en/support.html
-#9 49.04 
-#9 49.04 Commercial subscriptions for nginx are available on:
-#9 49.04 * https://nginx.com/products/
-#9 49.04 
-#9 49.04 ----------------------------------------------------------------------
-#9 49.04 Unpacking nginx (1.26.3-1~noble) ...
-#9 49.08 Setting up nginx (1.26.3-1~noble) ...
-#9 49.10 invoke-rc.d: could not determine current runlevel
-#9 49.10 invoke-rc.d: policy-rc.d denied execution of start.
-#9 49.21 Created symlink /etc/systemd/system/multi-user.target.wants/nginx.service → /usr/lib/systemd/system/nginx.service.
-#9 49.23 
-#9 49.23 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 7752 (apt)...Created symlink /etc/systemd/system/multi-user.target.wants/hiddify-nginx.service → /opt/hiddify-manager/nginx/hiddify-nginx.service.
-#9 49.33 }========================nginx===================================
-#9 49.36 
-#9 49.36 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 7752 (apt)...
-#9 49.36 Reading package lists...
-#9 49.50 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 7752 (apt)...
-#9 50.13 Building dependency tree...
-#9 50.23 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 7752 (apt)...
-#9 50.31 Reading state information...
-#9 50.47 The following package was automatically installed and is no longer required:
-#9 50.47   libbloom1
-#9 50.47 Use 'apt autoremove' to remove it.
-#9 50.47 The following additional packages will be installed:
-#9 50.47   libjemalloc2 liblua5.4-0 libopentracing-c-wrapper0t64 libopentracing1
-#9 50.47 Suggested packages:
-#9 50.47   vim-haproxy haproxy-doc
-#9 50.50 
-#9 50.50 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 8017 (apt)...The following NEW packages will be installed:
-#9 50.53   haproxy libjemalloc2 liblua5.4-0 libopentracing-c-wrapper0t64
-#9 50.53   libopentracing1
-#9 50.72 0 upgraded, 5 newly installed, 0 to remove and 1 not upgraded.
-#9 50.72 Need to get 3005 kB of archives.
-#9 50.72 After this operation, 7699 kB of additional disk space will be used.
-#9 50.72 Get:1 http://archive.ubuntu.com/ubuntu noble/universe amd64 libjemalloc2 amd64 5.3.0-2build1 [256 kB]
-#9 50.93 Get:2 http://archive.ubuntu.com/ubuntu noble/main amd64 liblua5.4-0 amd64 5.4.6-3build2 [166 kB]
-#9 50.94 Get:3 http://archive.ubuntu.com/ubuntu noble/universe amd64 libopentracing1 amd64 1.6.0-4 [52.8 kB]
-#9 50.95 Get:4 http://archive.ubuntu.com/ubuntu noble/universe amd64 libopentracing-c-wrapper0t64 amd64 1.1.3-3.1build1 [31.2 kB]
-#9 51.17 Get:5 https://ppa.launchpadcontent.net/vbernat/haproxy-3.2/ubuntu noble/main amd64 haproxy amd64 3.2.10-1ppa1~noble [2498 kB]
-#9 51.23 
-#9 51.23 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 8017 (apt)...
-#9 51.50 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 8017 (apt)...
-#9 52.23 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 8017 (apt)...
-#9 52.50 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 8017 (apt)...Fetched 3005 kB in 1s (2394 kB/s)
-#9 52.72 Selecting previously unselected package libjemalloc2:amd64.
-#9 52.72 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 19673 files and directories currently installed.)
-#9 52.73 Preparing to unpack .../libjemalloc2_5.3.0-2build1_amd64.deb ...
-#9 52.74 Unpacking libjemalloc2:amd64 (5.3.0-2build1) ...
-#9 52.76 Selecting previously unselected package liblua5.4-0:amd64.
-#9 52.76 Preparing to unpack .../liblua5.4-0_5.4.6-3build2_amd64.deb ...
-#9 52.76 Unpacking liblua5.4-0:amd64 (5.4.6-3build2) ...
-#9 52.78 Selecting previously unselected package libopentracing1:amd64.
-#9 52.78 Preparing to unpack .../libopentracing1_1.6.0-4_amd64.deb ...
-#9 52.78 Unpacking libopentracing1:amd64 (1.6.0-4) ...
-#9 52.80 Selecting previously unselected package libopentracing-c-wrapper0t64:amd64.
-#9 52.80 Preparing to unpack .../libopentracing-c-wrapper0t64_1.1.3-3.1build1_amd64.deb ...
-#9 52.80 Unpacking libopentracing-c-wrapper0t64:amd64 (1.1.3-3.1build1) ...
-#9 52.82 Selecting previously unselected package haproxy.
-#9 52.82 Preparing to unpack .../haproxy_3.2.10-1ppa1~noble_amd64.deb ...
-#9 52.82 Unpacking haproxy (3.2.10-1ppa1~noble) ...
-#9 52.87 Setting up libjemalloc2:amd64 (5.3.0-2build1) ...
-#9 52.87 Setting up liblua5.4-0:amd64 (5.4.6-3build2) ...
-#9 52.87 Setting up libopentracing1:amd64 (1.6.0-4) ...
-#9 52.88 Setting up libopentracing-c-wrapper0t64:amd64 (1.1.3-3.1build1) ...
-#9 52.88 Setting up haproxy (3.2.10-1ppa1~noble) ...
-#9 52.96 invoke-rc.d: could not determine current runlevel
-#9 52.97 invoke-rc.d: policy-rc.d denied execution of start.
-#9 53.07 Created symlink /etc/systemd/system/multi-user.target.wants/haproxy.service → /usr/lib/systemd/system/haproxy.service.
-#9 53.07 Processing triggers for libc-bin (2.39-0ubuntu8.6) ...
-#9 53.13 Created symlink /etc/systemd/system/multi-user.target.wants/hiddify-haproxy.service → /opt/hiddify-manager/haproxy/hiddify-haproxy.service.
-#9 53.13 }========================haproxy===================================
-#9 53.13 ####30####Installing...####Getting Certificates####
-#9 53.13 ======================acme.sh====================================={
-#9 53.13 ===install.sh acme.sh
-#9 53.14 socat version  is not installed.
-#9 53.15 
-#9 53.15 WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
-#9 53.15 
-#9 53.15 Reading package lists...
-#9 53.23 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 8017 (apt)...
-#9 53.50 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 8017 (apt)...
-#9 53.91 Building dependency tree...
-#9 54.10 Reading state information...
-#9 54.23 
-#9 54.23 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 8505 (apt)...The following package was automatically installed and is no longer required:
-#9 54.26   libbloom1
-#9 54.26 Use 'apt autoremove' to remove it.
-#9 54.28 The following NEW packages will be installed:
-#9 54.28   socat
-#9 54.50 
-#9 54.50 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 8505 (apt)...0 upgraded, 1 newly installed, 0 to remove and 1 not upgraded.
-#9 54.62 Need to get 374 kB of archives.
-#9 54.62 After this operation, 1649 kB of additional disk space will be used.
-#9 54.62 Get:1 http://archive.ubuntu.com/ubuntu noble/main amd64 socat amd64 1.8.0.0-4build3 [374 kB]
-#9 55.24 
-#9 55.24 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 8505 (apt)...
-#9 55.51 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 8505 (apt)...Fetched 374 kB in 1s (351 kB/s)
-#9 56.24 Selecting previously unselected package socat.
-#9 56.24 (Reading database ... 
-#9 56.24 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 8505 (apt)...(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 19792 files and directories currently installed.)
-#9 56.25 Preparing to unpack .../socat_1.8.0.0-4build3_amd64.deb ...
-#9 56.25 Unpacking socat (1.8.0.0-4build3) ...
-#9 56.27 Setting up socat (1.8.0.0-4build3) ...
-#9 56.51 
-#9 56.51 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 8505 (apt)...
-#9 56.51 Reading package lists...  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-#9 56.57                                  Dload  Upload   Total   Spent    Left  Speed
-#9 56.57 
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
-100  226k  100  226k    0     0  2257k      0 --:--:-- --:--:-- --:--:-- 2269k
-#9 56.67 [Wed Dec 24 14:11:53 UTC 2025] Installing from online archive.
-#9 56.67 [Wed Dec 24 14:11:53 UTC 2025] Downloading https://github.com/acmesh-official/acme.sh/archive/master.tar.gz
-#9 57.02 [Wed Dec 24 14:11:54 UTC 2025] Extracting master.tar.gz
-#9 57.07 [Wed Dec 24 14:11:54 UTC 2025] Installing to /opt/hiddify-manager/acme.sh/lib
-#9 57.07 [Wed Dec 24 14:11:54 UTC 2025] Installed to /opt/hiddify-manager/acme.sh/lib/acme.sh
-#9 57.09 [Wed Dec 24 14:11:54 UTC 2025] Installing alias to '/root/.profile'
-#9 57.10 [Wed Dec 24 14:11:54 UTC 2025] Close and reopen your terminal to start using acme.sh
-#9 57.12 [Wed Dec 24 14:11:54 UTC 2025] bash has been found. Changing the shebang to use bash as preferred.
-#9 57.24 
-#9 57.24 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 8505 (apt)...
-#9 57.32 Building dependency tree...
-#9 57.52 Reading state information...
-#9 57.69 The following additional packages will be installed:
-#9 57.69   libcares2 libcork16 libcorkipset1 libjsonparser1.1 libmbedcrypto7t64
-#9 57.70   libpcre3 libsodium23
-#9 57.70 Suggested packages:
-#9 57.70   haveged kcptun
-#9 57.74 The following NEW packages will be installed:
-#9 57.74   libcares2 libcork16 libcorkipset1 libjsonparser1.1 libmbedcrypto7t64
-#9 57.74   libpcre3 libsodium23 shadowsocks-libev simple-obfs
-#9 57.94 [Wed Dec 24 14:11:54 UTC 2025] OK
-#9 57.94 [Wed Dec 24 14:11:54 UTC 2025] Install success!
-#9 57.98 [Wed Dec 24 14:11:54 UTC 2025] Removing cron job
-#9 57.98 no crontab for root
-#9 58.02 0 upgraded, 9 newly installed, 0 to remove and 1 not upgraded.
-#9 58.02 Need to get 997 kB of archives.
-#9 58.02 After this operation, 2969 kB of additional disk space will be used.
-#9 58.02 Get:1 http://archive.ubuntu.com/ubuntu noble/main amd64 libcares2 amd64 1.27.0-1.0ubuntu1 [73.7 kB]
-#9 58.24 
-#9 58.24 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 8261 (apt)...[Wed Dec 24 14:11:55 UTC 2025] Account key creation OK.
-#9 58.36 [Wed Dec 24 14:11:55 UTC 2025] No EAB credentials found for ZeroSSL, let's obtain them
-#9 58.42 Get:2 http://archive.ubuntu.com/ubuntu noble/universe amd64 libcork16 amd64 1.0.0~rc3-3build1 [44.4 kB]
-#9 58.47 Get:3 http://archive.ubuntu.com/ubuntu noble/universe amd64 libcorkipset1 amd64 1.1.1+git20171111.6842a63-2build1 [16.9 kB]
-#9 58.49 Get:4 http://archive.ubuntu.com/ubuntu noble/universe amd64 libjsonparser1.1 amd64 1.1.0-2 [8540 B]
-#9 58.50 Get:5 http://archive.ubuntu.com/ubuntu noble/universe amd64 libmbedcrypto7t64 amd64 2.28.8-1 [209 kB]
-#9 58.68 Get:6 http://archive.ubuntu.com/ubuntu noble/universe amd64 libpcre3 amd64 2:8.39-15build1 [248 kB]
-#9 58.78 Get:7 http://archive.ubuntu.com/ubuntu noble/main amd64 libsodium23 amd64 1.0.18-1build3 [161 kB]
-#9 58.82 Get:8 http://archive.ubuntu.com/ubuntu noble/universe amd64 shadowsocks-libev amd64 3.3.5+ds-10build3 [184 kB]
-#9 58.85 Get:9 http://archive.ubuntu.com/ubuntu noble/universe amd64 simple-obfs amd64 0.0.5-6build2 [50.4 kB]
-#9 59.24 
-#9 59.24 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 8261 (apt)...[Wed Dec 24 14:11:56 UTC 2025] Registering account: https://acme.zerossl.com/v2/DV90
-#9 59.73 Fetched 997 kB in 1s (898 kB/s)
-#9 59.74 Selecting previously unselected package libcares2:amd64.
-#9 59.74 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 19835 files and directories currently installed.)
-#9 59.76 Preparing to unpack .../0-libcares2_1.27.0-1.0ubuntu1_amd64.deb ...
-#9 59.76 Unpacking libcares2:amd64 (1.27.0-1.0ubuntu1) ...
-#9 59.78 Selecting previously unselected package libcork16:amd64.
-#9 59.78 Preparing to unpack .../1-libcork16_1.0.0~rc3-3build1_amd64.deb ...
-#9 59.78 Unpacking libcork16:amd64 (1.0.0~rc3-3build1) ...
-#9 59.80 Selecting previously unselected package libcorkipset1:amd64.
-#9 59.80 Preparing to unpack .../2-libcorkipset1_1.1.1+git20171111.6842a63-2build1_amd64.deb ...
-#9 59.80 Unpacking libcorkipset1:amd64 (1.1.1+git20171111.6842a63-2build1) ...
-#9 59.81 Selecting previously unselected package libjsonparser1.1:amd64.
-#9 59.82 Preparing to unpack .../3-libjsonparser1.1_1.1.0-2_amd64.deb ...
-#9 59.82 Unpacking libjsonparser1.1:amd64 (1.1.0-2) ...
-#9 59.83 Selecting previously unselected package libmbedcrypto7t64:amd64.
-#9 59.84 Preparing to unpack .../4-libmbedcrypto7t64_2.28.8-1_amd64.deb ...
-#9 59.84 Unpacking libmbedcrypto7t64:amd64 (2.28.8-1) ...
-#9 59.86 Selecting previously unselected package libpcre3:amd64.
-#9 59.86 Preparing to unpack .../5-libpcre3_2%3a8.39-15build1_amd64.deb ...
-#9 59.86 Unpacking libpcre3:amd64 (2:8.39-15build1) ...
-#9 59.88 Selecting previously unselected package libsodium23:amd64.
-#9 59.89 Preparing to unpack .../6-libsodium23_1.0.18-1build3_amd64.deb ...
-#9 59.89 Unpacking libsodium23:amd64 (1.0.18-1build3) ...
-#9 59.91 Selecting previously unselected package shadowsocks-libev.
-#9 59.91 Preparing to unpack .../7-shadowsocks-libev_3.3.5+ds-10build3_amd64.deb ...
-#9 59.91 Unpacking shadowsocks-libev (3.3.5+ds-10build3) ...
-#9 59.93 Selecting previously unselected package simple-obfs.
-#9 59.94 Preparing to unpack .../8-simple-obfs_0.0.5-6build2_amd64.deb ...
-#9 59.94 Unpacking simple-obfs (0.0.5-6build2) ...
-#9 59.96 Setting up libsodium23:amd64 (1.0.18-1build3) ...
-#9 59.96 Setting up libmbedcrypto7t64:amd64 (2.28.8-1) ...
-#9 59.96 Setting up libpcre3:amd64 (2:8.39-15build1) ...
-#9 59.97 Setting up libjsonparser1.1:amd64 (1.1.0-2) ...
-#9 59.97 Setting up libcares2:amd64 (1.27.0-1.0ubuntu1) ...
-#9 59.97 Setting up libcork16:amd64 (1.0.0~rc3-3build1) ...
-#9 59.98 Setting up libcorkipset1:amd64 (1.1.1+git20171111.6842a63-2build1) ...
-#9 59.98 Setting up shadowsocks-libev (3.3.5+ds-10build3) ...
-#9 60.00 invoke-rc.d: could not determine current runlevel
-#9 60.00 invoke-rc.d: policy-rc.d denied execution of start.
-#9 60.12 Created symlink /etc/systemd/system/multi-user.target.wants/shadowsocks-libev.service → /usr/lib/systemd/system/shadowsocks-libev.service.
-#9 60.12 Setting up simple-obfs (0.0.5-6build2) ...
-#9 60.12 /var/lib/dpkg/info/simple-obfs.postinst: 31: pwgen: not found
-#9 60.13 Processing triggers for libc-bin (2.39-0ubuntu8.6) ...
-#9 60.16 }========================other/ssfaketls===================================
-#9 60.24 
-#9 60.24 Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 8261 (apt)...
-#9 60.24 Reading package lists...[Wed Dec 24 14:11:57 UTC 2025] Registered
-#9 60.70 [Wed Dec 24 14:11:57 UTC 2025] ACCOUNT_THUMBPRINT='g4O6MuVSgEsYCYZo_V_XXTC8A-74KlMRBcHcQ79k5L0'
-#9 60.70 System has not been booted with systemd as init system (PID 1). Can't operate.
-#9 60.70 Failed to connect to bus: Host is down
-#9 60.70 }========================acme.sh===================================
-#9 61.00 
-#9 61.01 Building dependency tree...
-#9 61.19 Reading state information...
-#9 61.35 unzip is already the newest version (6.0-28ubuntu4.1).
-#9 61.35 0 upgraded, 0 newly installed, 0 to remove and 1 not upgraded.
-#9 61.81 Set installed version of xray to 25.12.8.
-#9 61.81 }========================xray===================================
-#9 61.81 ---------------------Finished!------------------------
-#9 61.81 System has not been booted with systemd as init system (PID 1). Can't operate.
-#9 61.81 Failed to connect to bus: Host is down
-#9 61.82 System has not been booted with systemd as init system (PID 1). Can't operate.
-#9 61.82 Failed to connect to bus: Host is down
-#9 61.82 ####100####Installing...####Done####
-#9 61.82 installing in docker mode finishs
-#9 61.82 ---------------------Finished!------------------------
-#9 DONE 62.1s
-#10 exporting to image
-#10 exporting layers
-#10 exporting layers 37.8s done
-#10 exporting manifest sha256:d6d41c2212d4a99ebb1d7bdcacbfbf44354be89905c921a53d3f9ccb2f64bb4d done
-#10 exporting config sha256:4fea3d6c3db2c2493b8a9b30a7fd880bec5f9ea0376edd11c9553a83fa6cbd21 done
-#10 ERROR: failed to parse ref "ghcr.io/mn-hacker/Hiddify-Manager": invalid reference format: repository name (mn-hacker/Hiddify-Manager) must be lowercase
-------
- > exporting to image:
-------
-ERROR: failed to build: failed to solve: failed to parse ref "ghcr.io/mn-hacker/Hiddify-Manager": invalid reference format: repository name (mn-hacker/Hiddify-Manager) must be lowercase
-Reference
-Check build summary support
-Error: buildx failed with: ERROR: failed to build: failed to solve: failed to parse ref "ghcr.io/mn-hacker/Hiddify-Manager": invalid reference format: repository name (mn-hacker/Hiddify-Manager) must be lowercase
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/ckeditor/translations/ug.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/ckeditor/translations/pt.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/ckeditor/translations/ko.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/ckeditor/translations/nl.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/ckeditor/translations/tt.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/ckeditor/translations/tr.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/ckeditor/translations/ja.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/ckeditor/translations/ast.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/ckeditor/translations/ro.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/ckeditor/translations/fr.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/ckeditor/translations/ne.js
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/chart.js/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/chart.js/Chart.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/chart.js/Chart.min.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/chart.js/Chart.bundle.min.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/chart.js/Chart.bundle.js
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/popper/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/popper/popper.min.js
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/popper/esm/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/popper/esm/popper.min.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/popper/esm/popper.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/popper/esm/popper-utils.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/popper/esm/popper-utils.min.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/popper/popper.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/popper/popper-utils.js
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/popper/umd/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/popper/umd/popper.min.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/popper/umd/popper.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/popper/umd/popper-utils.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/popper/umd/popper-utils.min.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/popper/popper-utils.min.js
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/jquery/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/jquery/jquery.min.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/jquery/jquery.slim.min.map
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/jquery/jquery.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/jquery/jquery.slim.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/jquery/jquery.min.map
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/jquery/jquery.slim.min.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/jquery/core.js
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/morris/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/morris/morris.min.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/morris/morris.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/morris/morris.css
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/slimScroll/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/slimScroll/jquery.slimscroll.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/slimScroll/jquery.slimscroll.min.js
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/pace/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/pace/pace.min.css
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/pace/pace.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/pace/pace.css
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/pace/pace.min.js
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/daterangepicker/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/daterangepicker/daterangepicker-bs3.css
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/daterangepicker/moment.min.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/daterangepicker/moment.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/daterangepicker/daterangepicker.js
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/bootstrap-wysihtml5/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.css
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/font-awesome/
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/font-awesome/css/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/font-awesome/css/font-awesome.min.css
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/font-awesome/css/font-awesome.css
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/font-awesome/css/font-awesome.css.map
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/font-awesome/fonts/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/font-awesome/fonts/fontawesome-webfont.woff
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/font-awesome/fonts/fontawesome-webfont.woff2
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/font-awesome/fonts/fontawesome-webfont.ttf
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/font-awesome/fonts/FontAwesome.otf
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/font-awesome/fonts/fontawesome-webfont.svg
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/font-awesome/fonts/fontawesome-webfont.eot
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.is.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.nb.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.nl.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.zh-CN.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.sw.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.cs.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.id.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.he.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.gl.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.lv.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.th.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.tr.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.ua.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.vi.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.de.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.hr.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.el.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.fa.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.sq.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.sv.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.az.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.sl.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.fi.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.ro.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.rs-latin.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.da.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.kr.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.it.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.ja.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.cy.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.rs.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.ar.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.pt-BR.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.zh-TW.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.no.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.fr.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.ru.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.nl-BE.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.kk.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.sk.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.et.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.lt.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.ca.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.bg.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.es.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.ka.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.hu.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.mk.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.ms.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.pl.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/locales/bootstrap-datepicker.pt.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/datepicker3.css
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/datepicker/bootstrap-datepicker.js
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/colorpicker/
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/colorpicker/img/
+ extracting: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/colorpicker/img/hue.png
+ extracting: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/colorpicker/img/alpha.png
+ extracting: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/colorpicker/img/hue-horizontal.png
+ extracting: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/colorpicker/img/saturation.png
+ extracting: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/colorpicker/img/alpha-horizontal.png
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/colorpicker/bootstrap-colorpicker.min.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/colorpicker/bootstrap-colorpicker.css
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/colorpicker/bootstrap-colorpicker.min.css
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/plugins/colorpicker/bootstrap-colorpicker.js
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/js/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/js/popper.min.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/js/custom-protocol-check.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/js/demo.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/js/custom-rtl.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/js/pwa-sw.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/js/jquery-3.6.1.min.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/js/custom.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/js/qrcode.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/js/moment.min.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/js/bootbox.all.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/js/adminlte.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/js/bootstrap.min.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/js/bootbox.all.min.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/js/pwa.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/js/js.cookie.min.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/static/js/bootstrap.bundle.min.js
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/database.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/VERSION.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/Events.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/cache.py
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/flask.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/utils.py
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/network/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/network/auto_ip_selector.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/network/cf_api.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/network/net.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/network/__init__.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/auth.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/random.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/convert.py
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/proxy/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/proxy/clash.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/proxy/xray.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/proxy/singbox.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/proxy/wireguard.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/proxy/xrayjson.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/proxy/__init__.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/proxy/shared.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/encode.py
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/importer/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/importer/xui.py
+ extracting: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/importer/__init__.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/model.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/github_issue.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/crypto.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/__init__.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/system.py
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/node/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/node/parent.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/node/child.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/node/__init__.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/node/api_client.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/hutils/node/shared.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/celery.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/__main__.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/__init__.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/base_setup.py
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/templates/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/templates/flaskadmin-layout.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/templates/500.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/templates/admin.ht.old
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/templates/donation.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/templates/redirect.html
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/templates/hiddify-flask-admin/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/templates/hiddify-flask-admin/list.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/templates/hiddify-flask-admin/actions.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/templates/github_issue_body.j2
+ extracting: hiddify-manager/hiddify-panel/src/hiddifypanel/templates/fake.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/templates/static.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/templates/macros.html
+ extracting: hiddify-manager/hiddify-panel/src/hiddifypanel/templates/a.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/templates/master.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/templates/lte-master.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/templates/admin-layout.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/templates/error.html
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/translations/
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/translations/en/
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/translations/en/LC_MESSAGES/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/translations/en/LC_MESSAGES/messages.mo
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/translations/en/LC_MESSAGES/messages.po
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/translations/my/
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/translations/my/LC_MESSAGES/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/translations/my/LC_MESSAGES/messages.mo
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/translations/my/LC_MESSAGES/messages.po
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/translations/zh/
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/translations/zh/LC_MESSAGES/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/translations/zh/LC_MESSAGES/messages.mo
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/translations/zh/LC_MESSAGES/messages.po
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/translations/fa/
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/translations/fa/LC_MESSAGES/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/translations/fa/LC_MESSAGES/messages.mo
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/translations/fa/LC_MESSAGES/messages.po
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/translations/pt/
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/translations/pt/LC_MESSAGES/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/translations/pt/LC_MESSAGES/messages.mo
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/translations/pt/LC_MESSAGES/messages.po
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/translations/ru/
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/translations/ru/LC_MESSAGES/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/translations/ru/LC_MESSAGES/messages.mo
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/translations/ru/LC_MESSAGES/messages.po
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/fix_flaskadmin_babel.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/websocket.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/Dashboard.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/NodeAdmin.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/DomainAdmin.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/AdminstratorAdmin.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/Backup.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/QuickSetup.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/commercial_info.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/Terminal.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/adminlte.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/UserAdmin.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/SettingAdmin.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/ProxyAdmin.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/__init__.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/ConfigAdmin.py
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/redirect_to_admin.html
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/model/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/model/domain_list.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/model/user_list.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/model/proxydetail_list.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/model/admin_list.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/base2.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/index.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/view_logs.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/quick_setup.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/parent_dash.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/ltemaster.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/backup.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/configfake.html
+ extracting: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/a.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/commercial_info.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/proxy.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/result.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/config.html
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/layout.html
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/file/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/file/list.html
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/file/modals/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/file/modals/form.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/file/form.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/actions.html
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/model/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/model/list.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/model/layout.html
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/model/modals/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/model/modals/details.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/model/modals/create.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/model/modals/edit.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/model/row_actions.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/model/details.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/model/inline_list_base.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/model/create.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/model/edit.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/model/inline_field_list.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/model/inline_form.html
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/rediscli/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/rediscli/console.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/rediscli/response.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/index.html
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/adminlte/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/adminlte/adminlte.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/adminlte/forms.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/static.html
+ extracting: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/master.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/templates/fake_for_translation/Flask-AdminLTE3/templates/flask-admin/base.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/Actions.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/auth_back.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/cli.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/init_db.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/auth_back2.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/asset.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/common.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin_2.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/hlogger.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/custom_widgets.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/run_commander.py
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/common_bp/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/common_bp/login.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/common_bp/__init__.py
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/common_bp/templates/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/common_bp/templates/login.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/hiddify.py
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v1/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v1/tgbot.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v1/resources.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v1/__init__.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v1/tgmsg.py
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/admin/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/admin/system_actions.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/admin/admin_log_api.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/admin/server_status_api.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/admin/admin_info_api.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/admin/admin_users_api.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/admin/user_api.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/admin/admin_user_api.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/admin/users_api.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/admin/schema.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/admin/__init__.py
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/parent/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/parent/usage_api.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/parent/register_api.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/parent/sync_api.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/parent/status_api.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/parent/schema.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/parent/__init__.py
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/user/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/user/info_api.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/user/configs_api.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/user/short_api.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/user/mtproxies.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/user/apps_api.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/user/__init__.py
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/child/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/child/register_parent_api.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/child/sync_parent_api.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/child/actions.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/child/schema.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/child/__init__.py
+ extracting: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/__init__.py
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/panel/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/panel/ping_pong.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/panel/info.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/panel/schema.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/v2/panel/__init__.py
+ extracting: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/restapi/__init__.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/ParentDomainAdmin.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/ProxyDetailsAdmin.py
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/telegrambot/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/telegrambot/Usage.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/telegrambot/information.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/telegrambot/DefaultResponse.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/telegrambot/admin.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/telegrambot/__init__.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/__init__.py
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/templates/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/templates/parent_dash.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/commercial/templates/configc.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/usage.py
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/user.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/link_maker.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/__init__.py
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/new.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/clash_config.yml
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/redirect_to_new_format.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/clash_config copy.yml
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/base_singbox_config.json.j2
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/all_configs copy.txt
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/all_configs.txt
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/clash_proxies.yml
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/home/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/home/clash-links.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/home/index copy.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/home/handle_smart.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/home/doh.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/home/telegram.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/home/multi.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/home/speedtest.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/home/base2.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/home/clash-links copy.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/home/ios.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/home/auto_page.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/home/usage.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/home/home.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/home/ios copy.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/home/android.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/home/windows.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/home/all-configs_old.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/home/all-configs.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/home/one_click.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/home/index_old.html
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/singbox_config.json
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/clash_proxies copy.yml
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/user/templates/base_xray_config.json.j2
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/__init__.py
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/node/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/node/test_pb2.pyi
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/node/test_grpc.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/node/test.proto
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/node/test_pb2.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/node/hello.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/node/a.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/node/__init__.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/panel/node/test_pb2_grpc.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/base.py
+   creating: hiddify-manager/hiddify-panel/src/hiddifypanel/drivers/
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/drivers/wireguard_api.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/drivers/user_driver.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/drivers/abstract_driver.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/drivers/ssh_liberty_bridge_api.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/drivers/singbox_api.py
+  inflating: hiddify-manager/hiddify-panel/src/hiddifypanel/drivers/xray_api.py
+  inflating: hiddify-manager/hiddify-panel/src/release.sh
+  inflating: hiddify-manager/hiddify-panel/src/uv.lock
+  inflating: hiddify-manager/hiddify-panel/src/Containerfile
+  inflating: hiddify-manager/hiddify-panel/src/run.sh
+  inflating: hiddify-manager/hiddify-panel/src/mkdocs.yml
+  inflating: hiddify-manager/hiddify-panel/src/Makefile
+   creating: hiddify-manager/nginx/
+  inflating: hiddify-manager/nginx/install.sh
+  inflating: hiddify-manager/nginx/pre-start.sh
+  inflating: hiddify-manager/nginx/uwsgi_params
+  inflating: hiddify-manager/nginx/ar_real_ip.conf
+  inflating: hiddify-manager/nginx/hiddify-nginx.service
+  inflating: hiddify-manager/nginx/add2shortlink.sh
+   creating: hiddify-manager/nginx/conf.d/
+  inflating: hiddify-manager/nginx/conf.d/xray-base.conf.j2
+  inflating: hiddify-manager/nginx/conf.d/speedtest.conf.j2
+  inflating: hiddify-manager/nginx/conf.d/singbox-base.conf.j2
+  inflating: hiddify-manager/nginx/run.sh
+   creating: hiddify-manager/nginx/parts/
+  inflating: hiddify-manager/nginx/parts/xhttp.conf
+ extracting: hiddify-manager/nginx/parts/acme.conf
+  inflating: hiddify-manager/nginx/parts/hiddify.conf.j2
+ extracting: hiddify-manager/nginx/parts/wsh2.conf
+  inflating: hiddify-manager/nginx/parts/proxy_to_static.conf.j2
+  inflating: hiddify-manager/nginx/parts/def-link.conf.j2
+ extracting: hiddify-manager/nginx/parts/short-link.conf.j2
+  inflating: hiddify-manager/nginx/parts/common.conf.j2
+  inflating: hiddify-manager/nginx/parts/proxy_path.conf.j2
+  inflating: hiddify-manager/nginx/parts/grpc.conf
+  inflating: hiddify-manager/nginx/parts/proxy_to_panel.conf.j2
+ extracting: hiddify-manager/nginx/parts/tcph2.conf
+  inflating: hiddify-manager/nginx/nginx.conf.j2
+  inflating: hiddify-manager/nginx/cf_real_ip.conf
+  inflating: hiddify-manager/README.md
+  inflating: hiddify-manager/docker-init.sh
+  inflating: hiddify-manager/apply_configs.sh
+  inflating: hiddify-manager/cloud-init.yml
+   creating: hiddify-manager/acme.sh/
+  inflating: hiddify-manager/acme.sh/install.sh
+  inflating: hiddify-manager/acme.sh/get_cert.sh
+  inflating: hiddify-manager/acme.sh/cert_utils.sh
+  inflating: hiddify-manager/acme.sh/run.sh
+ extracting: hiddify-manager/acme.sh/generate_self_signed_cert.sh
+  inflating: hiddify-manager/README_fa.md
+  inflating: hiddify-manager/docker-compose.yml
+   creating: hiddify-manager/docs/
+  inflating: hiddify-manager/docs/create_domain.md
+  inflating: hiddify-manager/docs/HiddifyPanel.webp
+  inflating: hiddify-manager/docs/Turorials_en.webp
+  inflating: hiddify-manager/docs/Tutorials_cn.webp
+  inflating: hiddify-manager/docs/Tutorials_fa.webp
+   creating: hiddify-manager/haproxy/
+  inflating: hiddify-manager/haproxy/install.sh
+   creating: hiddify-manager/haproxy/iplists/
+  inflating: hiddify-manager/haproxy/iplists/cloudfront.lst
+  inflating: hiddify-manager/haproxy/iplists/arvan.lst
+  inflating: hiddify-manager/haproxy/iplists/cloudflare.lst
+  inflating: hiddify-manager/haproxy/haproxy.cfg.j2
+   creating: hiddify-manager/haproxy/maps/
+ extracting: hiddify-manager/haproxy/maps/sni_h2.j2
+  inflating: hiddify-manager/haproxy/maps/path.j2
+  inflating: hiddify-manager/haproxy/maps/http_domain.j2
+  inflating: hiddify-manager/haproxy/maps/path_v10.j2
+  inflating: hiddify-manager/haproxy/maps/sni.j2
+  inflating: hiddify-manager/haproxy/maps/path_h2.j2
+ extracting: hiddify-manager/haproxy/maps/decoy_domain.j2
+   creating: hiddify-manager/haproxy/fronts/
+  inflating: hiddify-manager/haproxy/fronts/sni_proxy.cfg.pj2
+  inflating: hiddify-manager/haproxy/fronts/in_tcpmode.cfg.pj2
+  inflating: hiddify-manager/haproxy/fronts/in_httpmode.cfg.pj2
+  inflating: hiddify-manager/haproxy/fronts/stats.cfg.pj2
+   creating: hiddify-manager/haproxy/backends/
+  inflating: hiddify-manager/haproxy/backends/v10.cfg.pj2
+  inflating: hiddify-manager/haproxy/backends/common.cfg.pj2
+  inflating: hiddify-manager/haproxy/run.sh
+  inflating: hiddify-manager/haproxy/hiddify-haproxy.service
+   creating: hiddify-manager/common/
+  inflating: hiddify-manager/common/commander.py
+  inflating: hiddify-manager/common/install.sh
+  inflating: hiddify-manager/common/hiddify_installer.sh
+  inflating: hiddify-manager/common/jinja.py
+  inflating: hiddify-manager/common/docker-installer.sh
+   creating: hiddify-manager/common/__pycache__/
+  inflating: hiddify-manager/common/__pycache__/commander.cpython-310.pyc
+  inflating: hiddify-manager/common/example.json
+  inflating: hiddify-manager/common/download_install.sh
+  inflating: hiddify-manager/common/download.sh
+  inflating: hiddify-manager/common/downgrade.sh
+  inflating: hiddify-manager/common/change_dns.py
+  inflating: hiddify-manager/common/sysctl.conf
+  inflating: hiddify-manager/common/download_install_easylink.sh
+  inflating: hiddify-manager/common/run.sh.j2
+  inflating: hiddify-manager/common/logo.ico
+  inflating: hiddify-manager/common/remove_remote_assistant.sh
+  inflating: hiddify-manager/common/add_remote_assistant.sh
+  inflating: hiddify-manager/common/google-bbr.sh
+  inflating: hiddify-manager/common/packages.lock
+  inflating: hiddify-manager/common/replace_variables.sh
+  inflating: hiddify-manager/common/daily_actions.sh
+  inflating: hiddify-manager/common/package_manager.sh
+  inflating: hiddify-manager/common/utils.sh
+   creating: hiddify-manager/other/
+   creating: hiddify-manager/other/mysql/
+  inflating: hiddify-manager/other/mysql/install.sh
+   creating: hiddify-manager/other/wireguard/
+  inflating: hiddify-manager/other/wireguard/install.sh.j2
+  inflating: hiddify-manager/other/wireguard/run.sh.j2
+  inflating: hiddify-manager/other/wireguard/disable.sh
+  inflating: hiddify-manager/other/wireguard/script.sh
+  inflating: hiddify-manager/other/wireguard/wg_utils.sh
+   creating: hiddify-manager/other/docker/
+  inflating: hiddify-manager/other/docker/journalctl
+  inflating: hiddify-manager/other/docker/systemctl
+   creating: hiddify-manager/other/warp/
+ extracting: hiddify-manager/other/warp/install.sh
+   creating: hiddify-manager/other/warp/wireguard/
+  inflating: hiddify-manager/other/warp/wireguard/install.sh
+  inflating: hiddify-manager/other/warp/wireguard/change_ip.sh
+  inflating: hiddify-manager/other/warp/wireguard/status.sh
+  inflating: hiddify-manager/other/warp/wireguard/run.sh.j2
+  inflating: hiddify-manager/other/warp/wireguard/disable.sh
+  inflating: hiddify-manager/other/warp/wireguard/add_version.sh
+ extracting: hiddify-manager/other/warp/change_ip.sh
+   creating: hiddify-manager/other/warp/singbox/
+  inflating: hiddify-manager/other/warp/singbox/install.sh
+  inflating: hiddify-manager/other/warp/singbox/change_ip.sh
+  inflating: hiddify-manager/other/warp/singbox/status.sh
+  inflating: hiddify-manager/other/warp/singbox/hiddify-warp.service
+  inflating: hiddify-manager/other/warp/singbox/disable.sh
+  inflating: hiddify-manager/other/warp/singbox/check-quota.sh
+  inflating: hiddify-manager/other/warp/singbox/run.sh
+ extracting: hiddify-manager/other/warp/status.sh
+ extracting: hiddify-manager/other/warp/disable.sh
+ extracting: hiddify-manager/other/warp/run.sh
+   creating: hiddify-manager/other/ssfaketls/
+  inflating: hiddify-manager/other/ssfaketls/install.sh
+  inflating: hiddify-manager/other/ssfaketls/disable.sh
+  inflating: hiddify-manager/other/ssfaketls/hiddify-ss-faketls.service.j2
+  inflating: hiddify-manager/other/ssfaketls/run.sh
+   creating: hiddify-manager/other/v2ray/
+  inflating: hiddify-manager/other/v2ray/install.sh
+  inflating: hiddify-manager/other/v2ray/config-v2ray.json.j2
+  inflating: hiddify-manager/other/v2ray/run.sh
+   creating: hiddify-manager/other/ssh/
+  inflating: hiddify-manager/other/ssh/install.sh
+  inflating: hiddify-manager/other/ssh/disable.sh
+  inflating: hiddify-manager/other/ssh/run.sh
+  inflating: hiddify-manager/other/ssh/hiddify-ssh-liberty-bridge.service
+   creating: hiddify-manager/other/speedtest/
+ extracting: hiddify-manager/other/speedtest/install.sh
+ extracting: hiddify-manager/other/speedtest/upload
+  inflating: hiddify-manager/other/speedtest/License.md
+  inflating: hiddify-manager/other/speedtest/index.html
+  inflating: hiddify-manager/other/speedtest/hosted.html
+   creating: hiddify-manager/other/speedtest/assets/
+   creating: hiddify-manager/other/speedtest/assets/images/
+   creating: hiddify-manager/other/speedtest/assets/images/icons/
+  inflating: hiddify-manager/other/speedtest/assets/images/icons/site.webmanifest
+  inflating: hiddify-manager/other/speedtest/assets/images/icons/launcher-icon-1x.png
+  inflating: hiddify-manager/other/speedtest/assets/images/icons/browserconfig.xml
+ extracting: hiddify-manager/other/speedtest/assets/images/icons/favicon-32x32.png
+  inflating: hiddify-manager/other/speedtest/assets/images/icons/favicon-16x16.png
+  inflating: hiddify-manager/other/speedtest/assets/images/icons/launcher-icon-4x.png
+  inflating: hiddify-manager/other/speedtest/assets/images/icons/apple-touch-icon.png
+  inflating: hiddify-manager/other/speedtest/assets/images/icons/launcher-icon-3x.png
+  inflating: hiddify-manager/other/speedtest/assets/images/icons/android-chrome-512x512.png
+  inflating: hiddify-manager/other/speedtest/assets/images/icons/mstile-150x150.png
+  inflating: hiddify-manager/other/speedtest/assets/images/icons/launcher-icon-2x.png
+  inflating: hiddify-manager/other/speedtest/assets/images/icons/android-chrome-192x192.png
+  inflating: hiddify-manager/other/speedtest/assets/images/icons/favicon.ico
+  inflating: hiddify-manager/other/speedtest/assets/images/icons/safari-pinned-tab.svg
+  inflating: hiddify-manager/other/speedtest/assets/images/app.svg
+   creating: hiddify-manager/other/speedtest/assets/css/
+  inflating: hiddify-manager/other/speedtest/assets/css/app.css
+  inflating: hiddify-manager/other/speedtest/assets/css/darkmode.css
+   creating: hiddify-manager/other/speedtest/assets/fonts/
+ extracting: hiddify-manager/other/speedtest/assets/fonts/roboto-v30-latin-500.woff2
+  inflating: hiddify-manager/other/speedtest/assets/fonts/roboto-v30-latin-regular.eot
+  inflating: hiddify-manager/other/speedtest/assets/fonts/roboto-v30-latin-500.ttf
+  inflating: hiddify-manager/other/speedtest/assets/fonts/roboto-v30-latin-500.eot
+  inflating: hiddify-manager/other/speedtest/assets/fonts/roboto-v30-latin-regular.svg
+  inflating: hiddify-manager/other/speedtest/assets/fonts/roboto-v30-latin-500.svg
+  inflating: hiddify-manager/other/speedtest/assets/fonts/roboto-v30-latin-500.woff
+  inflating: hiddify-manager/other/speedtest/assets/fonts/roboto-v30-latin-regular.woff
+ extracting: hiddify-manager/other/speedtest/assets/fonts/roboto-v30-latin-regular.woff2
+  inflating: hiddify-manager/other/speedtest/assets/fonts/roboto-v30-latin-regular.ttf
+   creating: hiddify-manager/other/speedtest/assets/js/
+  inflating: hiddify-manager/other/speedtest/assets/js/app-2.5.4.min.js
+  inflating: hiddify-manager/other/speedtest/assets/js/app-2.5.4.js
+  inflating: hiddify-manager/other/speedtest/assets/js/darkmode.js
+  inflating: hiddify-manager/other/speedtest/README.md
+   creating: hiddify-manager/other/telegram/
+   creating: hiddify-manager/other/telegram/python/
+  inflating: hiddify-manager/other/telegram/python/install.sh
+  inflating: hiddify-manager/other/telegram/python/config.py.j2
+  inflating: hiddify-manager/other/telegram/python/mtproxy.service
+  inflating: hiddify-manager/other/telegram/python/run.sh
+  inflating: hiddify-manager/other/telegram/install.sh.j2
+  inflating: hiddify-manager/other/telegram/run.sh.j2
+  inflating: hiddify-manager/other/telegram/disable.sh
+   creating: hiddify-manager/other/telegram/orig/
+  inflating: hiddify-manager/other/telegram/orig/install.sh
+  inflating: hiddify-manager/other/telegram/orig/tgproxy_run.sh.j2
+  inflating: hiddify-manager/other/telegram/orig/mtproxy.service
+  inflating: hiddify-manager/other/telegram/orig/run.sh
+   creating: hiddify-manager/other/telegram/erlang/
+  inflating: hiddify-manager/other/telegram/erlang/install.sh.j2
+  inflating: hiddify-manager/other/telegram/erlang/run.sh.j2
+  inflating: hiddify-manager/other/telegram/erlang/prod-sys.config.j2
+   creating: hiddify-manager/other/telegram/tgo/
+  inflating: hiddify-manager/other/telegram/tgo/install.sh
+  inflating: hiddify-manager/other/telegram/tgo/mtg.toml.j2
+  inflating: hiddify-manager/other/telegram/tgo/mtproxy.service
+  inflating: hiddify-manager/other/telegram/tgo/run.sh
+   creating: hiddify-manager/other/deprecated/
+   creating: hiddify-manager/other/deprecated/caddy/
+  inflating: hiddify-manager/other/deprecated/caddy/install.sh
+  inflating: hiddify-manager/other/deprecated/caddy/hiddify-caddy.service
+  inflating: hiddify-manager/other/deprecated/caddy/Caddyfile.template
+  inflating: hiddify-manager/other/deprecated/caddy/run.sh
+   creating: hiddify-manager/other/deprecated/xray/
+  inflating: hiddify-manager/other/deprecated/xray/xtls-sni-config.json.template
+  inflating: hiddify-manager/other/deprecated/xray/xtls-config.old.json.template
+   creating: hiddify-manager/other/deprecated/monitoring/
+  inflating: hiddify-manager/other/deprecated/monitoring/install.sh
+  inflating: hiddify-manager/other/deprecated/monitoring/cron.sh.template
+  inflating: hiddify-manager/other/deprecated/monitoring/hiddify_monitoring_web.service.template
+  inflating: hiddify-manager/other/deprecated/monitoring/uninstall.sh
+  inflating: hiddify-manager/other/deprecated/monitoring/simple_web.py.template
+  inflating: hiddify-manager/other/deprecated/monitoring/run.sh
+   creating: hiddify-manager/other/deprecated/sniproxy/
+  inflating: hiddify-manager/other/deprecated/sniproxy/install.sh
+  inflating: hiddify-manager/other/deprecated/sniproxy/hiddify-sniproxy.service.template
+  inflating: hiddify-manager/other/deprecated/sniproxy/sniproxy.conf.template
+  inflating: hiddify-manager/other/deprecated/sniproxy/run.sh
+  inflating: hiddify-manager/other/deprecated/remove_deprecated.sh
+   creating: hiddify-manager/other/deprecated/clash-server/
+  inflating: hiddify-manager/other/deprecated/clash-server/install.sh
+  inflating: hiddify-manager/other/deprecated/clash-server/uninstall.sh
+   creating: hiddify-manager/other/deprecated/clash-server/data/
+  inflating: hiddify-manager/other/deprecated/clash-server/data/config.yaml.template
+  inflating: hiddify-manager/other/deprecated/clash-server/clash-server.service.template
+  inflating: hiddify-manager/other/deprecated/clash-server/run.sh
+   creating: hiddify-manager/other/deprecated/nginx/
+  inflating: hiddify-manager/other/deprecated/nginx/sni-proxy.conf.template
+   creating: hiddify-manager/other/deprecated/certbot/
+ extracting: hiddify-manager/other/deprecated/certbot/install.sh
+  inflating: hiddify-manager/other/deprecated/certbot/run.sh
+   creating: hiddify-manager/other/deprecated/clash/
+  inflating: hiddify-manager/other/deprecated/clash/meta-proxies.yml
+  inflating: hiddify-manager/other/deprecated/clash/normal.yml
+  inflating: hiddify-manager/other/deprecated/clash/only_iran.yml
+  inflating: hiddify-manager/other/deprecated/clash/meta_all.yml
+  inflating: hiddify-manager/other/deprecated/clash/proxies.yml
+  inflating: hiddify-manager/other/deprecated/clash/all.yml
+   creating: hiddify-manager/other/deprecated/clash/rules/
+  inflating: hiddify-manager/other/deprecated/clash/rules/blocked-sites.yml
+  inflating: hiddify-manager/other/deprecated/clash/rules/tmp-blocked-sites.yml
+  inflating: hiddify-manager/other/deprecated/clash/rules/ads-sites.yml
+  inflating: hiddify-manager/other/deprecated/clash/rules/open-sites.yml
+  inflating: hiddify-manager/other/deprecated/clash/rules/iran-sites.yml
+  inflating: hiddify-manager/other/deprecated/clash/meta_normal.yml
+  inflating: hiddify-manager/other/deprecated/clash/meta_lite.yml
+  inflating: hiddify-manager/other/deprecated/clash/lite.yml
+   creating: hiddify-manager/other/deprecated/trojan-go/
+  inflating: hiddify-manager/other/deprecated/trojan-go/install.sh
+  inflating: hiddify-manager/other/deprecated/trojan-go/uninstall.sh
+  inflating: hiddify-manager/other/deprecated/trojan-go/config.json.template
+  inflating: hiddify-manager/other/deprecated/trojan-go/run.sh
+   creating: hiddify-manager/other/deprecated/vmess/
+  inflating: hiddify-manager/other/deprecated/vmess/install.sh
+  inflating: hiddify-manager/other/deprecated/vmess/uninstall.sh
+  inflating: hiddify-manager/other/deprecated/vmess/config.json.template
+  inflating: hiddify-manager/other/deprecated/vmess/run.sh
+   creating: hiddify-manager/other/deprecated/shadowtls/
+  inflating: hiddify-manager/other/deprecated/shadowtls/install.sh
+  inflating: hiddify-manager/other/deprecated/shadowtls/shadowtls.conf.j2
+  inflating: hiddify-manager/other/deprecated/shadowtls/shadowtls.service
+  inflating: hiddify-manager/other/deprecated/shadowtls/run.sh
+   creating: hiddify-manager/other/deprecated/netdata/
+  inflating: hiddify-manager/other/deprecated/netdata/install.sh
+  inflating: hiddify-manager/other/deprecated/netdata/uninstall.sh
+  inflating: hiddify-manager/other/deprecated/netdata/dash.html
+  inflating: hiddify-manager/other/deprecated/netdata/run.sh
+  inflating: hiddify-manager/other/deprecated/ss-azure-template.json
+   creating: hiddify-manager/other/hiddify-cli/
+  inflating: hiddify-manager/other/hiddify-cli/hiddify-cli.service
+  inflating: hiddify-manager/other/hiddify-cli/install.sh.j2
+  inflating: hiddify-manager/other/hiddify-cli/run.sh.j2
+  inflating: hiddify-manager/other/hiddify-cli/disable.sh
+  inflating: hiddify-manager/other/hiddify-cli/h_client_config.json
+   creating: hiddify-manager/other/redis/
+  inflating: hiddify-manager/other/redis/install.sh
+  inflating: hiddify-manager/other/redis/hiddify-redis.service
+  inflating: hiddify-manager/other/redis/redis.conf
+ extracting: hiddify-manager/other/redis/run.sh
+  inflating: hiddify-manager/config.env.default
+  inflating: hiddify-manager/README_cn.md
+  inflating: hiddify-manager/update.sh
+  inflating: hiddify-manager/error.txt
+   creating: hiddify-manager/operations/
+   creating: hiddify-manager/operations/lxd/
+   creating: hiddify-manager/operations/lxd/utils/
+  inflating: hiddify-manager/operations/lxd/utils/hiddify_ports_to_csv.sh
+  inflating: hiddify-manager/operations/lxd/utils/lxc_ports_to_host.sh
+  inflating: hiddify-manager/operations/lxd/README.md
+  inflating: hiddify-manager/operations/lxd/README.fa.md
+  inflating: hiddify-manager/operations/lxd/setup_lxc_container.sh
+  inflating: hiddify-manager/Makefile
+  inflating: hiddify-manager/README_ru.md
+
+
+
+Using CPython 3.13.11
+Creating virtual environment at: .venv313
+Activate with: source .venv313/bin/activate
+Using Python 3.13.11 environment at: .venv313
+Package cli-progress is not installed.
+Using Python 3.13.11 environment at: .venv313
+Resolved 6 packages in 59ms
+Prepared 6 packages in 0.71ms
+Installed 6 packages in 7ms
+ + argparse==1.4.0
+ + asyncio==4.0.0
+ + cli-progress==2.0.0
+ + typing-extensions==4.15.0
+ + urwid==2.6.10
+ + wcwidth==0.2.14
+
+
+
+
+
+
+/opt/hiddify-manager/.venv313/bin/python3: No module named hiddifypanel
+
+
+
+Error: Key not found: warp_mode
+
+----------------------------------------------------------------
+- Warp Status:
+  - Profile:
+        2025/12/25 01:03:42 Using config file: wgcf-account.toml
+        2025/12/25 01:03:42 no valid account detected
+  - Network:
+        "country"      : "Finland",
+        "city"         : "Helsinki",
+        "org"          : "Cloudflare WARP",
+        "query"        : "104.28.222.15"
+----------------------------------------------------------------
+- Global IP:
+Error: Key not found: core_type
+----------------------------------------------------------------
+- Services Status:
+Error: Key not found: warp_mode
+    hiddify-redis                                          active
+    hiddify-haproxy                                    activating
+    hiddify-panel                                          failed
+    hiddify-singbox                                    activating
+    hiddify-ssh-liberty-bridge                         activating
+    hiddify-xray                                       activating
+    hiddify-nginx                                      activating
+    hiddify-panel-background-tasks                         failed

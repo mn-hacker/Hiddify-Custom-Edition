@@ -43,23 +43,23 @@ function main() {
     echo "Creating a backup ..."
     ./hiddify-panel/backup.sh
 
-    update_script="https://raw.githubusercontent.com/hiddify/Hiddify-Manager/refs/heads/main/common/download.sh"
+    update_script="https://raw.githubusercontent.com/mn-hacker/Hiddify-Manager/refs/heads/main/common/download.sh"
     case "$package_mode" in
     develop)
         # Use the latest commit from GitHub
         latest_panel=$(get_commit_version Hiddify-Panel)
         latest_manager=$(get_commit_version hiddify-manager)
-        update_script="https://raw.githubusercontent.com/hiddify/Hiddify-Manager/refs/heads/dev/common/download.sh"
+        update_script="https://raw.githubusercontent.com/mn-hacker/Hiddify-Manager/refs/heads/dev/common/download.sh"
         ;;
     beta)
         latest_panel=$(get_pre_release_version hiddify-panel)
         latest_manager=$(get_pre_release_version hiddify-manager)
-        update_script="https://raw.githubusercontent.com/hiddify/Hiddify-Manager/refs/heads/beta/common/download.sh"
+        update_script="https://raw.githubusercontent.com/mn-hacker/Hiddify-Manager/refs/heads/beta/common/download.sh"
         ;;
     release)
         latest_panel=$(get_release_version hiddify-panel)
         latest_manager=$(get_release_version hiddify-manager)
-        update_script="https://raw.githubusercontent.com/hiddify/Hiddify-Manager/refs/heads/main/common/download.sh"
+        update_script="https://raw.githubusercontent.com/mn-hacker/Hiddify-Manager/refs/heads/main/common/download.sh"
         ;;
     esac
 

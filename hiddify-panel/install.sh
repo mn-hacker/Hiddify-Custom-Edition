@@ -27,9 +27,15 @@ ln -sf $(pwd)/hiddify-panel-background-tasks.service /etc/systemd/system/hiddify
 systemctl enable hiddify-panel-background-tasks.service
 
 if [ -n "$HIDDIFY_PANLE_SOURCE_DIR" ]; then
-    echo "NOTICE: building hiddifypanel package from source..."
+    echo "NOTICE: building hiddifypanel package from source dir..."
     echo "NOTICE: the source dir $HIDDIFY_PANLE_SOURCE_DIR"
     uv pip install -e "$HIDDIFY_PANLE_SOURCE_DIR"
+elif [ -d "src" ] && [ -f "src/pyproject.toml" ]; then
+    echo "NOTICE: installing hiddifypanel from bundled src/..."
+    uv pip install ./src/
+else
+    echo "NOTICE: installing hiddifypanel from PyPI..."
+    uv pip install hiddifypanel
 fi
 
 rm -rf /etc/cron.d/{hiddify_usage_update,hiddify_auto_backup}
