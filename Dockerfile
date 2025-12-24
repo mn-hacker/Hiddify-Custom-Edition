@@ -15,6 +15,7 @@ RUN cp other/docker/* /usr/bin/ && \
     mkdir -p /hiddify-data/ssl/ && \
     rm -rf /opt/hiddify-manager/ssl && \
     ln -sf /hiddify-data/ssl /opt/hiddify-manager/ssl && \
+    find . -name "*.sh" -exec chmod +x {} \; && \
     bash -c "./common/hiddify_installer.sh docker --no-gui" &&\
     rm -rf /var/cache/apt/archives /var/lib/apt/lists/* 
 
