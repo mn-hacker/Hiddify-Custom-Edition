@@ -53,12 +53,25 @@ jobs:
           python -m pip install --upgrade pip 
           pip install gitchangelog pystache
           sudo apt install -y zip
+      - name: Verify submodule
+        run: |
+          echo "Checking hiddify-panel/src contents..."
+          ls -la hiddify-panel/src/ || echo "src is empty!"
+          if [ ! -f "hiddify-panel/src/pyproject.toml" ]; then
+            echo "Submodule not found, cloning manually..."
+            rm -rf hiddify-panel/src
+            git clone --depth 1 https://github.com/hiddify/Hiddify-Panel.git hiddify-panel/src
+          fi
+          echo "Panel source files:"
+          ls -la hiddify-panel/src/
       - name: zip
         run: |
             find . -name "*.sh" -exec chmod +x {} \;
-            zip -r hiddify-manager.zip .  -x .**\*
-            cp  hiddify-manager.zip hiddify-config.zip 
-            cp  hiddify-manager.zip hiddify-server.zip 
+            # Remove .git folders from submodule to reduce size
+            rm -rf hiddify-panel/src/.git
+            zip -r hiddify-manager.zip . -x ".*" -x "*/.*"
+            cp hiddify-manager.zip hiddify-config.zip 
+            cp hiddify-manager.zip hiddify-server.zip 
       - name: Generate Changelog
         run: |
           chmod +x .github/release_message.sh
