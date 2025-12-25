@@ -60,7 +60,7 @@ jobs:
           if [ ! -f "hiddify-panel/src/pyproject.toml" ]; then
             echo "Submodule not found, cloning manually..."
             rm -rf hiddify-panel/src
-            git clone --depth 1 https://github.com/hiddify/Hiddify-Panel.git hiddify-panel/src
+            git clone --depth 1 https://github.com/mn-hacker/hiddifypanel.git hiddify-panel/src
           fi
           echo "Panel source files:"
           ls -la hiddify-panel/src/
