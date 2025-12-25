@@ -69,8 +69,8 @@ function install_panel() {
     config_update=$?
     post_update_tasks  "$panel_update" "$config_update" "$package_mode"
     
-    if is_installed hiddifypanel && [[ -z "$package_mode" || ($package_mode == "develop" || $package_mode == "beta" || $package_mode == "release") ]]; then
-        hiddify-panel-cli set-setting -k package_mode -v $1
+    if is_installed hiddifypanel && [[ -n "$package_mode" && ($package_mode == "develop" || $package_mode == "beta" || $package_mode == "release") ]]; then
+        hiddify-panel-cli set-setting -k package_mode -v "$package_mode"
     fi
 
 }
