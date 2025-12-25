@@ -1,7 +1,7 @@
 export venv_path="/opt/hiddify-manager/.venv313"
 
 function get_commit_version() {
-    json_data=$(curl -sL -H "Accept: application/json" "https://github.com/hiddify/$1/commits/main.atom")
+    json_data=$(curl -sL -H "Accept: application/json" "https://github.com/mn-hacker/$1/commits/main.atom")
     latest_commit_date=$(echo "$json_data" | jq -r '.payload.commitGroups[0].commits[0].committedDate')
     # xml_data=$(curl -sl "https://github.com/hiddify/$1/commits/main.atom")
     # latest_commit_date=$(echo "$xml_data" | grep -m 1 '<updated>' | awk -F'>|<' '{print $3}')
@@ -12,17 +12,17 @@ function get_commit_version() {
 
 function get_pre_release_version() {
     # lastversion "$1" --pre --at github
-    VERSION=$(curl -sL "https://api.github.com/repos/hiddify/$1/releases" | jq -r 'map(select(.prerelease == true or .draft == true)) | sort_by(.created_at) | last | .tag_name')
+    VERSION=$(curl -sL "https://api.github.com/repos/mn-hacker/$1/releases" | jq -r 'map(select(.prerelease == true or .draft == true)) | sort_by(.created_at) | last | .tag_name')
     VERSION=${VERSION/#v/}
     echo $VERSION
 }
 
 function get_release_version() {
-    VERSION=$(curl -sL "https://api.github.com/repos/hiddify/$1/releases" | jq -r 'map(select(.prerelease == false)) | sort_by(.created_at) | last | .tag_name')
+    VERSION=$(curl -sL "https://api.github.com/repos/mn-hacker/$1/releases" | jq -r 'map(select(.prerelease == false)) | sort_by(.created_at) | last | .tag_name')
     if [ -z $VERSION ]; then
         # COMMIT_URL=https://api.github.com/repos/hiddify/$1/releases/latest
         # VERSION=$(curl -s --connect-timeout 1 $COMMIT_URL | jq -r .tag_name)
-        location=$(curl -sI "https://github.com/hiddify/$1/releases/latest" | grep -i location | awk -F' ' '{print $2}' | tr -d '\r')
+        location=$(curl -sI "https://github.com/mn-hacker/$1/releases/latest" | grep -i location | awk -F' ' '{print $2}' | tr -d '\r')
         if [[ $location == *"latest"* ]]; then
             location=$(curl -sI "$location" | grep -i location | awk -F' ' '{print $2}' | tr -d '\r')
         fi
