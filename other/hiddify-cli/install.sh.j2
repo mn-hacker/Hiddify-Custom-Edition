@@ -5,14 +5,23 @@ useradd -m hiddify-cli -s /bin/bash >/dev/null 2>&1
 
 latest=$(get_release_version hiddify-core)
 
+if [ -z "$latest" ]; then
+    echo "Warning: Could not get version, downloading latest..."
+    latest="latest"
+fi
+
 if [ "$(cat 'VERSION' 2>/dev/null)" != "$latest" ] || ! is_installed ./HiddifyCli; then
     echo "Downloading HiddifyCli..."
     pkg=$(dpkg --print-architecture)
 
-    curl -sLo hiddify-cli.tar.gz https://github.com/hiddify/hiddify-core/releases/download/v$latest/hiddify-cli-linux-$pkg.tar.gz
+    if [ "$latest" == "latest" ]; then
+        curl -sLo hiddify-cli.tar.gz "https://github.com/hiddify/hiddify-core/releases/latest/download/hiddify-cli-linux-$pkg.tar.gz"
+    else
+        curl -sLo hiddify-cli.tar.gz "https://github.com/hiddify/hiddify-core/releases/download/v$latest/hiddify-cli-linux-$pkg.tar.gz"
+    fi
 
     tar -xzf hiddify-cli.tar.gz
-    rm  hiddify-cli.tar.gz
+    rm hiddify-cli.tar.gz
     echo $latest> VERSION
 fi
 
