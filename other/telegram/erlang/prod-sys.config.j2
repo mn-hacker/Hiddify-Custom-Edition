@@ -1,17 +1,29 @@
 %% -*- mode: erlang -*-
 [
  {mtproto_proxy,
-  %% see src/mtproto_proxy.app.src for examples.
   [
+   %% Only allow fake-TLS connections (best anti-detection)
    {allowed_protocols, [mtp_fake_tls]},
+   
+   %% Ports configuration
    {ports,
     [#{name => mtp_handler_1,
-       listen_ip => "127.0.0.1",
+       listen_ip => "0.0.0.0",
        port => 1001,
-       secret => <<"{{ hconfigs['shared_secret'].replace("-","") }}">>,
-       tag => <<"{{ hconfigs['telegram_adtag'] }}">>}
-    ]}
-   ]},
+       secret => <<"{{ hconfigs['shared_secret'].replace("-","") }}">>
+       {% if hconfigs['telegram_adtag'] %}
+       ,tag => <<"{{ hconfigs['telegram_adtag'] }}">>
+       {% endif %}
+      }
+    ]},
+    
+   %% Connection limits to prevent abuse
+   {init_dc_connections, 4},
+   {clients_per_dc_connection, 4000},
+   
+   %% Replay attack protection
+   {replay_check_session_storage, mtp_session_storage_ets}
+  ]},
 
  %% Logging config
  {lager,
@@ -24,17 +36,13 @@
      {lager_file_backend,
       [{file, "application.log"},
        {level, info},
-       %% Do fsync only on critical messages
        {sync_on, critical},
-       %% If we logged more than X messages in a second, flush the rest
        {high_water_mark, 300},
-       %% If we hit hwm and msg queue len is >X, flush the queue
        {flush_queue, true},
        {flush_threshold, 2000},
-       %% How often to check if log should be rotated
        {check_interval, 5000},
-       %% Rotate when file size is 100MB+
-       {size, 104857600}
+       %% Rotate when file size is 50MB
+       {size, 52428800}
       ]}
     ]}]},
  {sasl, [{errlog_type, error}]}

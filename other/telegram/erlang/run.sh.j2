@@ -1,19 +1,38 @@
-# systemctl enable mtproxy.service
-# systemctl restart mtproxy.service
-#cd mtproto_proxy
-#sudo make update-sysconfig 
-#sudo systemctl enable mtproto-proxy
-#sudo systemctl restart mtproto-proxy
+#!/bin/bash
 
-rm -rf mtproto_proxy
+MTPROXY_DIR="/opt/hiddify-manager/other/telegram/erlang/mtproto_proxy"
+cd "$MTPROXY_DIR" || exit 1
 
-{% if hconfigs['telegram_adtag']%}
-    bash install_mtproxy.sh -p 1001 -s {{ hconfigs['shared_secret'].replace("-","") }} -t {{ hconfigs['telegram_adtag'] }} -a tls -d {{ hconfigs['telegram_fakedomain'] }} > /dev/null 2>&1
-{% else %}
-echo "y\n" | bash install_mtproxy.sh -p 1001 -s {{ hconfigs['shared_secret'].replace("-","") }} -a tls -d {{ hconfigs['telegram_fakedomain'] }} > /dev/null 2>&1
-{% endif %}
+# Copy the config file
+cp /opt/hiddify-manager/other/telegram/erlang/prod-sys.config config/prod-sys.config
+chmod 600 config/prod-sys.config
 
-rm -rf mtproto_proxy.tar.gz
+# Create/update systemd service
+cat > /etc/systemd/system/mtproxy.service << 'EOF'
+[Unit]
+Description=Erlang MTProto Proxy (seriyps)
+Documentation=https://github.com/seriyps/mtproto_proxy
+After=network.target
 
-chmod 600  prod-sys.config
-yes | cp -f prod-sys.config mtproto_proxy/config/prod-sys.config
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/hiddify-manager/other/telegram/erlang/mtproto_proxy
+ExecStart=/opt/hiddify-manager/other/telegram/erlang/mtproto_proxy/start.sh
+ExecStop=/opt/hiddify-manager/other/telegram/erlang/mtproto_proxy/bin/mtp_proxy stop
+Restart=always
+RestartSec=5
+LimitNOFILE=65535
+StandardOutput=file:/opt/hiddify-manager/log/system/telegram.out.log
+StandardError=file:/opt/hiddify-manager/log/system/telegram.err.log
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable mtproxy.service
+systemctl restart mtproxy.service
+
+sleep 2
+systemctl status mtproxy --no-pager

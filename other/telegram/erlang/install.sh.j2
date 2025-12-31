@@ -1,6 +1,39 @@
-systemctl stop mtproxy.service >/dev/null 2>&1
-systemctl disable mtproxy.service >/dev/null 2>&1
+#!/bin/bash
+source /opt/hiddify-manager/common/utils.sh
+
+# Stop existing services
 systemctl stop mtproto-proxy.service >/dev/null 2>&1
 systemctl disable mtproto-proxy.service >/dev/null 2>&1
+systemctl stop mtproxy.service >/dev/null 2>&1
+systemctl disable mtproxy.service >/dev/null 2>&1
 
-curl -sL -o install_mtproxy.sh https://gist.githubusercontent.com/hiddify-com/9134259f2df9ff91bb365c629512b6b3/raw/ec42ccfd96431686425a8f4e4e16a07d12062e82/install_mtproxy.sh
+# Install Erlang dependencies
+install_package erlang-nox erlang-dev make
+
+# Clone the latest mtproto_proxy from seriyps (actively maintained)
+MTPROXY_DIR="/opt/hiddify-manager/other/telegram/erlang/mtproto_proxy"
+
+if [ -d "$MTPROXY_DIR" ]; then
+    cd "$MTPROXY_DIR"
+    git pull origin master || {
+        cd ..
+        rm -rf mtproto_proxy
+        git clone --depth 1 https://github.com/seriyps/mtproto_proxy.git
+    }
+else
+    git clone --depth 1 https://github.com/seriyps/mtproto_proxy.git
+fi
+
+cd "$MTPROXY_DIR"
+
+# Copy config templates
+cp config/vm.args.example config/prod-vm.args 2>/dev/null || true
+
+# Build the proxy
+make || exit 1
+
+# Create logs directory
+mkdir -p /var/log/mtproto-proxy
+chown nobody:nogroup /var/log/mtproto-proxy 2>/dev/null || chown nobody:nobody /var/log/mtproto-proxy
+
+echo "Erlang MTProto proxy installed successfully!"
