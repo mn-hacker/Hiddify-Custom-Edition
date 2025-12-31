@@ -1,571 +1,139 @@
-root@opsopsops:/opt/hiddify-manager# journalctl -xeu hiddify-redis --no-pager -n 50
-Dec 31 23:54:19 opsopsops systemd[1]: /etc/systemd/system/hiddify-redis.service:9: PIDFile= references a path below legacy directory /var/run/, updating /var/run/hiddify-redis-server.pid → /run/hiddify-redis-server.pid; please update the unit file accordingly.
-Dec 31 23:54:19 opsopsops systemd[1]: /etc/systemd/system/hiddify-redis.service:9: PIDFile= references a path below legacy directory /var/run/, updating /var/run/hiddify-redis-server.pid → /run/hiddify-redis-server.pid; please update the unit file accordingly.
-Dec 31 23:54:20 opsopsops systemd[1]: /etc/systemd/system/hiddify-redis.service:9: PIDFile= references a path below legacy directory /var/run/, updating /var/run/hiddify-redis-server.pid → /run/hiddify-redis-server.pid; please update the unit file accordingly.
-Dec 31 23:54:20 opsopsops systemd[1]: /etc/systemd/system/hiddify-redis.service:9: PIDFile= references a path below legacy directory /var/run/, updating /var/run/hiddify-redis-server.pid → /run/hiddify-redis-server.pid; please update the unit file accordingly.
-Dec 31 23:54:20 opsopsops systemd[1]: /etc/systemd/system/hiddify-redis.service:9: PIDFile= references a path below legacy directory /var/run/, updating /var/run/hiddify-redis-server.pid → /run/hiddify-redis-server.pid; please update the unit file accordingly.
-Dec 31 23:54:21 opsopsops systemd[1]: /etc/systemd/system/hiddify-redis.service:9: PIDFile= references a path below legacy directory /var/run/, updating /var/run/hiddify-redis-server.pid → /run/hiddify-redis-server.pid; please update the unit file accordingly.
-Dec 31 23:54:22 opsopsops systemd[1]: /etc/systemd/system/hiddify-redis.service:9: PIDFile= references a path below legacy directory /var/run/, updating /var/run/hiddify-redis-server.pid → /run/hiddify-redis-server.pid; please update the unit file accordingly.
-Dec 31 23:54:26 opsopsops systemd[1]: /etc/systemd/system/hiddify-redis.service:9: PIDFile= references a path below legacy directory /var/run/, updating /var/run/hiddify-redis-server.pid → /run/hiddify-redis-server.pid; please update the unit file accordingly.
-Jan 01 02:02:46 opsopsops systemd[1]: Stopping hiddify-redis.service - Hiddify Redis...
-░░ Subject: A stop job for unit hiddify-redis.service has begun execution
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ A stop job for unit hiddify-redis.service has begun execution.
-░░
-░░ The job identifier is 1134743.
-Jan 01 02:02:46 opsopsops systemd[1]: hiddify-redis.service: Deactivated successfully.
-░░ Subject: Unit succeeded
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ The unit hiddify-redis.service has successfully entered the 'dead' state.
-Jan 01 02:02:46 opsopsops systemd[1]: Stopped hiddify-redis.service - Hiddify Redis.
-░░ Subject: A stop job for unit hiddify-redis.service has finished
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ A stop job for unit hiddify-redis.service has finished.
-░░
-░░ The job identifier is 1134743 and the job result is done.
-Jan 01 02:02:46 opsopsops systemd[1]: hiddify-redis.service: Consumed 18.732s CPU time, 4.7M memory peak, 0B memory swap peak.
-░░ Subject: Resources consumed by unit runtime
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ The unit hiddify-redis.service completed and consumed the indicated resources.
-Jan 01 02:02:46 opsopsops systemd[1]: Starting hiddify-redis.service - Hiddify Redis...
-░░ Subject: A start job for unit hiddify-redis.service has begun execution
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ A start job for unit hiddify-redis.service has begun execution.
-░░
-░░ The job identifier is 1134743.
-Jan 01 02:02:46 opsopsops redis-server[456350]: *** FATAL CONFIG FILE ERROR (Redis 7.0.15) ***
-Jan 01 02:02:46 opsopsops redis-server[456350]: Can't open the log file: Permission denied
-Jan 01 02:02:46 opsopsops systemd[1]: hiddify-redis.service: Main process exited, code=exited, status=1/FAILURE
-░░ Subject: Unit process exited
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ An ExecStart= process belonging to unit hiddify-redis.service has exited.
-░░
-░░ The process' exit code is 'exited' and its exit status is 1.
-Jan 01 02:02:46 opsopsops systemd[1]: hiddify-redis.service: Failed with result 'exit-code'.
-░░ Subject: Unit failed
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ The unit hiddify-redis.service has entered the 'failed' state with result 'exit-code'.
-Jan 01 02:02:46 opsopsops systemd[1]: Failed to start hiddify-redis.service - Hiddify Redis.
-░░ Subject: A start job for unit hiddify-redis.service has failed
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ A start job for unit hiddify-redis.service has finished with a failure.
-░░
-░░ The job identifier is 1134743 and the job result is failed.
-Jan 01 02:02:46 opsopsops systemd[1]: hiddify-redis.service: Scheduled restart job, restart counter is at 1.
-░░ Subject: Automatic restarting of a unit has been scheduled
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ Automatic restarting of the unit hiddify-redis.service has been scheduled, as the result for
-░░ the configured Restart= setting for the unit.
-Jan 01 02:02:46 opsopsops systemd[1]: Starting hiddify-redis.service - Hiddify Redis...
-░░ Subject: A start job for unit hiddify-redis.service has begun execution
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ A start job for unit hiddify-redis.service has begun execution.
-░░
-░░ The job identifier is 1135156.
-Jan 01 02:02:46 opsopsops redis-server[456392]: *** FATAL CONFIG FILE ERROR (Redis 7.0.15) ***
-Jan 01 02:02:46 opsopsops redis-server[456392]: Can't open the log file: Permission denied
-Jan 01 02:02:46 opsopsops systemd[1]: hiddify-redis.service: Main process exited, code=exited, status=1/FAILURE
-░░ Subject: Unit process exited
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ An ExecStart= process belonging to unit hiddify-redis.service has exited.
-░░
-░░ The process' exit code is 'exited' and its exit status is 1.
-Jan 01 02:02:46 opsopsops systemd[1]: hiddify-redis.service: Failed with result 'exit-code'.
-░░ Subject: Unit failed
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ The unit hiddify-redis.service has entered the 'failed' state with result 'exit-code'.
-Jan 01 02:02:46 opsopsops systemd[1]: Failed to start hiddify-redis.service - Hiddify Redis.
-░░ Subject: A start job for unit hiddify-redis.service has failed
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ A start job for unit hiddify-redis.service has finished with a failure.
-░░
-░░ The job identifier is 1135156 and the job result is failed.
-Jan 01 02:02:46 opsopsops systemd[1]: hiddify-redis.service: Scheduled restart job, restart counter is at 2.
-░░ Subject: Automatic restarting of a unit has been scheduled
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ Automatic restarting of the unit hiddify-redis.service has been scheduled, as the result for
-░░ the configured Restart= setting for the unit.
-Jan 01 02:02:46 opsopsops systemd[1]: Starting hiddify-redis.service - Hiddify Redis...
-░░ Subject: A start job for unit hiddify-redis.service has begun execution
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ A start job for unit hiddify-redis.service has begun execution.
-░░
-░░ The job identifier is 1135259.
-Jan 01 02:02:46 opsopsops redis-server[456434]: *** FATAL CONFIG FILE ERROR (Redis 7.0.15) ***
-Jan 01 02:02:46 opsopsops redis-server[456434]: Can't open the log file: Permission denied
-Jan 01 02:02:46 opsopsops systemd[1]: hiddify-redis.service: Main process exited, code=exited, status=1/FAILURE
-░░ Subject: Unit process exited
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ An ExecStart= process belonging to unit hiddify-redis.service has exited.
-░░
-░░ The process' exit code is 'exited' and its exit status is 1.
-Jan 01 02:02:46 opsopsops systemd[1]: hiddify-redis.service: Failed with result 'exit-code'.
-░░ Subject: Unit failed
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ The unit hiddify-redis.service has entered the 'failed' state with result 'exit-code'.
-Jan 01 02:02:46 opsopsops systemd[1]: Failed to start hiddify-redis.service - Hiddify Redis.
-░░ Subject: A start job for unit hiddify-redis.service has failed
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ A start job for unit hiddify-redis.service has finished with a failure.
-░░
-░░ The job identifier is 1135259 and the job result is failed.
-Jan 01 02:02:47 opsopsops systemd[1]: hiddify-redis.service: Scheduled restart job, restart counter is at 3.
-░░ Subject: Automatic restarting of a unit has been scheduled
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ Automatic restarting of the unit hiddify-redis.service has been scheduled, as the result for
-░░ the configured Restart= setting for the unit.
-Jan 01 02:02:47 opsopsops systemd[1]: Starting hiddify-redis.service - Hiddify Redis...
-░░ Subject: A start job for unit hiddify-redis.service has begun execution
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ A start job for unit hiddify-redis.service has begun execution.
-░░
-░░ The job identifier is 1135362.
-Jan 01 02:02:47 opsopsops redis-server[456453]: *** FATAL CONFIG FILE ERROR (Redis 7.0.15) ***
-Jan 01 02:02:47 opsopsops redis-server[456453]: Can't open the log file: Permission denied
-Jan 01 02:02:47 opsopsops systemd[1]: hiddify-redis.service: Main process exited, code=exited, status=1/FAILURE
-░░ Subject: Unit process exited
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ An ExecStart= process belonging to unit hiddify-redis.service has exited.
-░░
-░░ The process' exit code is 'exited' and its exit status is 1.
-Jan 01 02:02:47 opsopsops systemd[1]: hiddify-redis.service: Failed with result 'exit-code'.
-░░ Subject: Unit failed
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ The unit hiddify-redis.service has entered the 'failed' state with result 'exit-code'.
-Jan 01 02:02:47 opsopsops systemd[1]: Failed to start hiddify-redis.service - Hiddify Redis.
-░░ Subject: A start job for unit hiddify-redis.service has failed
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ A start job for unit hiddify-redis.service has finished with a failure.
-░░
-░░ The job identifier is 1135362 and the job result is failed.
-Jan 01 02:02:47 opsopsops systemd[1]: hiddify-redis.service: Scheduled restart job, restart counter is at 4.
-░░ Subject: Automatic restarting of a unit has been scheduled
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ Automatic restarting of the unit hiddify-redis.service has been scheduled, as the result for
-░░ the configured Restart= setting for the unit.
-Jan 01 02:02:47 opsopsops systemd[1]: Starting hiddify-redis.service - Hiddify Redis...
-░░ Subject: A start job for unit hiddify-redis.service has begun execution
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ A start job for unit hiddify-redis.service has begun execution.
-░░
-░░ The job identifier is 1135465.
-Jan 01 02:02:47 opsopsops redis-server[456493]: *** FATAL CONFIG FILE ERROR (Redis 7.0.15) ***
-Jan 01 02:02:47 opsopsops redis-server[456493]: Can't open the log file: Permission denied
-Jan 01 02:02:47 opsopsops systemd[1]: hiddify-redis.service: Main process exited, code=exited, status=1/FAILURE
-░░ Subject: Unit process exited
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ An ExecStart= process belonging to unit hiddify-redis.service has exited.
-░░
-░░ The process' exit code is 'exited' and its exit status is 1.
-Jan 01 02:02:47 opsopsops systemd[1]: hiddify-redis.service: Failed with result 'exit-code'.
-░░ Subject: Unit failed
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ The unit hiddify-redis.service has entered the 'failed' state with result 'exit-code'.
-Jan 01 02:02:47 opsopsops systemd[1]: Failed to start hiddify-redis.service - Hiddify Redis.
-░░ Subject: A start job for unit hiddify-redis.service has failed
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ A start job for unit hiddify-redis.service has finished with a failure.
-░░
-░░ The job identifier is 1135465 and the job result is failed.
-Jan 01 02:02:47 opsopsops systemd[1]: hiddify-redis.service: Scheduled restart job, restart counter is at 5.
-░░ Subject: Automatic restarting of a unit has been scheduled
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ Automatic restarting of the unit hiddify-redis.service has been scheduled, as the result for
-░░ the configured Restart= setting for the unit.
-Jan 01 02:02:47 opsopsops systemd[1]: hiddify-redis.service: Start request repeated too quickly.
-Jan 01 02:02:47 opsopsops systemd[1]: hiddify-redis.service: Failed with result 'exit-code'.
-░░ Subject: Unit failed
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ The unit hiddify-redis.service has entered the 'failed' state with result 'exit-code'.
-Jan 01 02:02:47 opsopsops systemd[1]: Failed to start hiddify-redis.service - Hiddify Redis.
-░░ Subject: A start job for unit hiddify-redis.service has failed
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ A start job for unit hiddify-redis.service has finished with a failure.
-░░
-░░ The job identifier is 1135568 and the job result is failed.
+root@opsopsops:/opt/hiddify-manager# cat /opt/hiddify-manager/log/system/hiddify-panel.log | tail -100
+cat: /opt/hiddify-manager/log/system/hiddify-panel.log: No such file or directory
+root@opsopsops:/opt/hiddify-manager# journalctl -u hiddify-panel --since "3 minutes ago" --no-pager
+-- No entries --
+root@opsopsops:/opt/hiddify-manager# clear
+root@opsopsops:/opt/hiddify-manager# cd /opt/hiddify-manager/hiddify-panel
+root@opsopsops:/opt/hiddify-manager/hiddify-panel# source /opt/hiddify-manager/.venv313/bin/activate
+(.venv313) root@opsopsops:/opt/hiddify-manager/hiddify-panel# python -c "
+> from hiddifypanel.base import create_app
+> app = create_app()
+> with app.app_context():
+>     from flask import Flask
+>     with app.test_client() as client:
+>         resp = client.get('/pR0o8D0xj5pMxPd53uddjR2YPMRyRn/b2be82c2-87f9-4fb5-9df5-5e9f4f8b1cd4/singbox/')
+>         print('Status:', resp.status_code)
+>         print('Data:', resp.data[:500] if resp.data else 'EMPTY')
+> "
+Traceback (most recent call last):
+  File "<string>", line 3, in <module>
+    app = create_app()
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/base.py", line 58, in create_app
+    app.config.load_extensions("EXTENSIONS")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/dynaconf/contrib/flask_dynaconf.py", line 231, in load_extensions
+    initializer(app)
+    ~~~~~~~~~~~^^^^^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/celery.py", line 46, in init_app
+    backup_interval = int(hconfig(ConfigEnum.backup_interval) or "6")
+                          ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/redis_cache/__init__.py", line 231, in inner
+    parsed_result = fn(*args, **kwargs)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/models/config.py", line 64, in hconfig
+    child_id = Child.current().id
+               ~~~~~~~~~~~~~^^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/models/child.py", line 74, in current
+    child = Child.by_id(0)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/models/child.py", line 64, in by_id
+    return db.session.query(Child).filter(Child.id == id).first()
+           ~~~~~~~~~~~~~~~~^^^^^^^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/sqlalchemy/orm/scoping.py", line 1666, in query
+    return self._proxied.query(*entities, **kwargs)
+           ^^^^^^^^^^^^^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/sqlalchemy/orm/scoping.py", line 195, in _proxied
+    return self.registry()
+           ~~~~~~~~~~~~~^^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/sqlalchemy/util/_collections.py", line 634, in __call__
+    key = self.scopefunc()
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask_sqlalchemy/session.py", line 111, in _app_ctx_id
+    return id(app_ctx._get_current_object())  # type: ignore[attr-defined]
+              ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/werkzeug/local.py", line 519, in _get_current_object
+    raise RuntimeError(unbound_message) from None
+RuntimeError: Working outside of application context.
 
-
-
-
-
-root@opsopsops:/opt/hiddify-manager# journalctl -xeu hiddify-xray --no-pager -n 50
-Jan 01 02:05:10 opsopsops systemd[1]: hiddify-xray.service: Scheduled restart job, restart counter is at 45.
-░░ Subject: Automatic restarting of a unit has been scheduled
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ Automatic restarting of the unit hiddify-xray.service has been scheduled, as the result for
-░░ the configured Restart= setting for the unit.
-Jan 01 02:05:10 opsopsops systemd[1]: Starting hiddify-xray.service - Xray Service...
-░░ Subject: A start job for unit hiddify-xray.service has begun execution
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ A start job for unit hiddify-xray.service has begun execution.
-░░
-░░ The job identifier is 1155550.
-Jan 01 02:05:10 opsopsops systemd[1]: Started hiddify-xray.service - Xray Service.
-░░ Subject: A start job for unit hiddify-xray.service has finished successfully
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ A start job for unit hiddify-xray.service has finished successfully.
-░░
-░░ The job identifier is 1155550.
-Jan 01 02:05:10 opsopsops xray[458261]: Xray 25.12.8 (Xray, Penetrates Everything.) 81f8f39 (go1.25.5 linux/amd64)
-Jan 01 02:05:10 opsopsops xray[458261]: A unified platform for anti-censorship.
-Jan 01 02:05:10 opsopsops xray[458261]: 2026/01/01 02:05:10.749156 Using confdir from arg: /opt/hiddify-manager/xray/configs/
-Jan 01 02:05:10 opsopsops xray[458261]: 2026/01/01 02:05:10.749943 Using config from STDIN
-Jan 01 02:05:10 opsopsops xray[458261]: Failed to start: main: failed to load config files: [stdin:] > infra/conf/serial: failed to decode config: &{Name:stdin: Format:json} > infra/conf/serial: failed to read config file > EOF
-Jan 01 02:05:10 opsopsops systemd[1]: hiddify-xray.service: Main process exited, code=exited, status=23/n/a
-░░ Subject: Unit process exited
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ An ExecStart= process belonging to unit hiddify-xray.service has exited.
-░░
-░░ The process' exit code is 'exited' and its exit status is 23.
-Jan 01 02:05:10 opsopsops systemd[1]: hiddify-xray.service: Failed with result 'exit-code'.
-░░ Subject: Unit failed
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ The unit hiddify-xray.service has entered the 'failed' state with result 'exit-code'.
-Jan 01 02:05:13 opsopsops systemd[1]: hiddify-xray.service: Scheduled restart job, restart counter is at 46.
-░░ Subject: Automatic restarting of a unit has been scheduled
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ Automatic restarting of the unit hiddify-xray.service has been scheduled, as the result for
-░░ the configured Restart= setting for the unit.
-Jan 01 02:05:13 opsopsops systemd[1]: Starting hiddify-xray.service - Xray Service...
-░░ Subject: A start job for unit hiddify-xray.service has begun execution
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ A start job for unit hiddify-xray.service has begun execution.
-░░
-░░ The job identifier is 1156168.
-Jan 01 02:05:13 opsopsops systemd[1]: Started hiddify-xray.service - Xray Service.
-░░ Subject: A start job for unit hiddify-xray.service has finished successfully
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ A start job for unit hiddify-xray.service has finished successfully.
-░░
-░░ The job identifier is 1156168.
-Jan 01 02:05:13 opsopsops xray[458299]: Xray 25.12.8 (Xray, Penetrates Everything.) 81f8f39 (go1.25.5 linux/amd64)
-Jan 01 02:05:13 opsopsops xray[458299]: A unified platform for anti-censorship.
-Jan 01 02:05:13 opsopsops xray[458299]: 2026/01/01 02:05:13.995697 Using confdir from arg: /opt/hiddify-manager/xray/configs/
-Jan 01 02:05:13 opsopsops xray[458299]: 2026/01/01 02:05:13.996497 Using config from STDIN
-Jan 01 02:05:13 opsopsops xray[458299]: Failed to start: main: failed to load config files: [stdin:] > infra/conf/serial: failed to decode config: &{Name:stdin: Format:json} > infra/conf/serial: failed to read config file > EOF
-Jan 01 02:05:13 opsopsops systemd[1]: hiddify-xray.service: Main process exited, code=exited, status=23/n/a
-░░ Subject: Unit process exited
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ An ExecStart= process belonging to unit hiddify-xray.service has exited.
-░░
-░░ The process' exit code is 'exited' and its exit status is 23.
-Jan 01 02:05:14 opsopsops systemd[1]: hiddify-xray.service: Failed with result 'exit-code'.
-░░ Subject: Unit failed
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ The unit hiddify-xray.service has entered the 'failed' state with result 'exit-code'.
-Jan 01 02:05:17 opsopsops systemd[1]: hiddify-xray.service: Scheduled restart job, restart counter is at 47.
-░░ Subject: Automatic restarting of a unit has been scheduled
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ Automatic restarting of the unit hiddify-xray.service has been scheduled, as the result for
-░░ the configured Restart= setting for the unit.
-Jan 01 02:05:17 opsopsops systemd[1]: Starting hiddify-xray.service - Xray Service...
-░░ Subject: A start job for unit hiddify-xray.service has begun execution
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ A start job for unit hiddify-xray.service has begun execution.
-░░
-░░ The job identifier is 1156477.
-Jan 01 02:05:17 opsopsops systemd[1]: Started hiddify-xray.service - Xray Service.
-░░ Subject: A start job for unit hiddify-xray.service has finished successfully
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ A start job for unit hiddify-xray.service has finished successfully.
-░░
-░░ The job identifier is 1156477.
-Jan 01 02:05:17 opsopsops xray[458339]: Xray 25.12.8 (Xray, Penetrates Everything.) 81f8f39 (go1.25.5 linux/amd64)
-Jan 01 02:05:17 opsopsops xray[458339]: A unified platform for anti-censorship.
-Jan 01 02:05:17 opsopsops xray[458339]: 2026/01/01 02:05:17.242674 Using confdir from arg: /opt/hiddify-manager/xray/configs/
-Jan 01 02:05:17 opsopsops xray[458339]: 2026/01/01 02:05:17.243543 Using config from STDIN
-Jan 01 02:05:17 opsopsops xray[458339]: Failed to start: main: failed to load config files: [stdin:] > infra/conf/serial: failed to decode config: &{Name:stdin: Format:json} > infra/conf/serial: failed to read config file > EOF
-Jan 01 02:05:17 opsopsops systemd[1]: hiddify-xray.service: Main process exited, code=exited, status=23/n/a
-░░ Subject: Unit process exited
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ An ExecStart= process belonging to unit hiddify-xray.service has exited.
-░░
-░░ The process' exit code is 'exited' and its exit status is 23.
-Jan 01 02:05:17 opsopsops systemd[1]: hiddify-xray.service: Failed with result 'exit-code'.
-░░ Subject: Unit failed
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ The unit hiddify-xray.service has entered the 'failed' state with result 'exit-code'.
-Jan 01 02:05:20 opsopsops systemd[1]: hiddify-xray.service: Scheduled restart job, restart counter is at 48.
-░░ Subject: Automatic restarting of a unit has been scheduled
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ Automatic restarting of the unit hiddify-xray.service has been scheduled, as the result for
-░░ the configured Restart= setting for the unit.
-Jan 01 02:05:20 opsopsops systemd[1]: Starting hiddify-xray.service - Xray Service...
-░░ Subject: A start job for unit hiddify-xray.service has begun execution
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ A start job for unit hiddify-xray.service has begun execution.
-░░
-░░ The job identifier is 1156889.
-Jan 01 02:05:20 opsopsops systemd[1]: Started hiddify-xray.service - Xray Service.
-░░ Subject: A start job for unit hiddify-xray.service has finished successfully
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ A start job for unit hiddify-xray.service has finished successfully.
-░░
-░░ The job identifier is 1156889.
-Jan 01 02:05:20 opsopsops xray[458393]: Xray 25.12.8 (Xray, Penetrates Everything.) 81f8f39 (go1.25.5 linux/amd64)
-Jan 01 02:05:20 opsopsops xray[458393]: A unified platform for anti-censorship.
-Jan 01 02:05:20 opsopsops xray[458393]: 2026/01/01 02:05:20.493944 Using confdir from arg: /opt/hiddify-manager/xray/configs/
-Jan 01 02:05:20 opsopsops xray[458393]: 2026/01/01 02:05:20.494773 Using config from STDIN
-Jan 01 02:05:20 opsopsops xray[458393]: Failed to start: main: failed to load config files: [stdin:] > infra/conf/serial: failed to decode config: &{Name:stdin: Format:json} > infra/conf/serial: failed to read config file > EOF
-Jan 01 02:05:20 opsopsops systemd[1]: hiddify-xray.service: Main process exited, code=exited, status=23/n/a
-░░ Subject: Unit process exited
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ An ExecStart= process belonging to unit hiddify-xray.service has exited.
-░░
-░░ The process' exit code is 'exited' and its exit status is 23.
-Jan 01 02:05:20 opsopsops systemd[1]: hiddify-xray.service: Failed with result 'exit-code'.
-░░ Subject: Unit failed
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ The unit hiddify-xray.service has entered the 'failed' state with result 'exit-code'.
-Jan 01 02:05:23 opsopsops systemd[1]: hiddify-xray.service: Scheduled restart job, restart counter is at 49.
-░░ Subject: Automatic restarting of a unit has been scheduled
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ Automatic restarting of the unit hiddify-xray.service has been scheduled, as the result for
-░░ the configured Restart= setting for the unit.
-Jan 01 02:05:23 opsopsops systemd[1]: Starting hiddify-xray.service - Xray Service...
-░░ Subject: A start job for unit hiddify-xray.service has begun execution
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ A start job for unit hiddify-xray.service has begun execution.
-░░
-░░ The job identifier is 1157404.
-Jan 01 02:05:23 opsopsops systemd[1]: Started hiddify-xray.service - Xray Service.
-░░ Subject: A start job for unit hiddify-xray.service has finished successfully
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ A start job for unit hiddify-xray.service has finished successfully.
-░░
-░░ The job identifier is 1157404.
-Jan 01 02:05:23 opsopsops xray[458431]: Xray 25.12.8 (Xray, Penetrates Everything.) 81f8f39 (go1.25.5 linux/amd64)
-Jan 01 02:05:23 opsopsops xray[458431]: A unified platform for anti-censorship.
-Jan 01 02:05:23 opsopsops xray[458431]: 2026/01/01 02:05:23.576417 Using confdir from arg: /opt/hiddify-manager/xray/configs/
-Jan 01 02:05:23 opsopsops xray[458431]: 2026/01/01 02:05:23.576847 Using config from STDIN
-Jan 01 02:05:23 opsopsops xray[458431]: Failed to start: main: failed to load config files: [stdin:] > infra/conf/serial: failed to decode config: &{Name:stdin: Format:json} > infra/conf/serial: failed to read config file > EOF
-Jan 01 02:05:23 opsopsops systemd[1]: hiddify-xray.service: Main process exited, code=exited, status=23/n/a
-░░ Subject: Unit process exited
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ An ExecStart= process belonging to unit hiddify-xray.service has exited.
-░░
-░░ The process' exit code is 'exited' and its exit status is 23.
-Jan 01 02:05:23 opsopsops systemd[1]: hiddify-xray.service: Failed with result 'exit-code'.
-░░ Subject: Unit failed
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ The unit hiddify-xray.service has entered the 'failed' state with result 'exit-code'.
-
-
-
-
-
-
-root@opsopsops:/opt/hiddify-manager# journalctl -xeu hiddify-haproxy --no-pager -n 50
-Jan 01 02:05:52 opsopsops systemd[1]: hiddify-haproxy.service: Control process exited, code=exited, status=1/FAILURE
-░░ Subject: Unit process exited
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ An ExecStartPre= process belonging to unit hiddify-haproxy.service has exited.
-░░
-░░ The process' exit code is 'exited' and its exit status is 1.
-Jan 01 02:05:52 opsopsops systemd[1]: hiddify-haproxy.service: Failed with result 'exit-code'.
-░░ Subject: Unit failed
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ The unit hiddify-haproxy.service has entered the 'failed' state with result 'exit-code'.
-Jan 01 02:05:52 opsopsops systemd[1]: Failed to start hiddify-haproxy.service - HAProxy Load Balancer.
-░░ Subject: A start job for unit hiddify-haproxy.service has failed
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ A start job for unit hiddify-haproxy.service has finished with a failure.
-░░
-░░ The job identifier is 1161215 and the job result is failed.
-Jan 01 02:05:55 opsopsops systemd[1]: hiddify-haproxy.service: Scheduled restart job, restart counter is at 3104.
-░░ Subject: Automatic restarting of a unit has been scheduled
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ Automatic restarting of the unit hiddify-haproxy.service has been scheduled, as the result for
-░░ the configured Restart= setting for the unit.
-Jan 01 02:05:55 opsopsops systemd[1]: Starting hiddify-haproxy.service - HAProxy Load Balancer...
-░░ Subject: A start job for unit hiddify-haproxy.service has begun execution
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ A start job for unit hiddify-haproxy.service has begun execution.
-░░
-░░ The job identifier is 1161730.
-Jan 01 02:05:56 opsopsops haproxy[458790]: HAProxy version 3.2.10-1ppa1~noble 2025/12/20 - https://haproxy.org/
-Jan 01 02:05:56 opsopsops haproxy[458790]: Status: long-term supported branch - will stop receiving fixes around Q2 2030.
-Jan 01 02:05:56 opsopsops haproxy[458790]: Known bugs: http://www.haproxy.org/bugs/bugs-3.2.10.html
-Jan 01 02:05:56 opsopsops haproxy[458790]: Running on: Linux 6.8.0-90-generic #91-Ubuntu SMP PREEMPT_DYNAMIC Tue Nov 18 14:14:30 UTC 2025 x86_64
-Jan 01 02:05:56 opsopsops haproxy[458790]: Usage : haproxy [-f <cfgfile|cfgdir>]* [ -vdVD ] [ -n <maxconn> ] [ -N <maxpconn> ]
-Jan 01 02:05:56 opsopsops haproxy[458790]:         [ -p <pidfile> ] [ -m <max megs> ] [ -C <dir> ] [-- <cfgfile>*]
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -v displays version ; -vv shows known build options.
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -d enters debug mode ; -db only disables background mode.
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -dM[<byte>,help,...] debug memory (default: poison with <byte>/0x50)
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -dt activate traces on stderr
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -V enters verbose mode (disables quiet mode)
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -D goes daemon ; -C changes to <dir> before loading files.
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -W master-worker mode.
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -Ws master-worker mode with systemd notify support.
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -q quiet mode : don't display messages
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -c check mode : only check config files and exit
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -cc check condition : evaluate a condition and exit
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -4 force resolvers to consider IPv4 responses only
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -n sets the maximum total # of connections (uses ulimit -n)
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -m limits the usable amount of memory (in MB)
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -N sets the default, per-proxy maximum # of connections (0)
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -L set local peer name (default to hostname)
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -p writes pids of all children to this file
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -dC[[key],line] display the configuration file, if there is a key, the file will be anonymised
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -de disables epoll() usage even when available
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -dp disables poll() usage even when available
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -dS disables splice usage (broken on old kernels)
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -dG disables getaddrinfo() usage
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -dR disables SO_REUSEPORT usage
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -dL dumps loaded object files after config checks
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -dc dumps the list of selected and evicted CPUs
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -dK{class[,...]} dump registered keywords (use 'help' for list)
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -dr ignores server address resolution failures
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -dV disables SSL verify on servers side
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -dW fails if any warning is emitted
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -dD diagnostic mode : warn about suspicious configuration statements
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -dF disable fast-forward
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -dI enable insecure fork
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -dZ disable zero-copy forwarding
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -sf/-st [pid ]* finishes/terminates old pids.
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -x <unix_socket> get listening sockets from a unix socket
-Jan 01 02:05:56 opsopsops haproxy[458790]:         -S <bind>[,<bind options>...] new master CLI
-Jan 01 02:05:56 opsopsops systemd[1]: hiddify-haproxy.service: Control process exited, code=exited, status=1/FAILURE
-░░ Subject: Unit process exited
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ An ExecStartPre= process belonging to unit hiddify-haproxy.service has exited.
-░░
-░░ The process' exit code is 'exited' and its exit status is 1.
-Jan 01 02:05:56 opsopsops systemd[1]: hiddify-haproxy.service: Failed with result 'exit-code'.
-░░ Subject: Unit failed
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ The unit hiddify-haproxy.service has entered the 'failed' state with result 'exit-code'.
-Jan 01 02:05:56 opsopsops systemd[1]: Failed to start hiddify-haproxy.service - HAProxy Load Balancer.
-░░ Subject: A start job for unit hiddify-haproxy.service has failed
-░░ Defined-By: systemd
-░░ Support: http://www.ubuntu.com/support
-░░
-░░ A start job for unit hiddify-haproxy.service has finished with a failure.
-░░
-░░ The job identifier is 1161730 and the job result is failed.
+This typically means that you attempted to use functionality that needed
+the current application. To solve this, set up an application context
+with app.app_context(). See the documentation for more information.
+(.venv313) root@opsopsops:/opt/hiddify-manager/hiddify-panel# tail -f /var/log/syslog | grep -i hiddify &
+[1] 487541
+(.venv313) root@opsopsops:/opt/hiddify-manager/hiddify-panel# curl "http://127.0.0.1:9000/pR0o8D0xj5pMxPd53uddjR2YPMRyRn/b2be82c2-87f9-4fb5-9df5-5e9f4f8b1cd4/singbox/"2026-01-01T03:26:03.431376+03:30 opsopsops systemd[1]: hiddify-cli.service: Scheduled restart job, restart counter is at 217.
+2026-01-01T03:26:03.449737+03:30 opsopsops systemd[1]: Started hiddify-cli.service - HiddifyCli service.
+2026-01-01T03:26:03.462267+03:30 opsopsops HiddifyCli[487532]: DEBUG CORE libbox.Setup success ./tmp ./ ./tmp true
+2026-01-01T03:26:03.462368+03:30 opsopsops HiddifyCli[487532]: DEBUG CORE StartGrpcServerByMode 127.0.0.1:17078 3
+2026-01-01T03:26:03.462413+03:30 opsopsops HiddifyCli[487532]: DEBUG CORE grpcServer started on 127.0.0.1:17078
+2026-01-01T03:26:03.463514+03:30 opsopsops HiddifyCli[487532]: Running in standalone mode
+2026-01-01T03:26:03.483887+03:30 opsopsops HiddifyCli[487532]: Refresh interval: 0
+2026-01-01T03:26:03.484079+03:30 opsopsops HiddifyCli[487532]: Convert using json
+2026-01-01T03:26:03.490201+03:30 opsopsops HiddifyCli[487532]: Error in read and build config failed to parse config content: [SingboxParser] unmarshal error: unexpected end of JSON input
+2026-01-01T03:26:03.491140+03:30 opsopsops systemd[1]: hiddify-cli.service: Deactivated successfully.
+2026-01-01T03:26:06.680623+03:30 opsopsops systemd[1]: hiddify-cli.service: Scheduled restart job, restart counter is at 218.
+2026-01-01T03:26:06.689783+03:30 opsopsops systemd[1]: Started hiddify-cli.service - HiddifyCli service.
+2026-01-01T03:26:06.716037+03:30 opsopsops HiddifyCli[487542]: DEBUG CORE libbox.Setup success ./tmp ./ ./tmp true
+2026-01-01T03:26:06.716137+03:30 opsopsops HiddifyCli[487542]: DEBUG CORE StartGrpcServerByMode 127.0.0.1:17078 3
+2026-01-01T03:26:06.716508+03:30 opsopsops HiddifyCli[487542]: DEBUG CORE grpcServer started on 127.0.0.1:17078
+2026-01-01T03:26:06.718624+03:30 opsopsops HiddifyCli[487542]: Running in standalone mode
+2026-01-01T03:26:06.733299+03:30 opsopsops HiddifyCli[487542]: Refresh interval: 0
+2026-01-01T03:26:06.733879+03:30 opsopsops HiddifyCli[487542]: Convert using json
+2026-01-01T03:26:06.741566+03:30 opsopsops HiddifyCli[487542]: Error in read and build config failed to parse config content: [SingboxParser] unmarshal error: unexpected end of JSON input
+2026-01-01T03:26:06.742427+03:30 opsopsops systemd[1]: hiddify-cli.service: Deactivated successfully.
+2026-01-01T03:26:09.931548+03:30 opsopsops systemd[1]: hiddify-cli.service: Scheduled restart job, restart counter is at 219.
+2026-01-01T03:26:09.943916+03:30 opsopsops systemd[1]: Started hiddify-cli.service - HiddifyCli service.
+2026-01-01T03:26:09.967520+03:30 opsopsops HiddifyCli[487550]: DEBUG CORE libbox.Setup success ./tmp ./ ./tmp true
+2026-01-01T03:26:09.967656+03:30 opsopsops HiddifyCli[487550]: DEBUG CORE StartGrpcServerByMode 127.0.0.1:17078 3
+2026-01-01T03:26:09.967699+03:30 opsopsops HiddifyCli[487550]: DEBUG CORE grpcServer started on 127.0.0.1:17078
+2026-01-01T03:26:09.969486+03:30 opsopsops HiddifyCli[487550]: Running in standalone mode
+2026-01-01T03:26:09.989496+03:30 opsopsops HiddifyCli[487550]: Refresh interval: 0
+2026-01-01T03:26:09.990063+03:30 opsopsops HiddifyCli[487550]: Convert using json
+2026-01-01T03:26:09.998931+03:30 opsopsops HiddifyCli[487550]: Error in read and build config failed to parse config content: [SingboxParser] unmarshal error: unexpected end of JSON input
+2026-01-01T03:26:10.000883+03:30 opsopsops systemd[1]: hiddify-cli.service: Deactivated successfully.
+2026-01-01T03:26:13.181274+03:30 opsopsops systemd[1]: hiddify-cli.service: Scheduled restart job, restart counter is at 220.
+2026-01-01T03:26:13.200980+03:30 opsopsops systemd[1]: Started hiddify-cli.service - HiddifyCli service.
+2026-01-01T03:26:13.228343+03:30 opsopsops HiddifyCli[487569]: DEBUG CORE libbox.Setup success ./tmp ./ ./tmp true
+2026-01-01T03:26:13.228539+03:30 opsopsops HiddifyCli[487569]: DEBUG CORE StartGrpcServerByMode 127.0.0.1:17078 3
+2026-01-01T03:26:13.228620+03:30 opsopsops HiddifyCli[487569]: DEBUG CORE grpcServer started on 127.0.0.1:17078
+2026-01-01T03:26:13.232342+03:30 opsopsops HiddifyCli[487569]: Running in standalone mode
+2026-01-01T03:26:13.251524+03:30 opsopsops HiddifyCli[487569]: Refresh interval: 0
+2026-01-01T03:26:13.252110+03:30 opsopsops HiddifyCli[487569]: Convert using json
+2026-01-01T03:26:13.260874+03:30 opsopsops HiddifyCli[487569]: Error in read and build config failed to parse config content: [SingboxParser] unmarshal error: unexpected end of JSON input
+2026-01-01T03:26:13.263038+03:30 opsopsops systemd[1]: hiddify-cli.service: Deactivated successfully.
+2026-01-01T03:26:16.431593+03:30 opsopsops systemd[1]: hiddify-cli.service: Scheduled restart job, restart counter is at 221.
+2026-01-01T03:26:16.443968+03:30 opsopsops systemd[1]: Started hiddify-cli.service - HiddifyCli service.
+2026-01-01T03:26:16.467770+03:30 opsopsops HiddifyCli[487577]: DEBUG CORE libbox.Setup success ./tmp ./ ./tmp true
+2026-01-01T03:26:16.468037+03:30 opsopsops HiddifyCli[487577]: DEBUG CORE StartGrpcServerByMode 127.0.0.1:17078 3
+2026-01-01T03:26:16.468098+03:30 opsopsops HiddifyCli[487577]: DEBUG CORE grpcServer started on 127.0.0.1:17078
+2026-01-01T03:26:16.470336+03:30 opsopsops HiddifyCli[487577]: Running in standalone mode
+2026-01-01T03:26:16.489082+03:30 opsopsops HiddifyCli[487577]: Refresh interval: 0
+2026-01-01T03:26:16.489672+03:30 opsopsops HiddifyCli[487577]: Convert using json
+2026-01-01T03:26:16.497961+03:30 opsopsops HiddifyCli[487577]: Error in read and build config failed to parse config content: [SingboxParser] unmarshal error: unexpected end of JSON input
+2026-01-01T03:26:16.499590+03:30 opsopsops systemd[1]: hiddify-cli.service: Deactivated successfully.
+2026-01-01T03:26:19.681656+03:30 opsopsops systemd[1]: hiddify-cli.service: Scheduled restart job, restart counter is at 222.
+2026-01-01T03:26:19.699103+03:30 opsopsops systemd[1]: Started hiddify-cli.service - HiddifyCli service.
+2026-01-01T03:26:19.724291+03:30 opsopsops HiddifyCli[487587]: DEBUG CORE libbox.Setup success ./tmp ./ ./tmp true
+2026-01-01T03:26:19.724499+03:30 opsopsops HiddifyCli[487587]: DEBUG CORE StartGrpcServerByMode 127.0.0.1:17078 3
+2026-01-01T03:26:19.724559+03:30 opsopsops HiddifyCli[487587]: DEBUG CORE grpcServer started on 127.0.0.1:17078
+2026-01-01T03:26:19.727949+03:30 opsopsops HiddifyCli[487587]: Running in standalone mode
+2026-01-01T03:26:19.746735+03:30 opsopsops HiddifyCli[487587]: Refresh interval: 0
+2026-01-01T03:26:19.747613+03:30 opsopsops HiddifyCli[487587]: Convert using json
+2026-01-01T03:26:19.756991+03:30 opsopsops HiddifyCli[487587]: Error in read and build config failed to parse config content: [SingboxParser] unmarshal error: unexpected end of JSON input
+2026-01-01T03:26:19.758733+03:30 opsopsops systemd[1]: hiddify-cli.service: Deactivated successfully.
+2026-01-01T03:26:22.931394+03:30 opsopsops systemd[1]: hiddify-cli.service: Scheduled restart job, restart counter is at 223.
+2026-01-01T03:26:22.938884+03:30 opsopsops systemd[1]: Started hiddify-cli.service - HiddifyCli service.
+2026-01-01T03:26:22.965196+03:30 opsopsops HiddifyCli[487595]: DEBUG CORE libbox.Setup success ./tmp ./ ./tmp true
+2026-01-01T03:26:22.965340+03:30 opsopsops HiddifyCli[487595]: DEBUG CORE StartGrpcServerByMode 127.0.0.1:17078 3
+2026-01-01T03:26:22.965379+03:30 opsopsops HiddifyCli[487595]: DEBUG CORE grpcServer started on 127.0.0.1:17078
+2026-01-01T03:26:22.967139+03:30 opsopsops HiddifyCli[487595]: Running in standalone mode
+2026-01-01T03:26:22.986976+03:30 opsopsops HiddifyCli[487595]: Refresh interval: 0
+2026-01-01T03:26:22.987464+03:30 opsopsops HiddifyCli[487595]: Convert using json
+2026-01-01T03:26:22.995941+03:30 opsopsops HiddifyCli[487595]: Error in read and build config failed to parse config content: [SingboxParser] unmarshal error: unexpected end of JSON input
+2026-01-01T03:26:22.997599+03:30 opsopsops systemd[1]: hiddify-cli.service: Deactivated successfully.
+2026-01-01T03:26:26.180897+03:30 opsopsops systemd[1]: hiddify-cli.service: Scheduled restart job, restart counter is at 224.
+2026-01-01T03:26:26.189840+03:30 opsopsops systemd[1]: Started hiddify-cli.service - HiddifyCli service.
+2026-01-01T03:26:26.218293+03:30 opsopsops HiddifyCli[487604]: DEBUG CORE libbox.Setup success ./tmp ./ ./tmp true
+2026-01-01T03:26:26.218429+03:30 opsopsops HiddifyCli[487604]: DEBUG CORE StartGrpcServerByMode 127.0.0.1:17078 3
+2026-01-01T03:26:26.219155+03:30 opsopsops HiddifyCli[487604]: DEBUG CORE grpcServer started on 127.0.0.1:17078
+2026-01-01T03:26:26.223221+03:30 opsopsops HiddifyCli[487604]: Running in standalone mode
+2026-01-01T03:26:26.234925+03:30 opsopsops HiddifyCli[487604]: Refresh interval: 0
+2026-01-01T03:26:26.235176+03:30 opsopsops HiddifyCli[487604]: Convert using json
+2026-01-01T03:26:26.242144+03:30 opsopsops HiddifyCli[487604]: Error in read and build config failed to parse config content: [SingboxParser] unmarshal error: unexpected end of JSON input
+2026-01-01T03:26:26.244176+03:30 opsopsops systemd[1]: hiddify-cli.service: Deactivated successfully
