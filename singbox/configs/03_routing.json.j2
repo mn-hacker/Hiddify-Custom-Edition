@@ -118,6 +118,17 @@
           "rule_set": ["geosite-category-ads-all"]
         },
         {% endif %}
+        {% set custom_list = hconfigs.get('block_ads_custom', '').split('\n') | select('trim') | reject('equalto', '') | list %}
+        {% if custom_list %}
+        {
+          "outbound": "blackhole",
+          "domain": [
+            {% for domain in custom_list %}
+            "{{ domain }}"{% if not loop.last %},{% endif %}
+            {% endfor %}
+          ]
+        },
+        {% endif %}
         {% if hconfigs['block_malware_enable'] %}
         {
           "outbound": "blackhole",

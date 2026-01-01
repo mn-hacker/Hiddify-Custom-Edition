@@ -28,6 +28,11 @@
           "domain": [
             "geosite:category-ads",
             "geosite:category-ads-all"
+            {% if hconfigs.get('block_ads_custom') %}
+            {% for domain in hconfigs.get('block_ads_custom', '').split('\n') if domain.strip() %}
+            ,"domain:{{ domain.strip() }}"
+            {% endfor %}
+            {% endif %}
           ]
         },
         {% endif %}
