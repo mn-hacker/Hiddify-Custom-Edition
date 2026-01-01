@@ -9,6 +9,8 @@
 				"tag": "hysteria_in_{{port}}",
 				"listen": "::",
 				"listen_port": {{ port }},
+				"sniff": true,
+				"sniff_override_destination": true,
 				"up_mbps": {{ chconfigs[d['child_id']]['hysteria_up_mbps'] }},
 				"down_mbps": {{ chconfigs[d['child_id']]['hysteria_down_mbps'] }},
 				{% if chconfigs[d['child_id']]['hysteria_obfs_enable'] %}

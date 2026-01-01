@@ -20,7 +20,7 @@
 					"type": "http",
 					"path": "/{{ hconfigs['path_vmess'] }}{{ hconfigs['path_tcp'] }}",
 					"method":"GET",
-					"idle_timeout": "15s",
+					"idle_timeout": "115s",
 					"ping_timeout": "15s"
 				},
 				{% include "includes/multiplex.json.pj2"%}

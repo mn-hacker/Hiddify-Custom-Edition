@@ -1,4 +1,4 @@
 "type": "grpc",
 "service_name": "{{ path }}",
-"idle_timeout": "15s",
+"idle_timeout": "115s",
 "ping_timeout": "15s"

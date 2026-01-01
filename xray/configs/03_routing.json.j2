@@ -35,10 +35,12 @@
           "type": "field",
           "outboundTag": "blackhole",
           "domain": [
+            {% set valid_domains = [] %}
             {% for d in hconfigs['block_ads_custom'].split('\n') %}
-            {% if d.strip() %}
-            "domain:{{d.strip()}}",
-            {% endif %}
+            {% if d.strip() %}{% set _ = valid_domains.append(d.strip()) %}{% endif %}
+            {% endfor %}
+            {% for d in valid_domains %}
+            "domain:{{d}}"{% if not loop.last %},{% endif %}
             {% endfor %}
           ]
         },
@@ -48,8 +50,8 @@
           "type": "field",
           "outboundTag": "blackhole",
           "domain": [
-            "geosite:category-phishing",
-            "geosite:category-malware"
+            "geosite:phishing",
+            "geosite:malware"
           ]
         },
         {% endif %}

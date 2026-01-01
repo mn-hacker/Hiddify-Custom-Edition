@@ -122,10 +122,12 @@
         {
           "outbound": "blackhole",
           "domain": [
+            {% set valid_domains = [] %}
             {% for d in hconfigs['block_ads_custom'].split('\n') %}
-            {% if d.strip() %}
-            "{{d.strip()}}",
-            {% endif %}
+            {% if d.strip() %}{% set _ = valid_domains.append(d.strip()) %}{% endif %}
+            {% endfor %}
+            {% for d in valid_domains %}
+            "{{d}}"{% if not loop.last %},{% endif %}
             {% endfor %}
           ]
         },
