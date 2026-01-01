@@ -1,139 +1,90 @@
-root@opsopsops:/opt/hiddify-manager# cat /opt/hiddify-manager/log/system/hiddify-panel.log | tail -100
-cat: /opt/hiddify-manager/log/system/hiddify-panel.log: No such file or directory
-root@opsopsops:/opt/hiddify-manager# journalctl -u hiddify-panel --since "3 minutes ago" --no-pager
--- No entries --
-root@opsopsops:/opt/hiddify-manager# clear
 root@opsopsops:/opt/hiddify-manager# cd /opt/hiddify-manager/hiddify-panel
 root@opsopsops:/opt/hiddify-manager/hiddify-panel# source /opt/hiddify-manager/.venv313/bin/activate
 (.venv313) root@opsopsops:/opt/hiddify-manager/hiddify-panel# python -c "
 > from hiddifypanel.base import create_app
 > app = create_app()
 > with app.app_context():
->     from flask import Flask
 >     with app.test_client() as client:
 >         resp = client.get('/pR0o8D0xj5pMxPd53uddjR2YPMRyRn/b2be82c2-87f9-4fb5-9df5-5e9f4f8b1cd4/singbox/')
 >         print('Status:', resp.status_code)
->         print('Data:', resp.data[:500] if resp.data else 'EMPTY')
+>         print('Error:', resp.data[:1000] if resp.data else 'EMPTY')
 > "
-Traceback (most recent call last):
-  File "<string>", line 3, in <module>
-    app = create_app()
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/base.py", line 58, in create_app
-    app.config.load_extensions("EXTENSIONS")
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/dynaconf/contrib/flask_dynaconf.py", line 231, in load_extensions
-    initializer(app)
-    ~~~~~~~~~~~^^^^^
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/celery.py", line 46, in init_app
-    backup_interval = int(hconfig(ConfigEnum.backup_interval) or "6")
-                          ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/redis_cache/__init__.py", line 231, in inner
-    parsed_result = fn(*args, **kwargs)
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/models/config.py", line 64, in hconfig
-    child_id = Child.current().id
-               ~~~~~~~~~~~~~^^
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/models/child.py", line 74, in current
-    child = Child.by_id(0)
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/models/child.py", line 64, in by_id
-    return db.session.query(Child).filter(Child.id == id).first()
-           ~~~~~~~~~~~~~~~~^^^^^^^
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/sqlalchemy/orm/scoping.py", line 1666, in query
-    return self._proxied.query(*entities, **kwargs)
-           ^^^^^^^^^^^^^
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/sqlalchemy/orm/scoping.py", line 195, in _proxied
-    return self.registry()
-           ~~~~~~~~~~~~~^^
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/sqlalchemy/util/_collections.py", line 634, in __call__
-    key = self.scopefunc()
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask_sqlalchemy/session.py", line 111, in _app_ctx_id
-    return id(app_ctx._get_current_object())  # type: ignore[attr-defined]
-              ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/werkzeug/local.py", line 519, in _get_current_object
-    raise RuntimeError(unbound_message) from None
-RuntimeError: Working outside of application context.
+2026-01-01 13:52:46 | ERROR    | hiddifypanel.panel.common:internal_server_error:46 - 'ascii' codec can't decode byte 0xd8 in position 1: ordinal not in range(128)Traceback (most recent call last):
 
-This typically means that you attempted to use functionality that needed
-the current application. To solve this, set up an application context
-with app.app_context(). See the documentation for more information.
-(.venv313) root@opsopsops:/opt/hiddify-manager/hiddify-panel# tail -f /var/log/syslog | grep -i hiddify &
-[1] 487541
-(.venv313) root@opsopsops:/opt/hiddify-manager/hiddify-panel# curl "http://127.0.0.1:9000/pR0o8D0xj5pMxPd53uddjR2YPMRyRn/b2be82c2-87f9-4fb5-9df5-5e9f4f8b1cd4/singbox/"2026-01-01T03:26:03.431376+03:30 opsopsops systemd[1]: hiddify-cli.service: Scheduled restart job, restart counter is at 217.
-2026-01-01T03:26:03.449737+03:30 opsopsops systemd[1]: Started hiddify-cli.service - HiddifyCli service.
-2026-01-01T03:26:03.462267+03:30 opsopsops HiddifyCli[487532]: DEBUG CORE libbox.Setup success ./tmp ./ ./tmp true
-2026-01-01T03:26:03.462368+03:30 opsopsops HiddifyCli[487532]: DEBUG CORE StartGrpcServerByMode 127.0.0.1:17078 3
-2026-01-01T03:26:03.462413+03:30 opsopsops HiddifyCli[487532]: DEBUG CORE grpcServer started on 127.0.0.1:17078
-2026-01-01T03:26:03.463514+03:30 opsopsops HiddifyCli[487532]: Running in standalone mode
-2026-01-01T03:26:03.483887+03:30 opsopsops HiddifyCli[487532]: Refresh interval: 0
-2026-01-01T03:26:03.484079+03:30 opsopsops HiddifyCli[487532]: Convert using json
-2026-01-01T03:26:03.490201+03:30 opsopsops HiddifyCli[487532]: Error in read and build config failed to parse config content: [SingboxParser] unmarshal error: unexpected end of JSON input
-2026-01-01T03:26:03.491140+03:30 opsopsops systemd[1]: hiddify-cli.service: Deactivated successfully.
-2026-01-01T03:26:06.680623+03:30 opsopsops systemd[1]: hiddify-cli.service: Scheduled restart job, restart counter is at 218.
-2026-01-01T03:26:06.689783+03:30 opsopsops systemd[1]: Started hiddify-cli.service - HiddifyCli service.
-2026-01-01T03:26:06.716037+03:30 opsopsops HiddifyCli[487542]: DEBUG CORE libbox.Setup success ./tmp ./ ./tmp true
-2026-01-01T03:26:06.716137+03:30 opsopsops HiddifyCli[487542]: DEBUG CORE StartGrpcServerByMode 127.0.0.1:17078 3
-2026-01-01T03:26:06.716508+03:30 opsopsops HiddifyCli[487542]: DEBUG CORE grpcServer started on 127.0.0.1:17078
-2026-01-01T03:26:06.718624+03:30 opsopsops HiddifyCli[487542]: Running in standalone mode
-2026-01-01T03:26:06.733299+03:30 opsopsops HiddifyCli[487542]: Refresh interval: 0
-2026-01-01T03:26:06.733879+03:30 opsopsops HiddifyCli[487542]: Convert using json
-2026-01-01T03:26:06.741566+03:30 opsopsops HiddifyCli[487542]: Error in read and build config failed to parse config content: [SingboxParser] unmarshal error: unexpected end of JSON input
-2026-01-01T03:26:06.742427+03:30 opsopsops systemd[1]: hiddify-cli.service: Deactivated successfully.
-2026-01-01T03:26:09.931548+03:30 opsopsops systemd[1]: hiddify-cli.service: Scheduled restart job, restart counter is at 219.
-2026-01-01T03:26:09.943916+03:30 opsopsops systemd[1]: Started hiddify-cli.service - HiddifyCli service.
-2026-01-01T03:26:09.967520+03:30 opsopsops HiddifyCli[487550]: DEBUG CORE libbox.Setup success ./tmp ./ ./tmp true
-2026-01-01T03:26:09.967656+03:30 opsopsops HiddifyCli[487550]: DEBUG CORE StartGrpcServerByMode 127.0.0.1:17078 3
-2026-01-01T03:26:09.967699+03:30 opsopsops HiddifyCli[487550]: DEBUG CORE grpcServer started on 127.0.0.1:17078
-2026-01-01T03:26:09.969486+03:30 opsopsops HiddifyCli[487550]: Running in standalone mode
-2026-01-01T03:26:09.989496+03:30 opsopsops HiddifyCli[487550]: Refresh interval: 0
-2026-01-01T03:26:09.990063+03:30 opsopsops HiddifyCli[487550]: Convert using json
-2026-01-01T03:26:09.998931+03:30 opsopsops HiddifyCli[487550]: Error in read and build config failed to parse config content: [SingboxParser] unmarshal error: unexpected end of JSON input
-2026-01-01T03:26:10.000883+03:30 opsopsops systemd[1]: hiddify-cli.service: Deactivated successfully.
-2026-01-01T03:26:13.181274+03:30 opsopsops systemd[1]: hiddify-cli.service: Scheduled restart job, restart counter is at 220.
-2026-01-01T03:26:13.200980+03:30 opsopsops systemd[1]: Started hiddify-cli.service - HiddifyCli service.
-2026-01-01T03:26:13.228343+03:30 opsopsops HiddifyCli[487569]: DEBUG CORE libbox.Setup success ./tmp ./ ./tmp true
-2026-01-01T03:26:13.228539+03:30 opsopsops HiddifyCli[487569]: DEBUG CORE StartGrpcServerByMode 127.0.0.1:17078 3
-2026-01-01T03:26:13.228620+03:30 opsopsops HiddifyCli[487569]: DEBUG CORE grpcServer started on 127.0.0.1:17078
-2026-01-01T03:26:13.232342+03:30 opsopsops HiddifyCli[487569]: Running in standalone mode
-2026-01-01T03:26:13.251524+03:30 opsopsops HiddifyCli[487569]: Refresh interval: 0
-2026-01-01T03:26:13.252110+03:30 opsopsops HiddifyCli[487569]: Convert using json
-2026-01-01T03:26:13.260874+03:30 opsopsops HiddifyCli[487569]: Error in read and build config failed to parse config content: [SingboxParser] unmarshal error: unexpected end of JSON input
-2026-01-01T03:26:13.263038+03:30 opsopsops systemd[1]: hiddify-cli.service: Deactivated successfully.
-2026-01-01T03:26:16.431593+03:30 opsopsops systemd[1]: hiddify-cli.service: Scheduled restart job, restart counter is at 221.
-2026-01-01T03:26:16.443968+03:30 opsopsops systemd[1]: Started hiddify-cli.service - HiddifyCli service.
-2026-01-01T03:26:16.467770+03:30 opsopsops HiddifyCli[487577]: DEBUG CORE libbox.Setup success ./tmp ./ ./tmp true
-2026-01-01T03:26:16.468037+03:30 opsopsops HiddifyCli[487577]: DEBUG CORE StartGrpcServerByMode 127.0.0.1:17078 3
-2026-01-01T03:26:16.468098+03:30 opsopsops HiddifyCli[487577]: DEBUG CORE grpcServer started on 127.0.0.1:17078
-2026-01-01T03:26:16.470336+03:30 opsopsops HiddifyCli[487577]: Running in standalone mode
-2026-01-01T03:26:16.489082+03:30 opsopsops HiddifyCli[487577]: Refresh interval: 0
-2026-01-01T03:26:16.489672+03:30 opsopsops HiddifyCli[487577]: Convert using json
-2026-01-01T03:26:16.497961+03:30 opsopsops HiddifyCli[487577]: Error in read and build config failed to parse config content: [SingboxParser] unmarshal error: unexpected end of JSON input
-2026-01-01T03:26:16.499590+03:30 opsopsops systemd[1]: hiddify-cli.service: Deactivated successfully.
-2026-01-01T03:26:19.681656+03:30 opsopsops systemd[1]: hiddify-cli.service: Scheduled restart job, restart counter is at 222.
-2026-01-01T03:26:19.699103+03:30 opsopsops systemd[1]: Started hiddify-cli.service - HiddifyCli service.
-2026-01-01T03:26:19.724291+03:30 opsopsops HiddifyCli[487587]: DEBUG CORE libbox.Setup success ./tmp ./ ./tmp true
-2026-01-01T03:26:19.724499+03:30 opsopsops HiddifyCli[487587]: DEBUG CORE StartGrpcServerByMode 127.0.0.1:17078 3
-2026-01-01T03:26:19.724559+03:30 opsopsops HiddifyCli[487587]: DEBUG CORE grpcServer started on 127.0.0.1:17078
-2026-01-01T03:26:19.727949+03:30 opsopsops HiddifyCli[487587]: Running in standalone mode
-2026-01-01T03:26:19.746735+03:30 opsopsops HiddifyCli[487587]: Refresh interval: 0
-2026-01-01T03:26:19.747613+03:30 opsopsops HiddifyCli[487587]: Convert using json
-2026-01-01T03:26:19.756991+03:30 opsopsops HiddifyCli[487587]: Error in read and build config failed to parse config content: [SingboxParser] unmarshal error: unexpected end of JSON input
-2026-01-01T03:26:19.758733+03:30 opsopsops systemd[1]: hiddify-cli.service: Deactivated successfully.
-2026-01-01T03:26:22.931394+03:30 opsopsops systemd[1]: hiddify-cli.service: Scheduled restart job, restart counter is at 223.
-2026-01-01T03:26:22.938884+03:30 opsopsops systemd[1]: Started hiddify-cli.service - HiddifyCli service.
-2026-01-01T03:26:22.965196+03:30 opsopsops HiddifyCli[487595]: DEBUG CORE libbox.Setup success ./tmp ./ ./tmp true
-2026-01-01T03:26:22.965340+03:30 opsopsops HiddifyCli[487595]: DEBUG CORE StartGrpcServerByMode 127.0.0.1:17078 3
-2026-01-01T03:26:22.965379+03:30 opsopsops HiddifyCli[487595]: DEBUG CORE grpcServer started on 127.0.0.1:17078
-2026-01-01T03:26:22.967139+03:30 opsopsops HiddifyCli[487595]: Running in standalone mode
-2026-01-01T03:26:22.986976+03:30 opsopsops HiddifyCli[487595]: Refresh interval: 0
-2026-01-01T03:26:22.987464+03:30 opsopsops HiddifyCli[487595]: Convert using json
-2026-01-01T03:26:22.995941+03:30 opsopsops HiddifyCli[487595]: Error in read and build config failed to parse config content: [SingboxParser] unmarshal error: unexpected end of JSON input
-2026-01-01T03:26:22.997599+03:30 opsopsops systemd[1]: hiddify-cli.service: Deactivated successfully.
-2026-01-01T03:26:26.180897+03:30 opsopsops systemd[1]: hiddify-cli.service: Scheduled restart job, restart counter is at 224.
-2026-01-01T03:26:26.189840+03:30 opsopsops systemd[1]: Started hiddify-cli.service - HiddifyCli service.
-2026-01-01T03:26:26.218293+03:30 opsopsops HiddifyCli[487604]: DEBUG CORE libbox.Setup success ./tmp ./ ./tmp true
-2026-01-01T03:26:26.218429+03:30 opsopsops HiddifyCli[487604]: DEBUG CORE StartGrpcServerByMode 127.0.0.1:17078 3
-2026-01-01T03:26:26.219155+03:30 opsopsops HiddifyCli[487604]: DEBUG CORE grpcServer started on 127.0.0.1:17078
-2026-01-01T03:26:26.223221+03:30 opsopsops HiddifyCli[487604]: Running in standalone mode
-2026-01-01T03:26:26.234925+03:30 opsopsops HiddifyCli[487604]: Refresh interval: 0
-2026-01-01T03:26:26.235176+03:30 opsopsops HiddifyCli[487604]: Convert using json
-2026-01-01T03:26:26.242144+03:30 opsopsops HiddifyCli[487604]: Error in read and build config failed to parse config content: [SingboxParser] unmarshal error: unexpected end of JSON input
-2026-01-01T03:26:26.244176+03:30 opsopsops systemd[1]: hiddify-cli.service: Deactivated successfully
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask_babel/__init__.py", line 611, in get_translations
+    return cache[str(locale), self.domain[0]]
+
+KeyError: ('fa', 'messages')
+
+
+During handling of the above exception, another exception occurred:
+
+
+Traceback (most recent call last):
+
+  File "<string>", line 6, in <module>
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/werkzeug/test.py", line 1162, in get
+    return self.open(*args, **kw)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask/testing.py", line 235, in open
+    response = super().open(
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/werkzeug/test.py", line 1116, in open
+    response_parts = self.run_wsgi_app(request.environ, buffered=buffered)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/werkzeug/test.py", line 988, in run_wsgi_app
+    rv = run_wsgi_app(self.application, environ, buffered=buffered)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/werkzeug/test.py", line 1264, in run_wsgi_app
+    app_rv = app(environ, start_response)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask/app.py", line 1498, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/sonora/wsgi.py", line 247, in __call__
+    return self._application(environ, start_response)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/werkzeug/middleware/proxy_fix.py", line 183, in __call__
+    return self.app(environ, start_response)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+> File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask/app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask_classful.py", line 303, in proxy
+    response = view(**request.view_args)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask_classful.py", line 271, in inner
+    return fn(*args, **kwargs)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/auth.py", line 130, in decorated_view
+    return fn(*args, **kwargs)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/apiflask/scaffold.py", line 97, in wrapper
+    return current_app.ensure_sync(f)(*args, **kwargs)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/panel/user/user.py", line 73, in singbox_full
+    return self.full_singbox_imp()
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/auth.py", line 130, in decorated_view
+    return fn(*args, **kwargs)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/apiflask/scaffold.py", line 97, in wrapper
+    return current_app.ensure_sync(f)(*args, **kwargs)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/panel/user/user.py", line 240, in full_singbox_imp
+    c = get_common_data(g.account.uuid, mode)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/panel/user/user.py", line 358, in get_common_data
+    domains, db_domain, has_auto_cdn = get_domain_information(no_domain, filter_domain, request.host)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/panel/user/user.py", line 330, in get_domain_information
+    hutils.flask.flash(_("This domain does not exist in the panel!" + domain))
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask_babel/__init__.py", line 756, in gettext
+    return get_domain().gettext(*args, **kwargs)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask_babel/__init__.py", line 648, in gettext
+    t = self.get_translations()
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask_babel/__init__.py", line 623, in get_translations
+    catalog = support.Translations.load(
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/babel/support.py", line 662, in load
+    return cls(fp=fp, domain=domain)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/babel/support.py", line 635, in __init__
+    super().__init__(fp=fp)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/babel/support.py", line 393, in __init__
+    super().__init__(fp=fp)
+  File "/usr/local/share/uv/cpython-3.13.11-linux-x86_64-gnu/lib/python3.13/gettext.py", line 279, in __init__
+    self._parse(fp)
+  File "/usr/local/share/uv/cpython-3.13.11-linux-x86_64-gnu/lib/python3.13/gettext.py", line 433, in _parse
+    catalog[str(msg, charset)] = str(tmsg, charset)
+
+UnicodeDecodeError: 'ascii' codec can't decode byte 0xd8 in position 1: ordinal not in range(128)
+
+
+Status: 500
+Error: b'{"detail":["/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask/app.py:880 full_dispatch_request: rv = self.dispatch_request()","/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask/app.py:865 dispatch_request: return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]","/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask_classful.py:303 proxy: response = view(**request.view_args)","/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask_classful.py:271 inner: return fn(*args, **kwargs)","/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/auth.py:130 decorated_view: return fn(*args, **kwargs)","/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/apiflask/scaffold.py:97 wrapper: return current_app.ensure_sync(f)(*args, **kwargs)","/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/panel/user/user.py:73 singbox_full: return self.full_singbox_imp()",'
+(.venv313) root@opsopsops:/opt/hiddify-manager/hiddify-panel#
