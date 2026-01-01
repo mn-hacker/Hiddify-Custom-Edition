@@ -60,22 +60,13 @@
           ]
         },
         {% endif %}
-        {% if hconfigs.get('block_gambling_enable') %}
-        { // Block gambling sites (requires Iran-v2ray-rules geosite.dat)
+        {% if hconfigs.get('block_nsfw_enable') %}
+        { // Block NSFW content (adult content and gambling - from Iran-v2ray-rules nsfw category)
           "type": "field",
           "outboundTag": "blackhole",
           "domain": [
-            "geosite:category-gambling"
-          ]
-        },
-        {% endif %}
-        {% if hconfigs.get('block_adult_enable') %}
-        { // Block adult content
-          "type": "field",
-          "outboundTag": "blackhole",
-          "domain": [
-            "geosite:category-porn",
-            "geosite:nsfw"
+            "geosite:nsfw",
+            "geosite:category-porn"
           ]
         },
         {% endif %}

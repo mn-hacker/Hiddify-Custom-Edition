@@ -6,6 +6,8 @@
                         "error": "none",
                         "access": "none",
                         "dnsLog": false,
+                {%elif hconfigs.get('access_log_enable', False)%}
+                        "access": "/opt/hiddify-manager/log/xray_access.log",
                 {%endif%}
                 "logid": true,
                 "header": true,
