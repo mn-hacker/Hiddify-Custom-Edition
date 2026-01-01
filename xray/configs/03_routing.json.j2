@@ -21,56 +21,42 @@
         { //block quic
           "type": "field", "port": 443, "network": "udp", "outboundTag": "blackhole"
         },
-        {% if hconfigs['block_ads_enable'] %}
+        {% if hconfigs.get('block_ads_enable') %}
         { // Block ads and trackers
           "type": "field",
           "outboundTag": "blackhole",
           "domain": [
+            "geosite:category-ads",
             "geosite:category-ads-all"
           ]
         },
         {% endif %}
-        {% if hconfigs['block_ads_custom'] %}
-        { // Block custom domains
+        {% if hconfigs.get('block_malware_enable') %}
+        { // Block malware and phishing (requires Iran-v2ray-rules geosite.dat)
           "type": "field",
           "outboundTag": "blackhole",
           "domain": [
-            {% set valid_domains = [] %}
-            {% for d in hconfigs['block_ads_custom'].split('\n') %}
-            {% if d.strip() %}{% set _ = valid_domains.append(d.strip()) %}{% endif %}
-            {% endfor %}
-            {% for d in valid_domains %}
-            "domain:{{d}}"{% if not loop.last %},{% endif %}
-            {% endfor %}
+            "geosite:malware",
+            "geosite:phishing"
           ]
         },
         {% endif %}
-        {% if hconfigs['block_malware_enable'] %}
-        { // Block malware and phishing
-          "type": "field",
-          "outboundTag": "blackhole",
-          "domain": [
-            "geosite:phishing",
-            "geosite:malware"
-          ]
-        },
-        {% endif %}
-        {% if hconfigs['block_social_enable'] %}
+        {% if hconfigs.get('block_social_enable') %}
         { // Block social media
           "type": "field",
           "outboundTag": "blackhole",
           "domain": [
             "geosite:facebook",
+            "geosite:twitter",
             "geosite:instagram",
             "geosite:tiktok",
-            "geosite:twitter",
-            "geosite:snapchat",
-            "geosite:linkedin"
+            "geosite:linkedin",
+            "geosite:snapchat"
           ]
         },
         {% endif %}
-        {% if hconfigs['block_gambling_enable'] %}
-        { // Block gambling sites
+        {% if hconfigs.get('block_gambling_enable') %}
+        { // Block gambling sites (requires Iran-v2ray-rules geosite.dat)
           "type": "field",
           "outboundTag": "blackhole",
           "domain": [
@@ -78,12 +64,13 @@
           ]
         },
         {% endif %}
-        {% if hconfigs['block_adult_enable'] %}
+        {% if hconfigs.get('block_adult_enable') %}
         { // Block adult content
           "type": "field",
           "outboundTag": "blackhole",
           "domain": [
-            "geosite:category-porn"
+            "geosite:category-porn",
+            "geosite:nsfw"
           ]
         },
         {% endif %}
