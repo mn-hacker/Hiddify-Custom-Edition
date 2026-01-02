@@ -1,145 +1,65 @@
-root@opsopsops:/opt/hiddify-manager# cd /opt/hiddify-manager && bash install.sh
-
-
-
-Using Python 3.13.11 environment at: .venv313
-
-
-
-
-
-
-Traceback (most recent call last):
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/sqlalchemy/sql/sqltypes.py", line 1709, in _object_value_for_elem
-    return self._object_lookup[elem]  # type: ignore[return-value]
-           ~~~~~~~~~~~~~~~~~~~^^^^^^
-KeyError: 'block_gambling_enable'
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "<frozen runpy>", line 198, in _run_module_as_main
-  File "<frozen runpy>", line 88, in _run_code
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/__main__.py", line 13, in <module>
-    main()
-    ~~~~^^
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/click/core.py", line 1157, in __call__
-    return self.main(*args, **kwargs)
-           ~~~~~~~~~^^^^^^^^^^^^^^^^^
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/click/core.py", line 1078, in main
-    rv = self.invoke(ctx)
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/click/core.py", line 1688, in invoke
-    return _process_result(sub_ctx.command.invoke(sub_ctx))
-                           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/click/core.py", line 1434, in invoke
-    return ctx.invoke(self.callback, **ctx.params)
-           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/click/core.py", line 783, in invoke
-    return __callback(*args, **kwargs)
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/click/decorators.py", line 33, in new_func
-    return f(get_current_context(), *args, **kwargs)
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask/cli.py", line 386, in decorator
-    return ctx.invoke(f, *args, **kwargs)
-           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/click/core.py", line 783, in invoke
-    return __callback(*args, **kwargs)
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/panel/cli.py", line 60, in all_configs
-    print(json.dumps(hiddify.all_configs_for_cli(), indent=4))
-                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/panel/hiddify.py", line 352, in all_configs_for_cli
-    "chconfigs": get_hconfigs_childs(host_child_ids, json=True)
-                 ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/models/config.py", line 149, in get_hconfigs_childs
-    return {c: get_hconfigs(c, json) for c in child_ids}
-               ~~~~~~~~~~~~^^^^^^^^^
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/redis_cache/__init__.py", line 231, in inner
-    parsed_result = fn(*args, **kwargs)
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/models/config.py", line 141, in get_hconfigs
-    return {**{f'{u.key}' if json else u.key: u.value for u in BoolConfig.query.filter(BoolConfig.child_id == child_id).all() if u.key.type == bool},
-                                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/sqlalchemy/orm/query.py", line 2704, in all
-    return self._iter().all()  # type: ignore
-           ~~~~~~~~~~~~~~~~^^
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/sqlalchemy/engine/result.py", line 1774, in all
-    return self._allrows()
-           ~~~~~~~~~~~~~^^
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/sqlalchemy/engine/result.py", line 548, in _allrows
-    rows = self._fetchall_impl()
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/sqlalchemy/engine/result.py", line 1681, in _fetchall_impl
-    return self._real_result._fetchall_impl()
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/sqlalchemy/engine/result.py", line 2275, in _fetchall_impl
-    return list(self.iterator)
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/sqlalchemy/orm/loading.py", line 220, in chunks
-    fetch = cursor._raw_all_rows()
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/sqlalchemy/engine/result.py", line 541, in _raw_all_rows
-    return [make_row(row) for row in rows]
-            ~~~~~~~~^^^^^
-  File "lib/sqlalchemy/cyextension/resultproxy.pyx", line 22, in sqlalchemy.cyextension.resultproxy.BaseRow.__init__
-  File "lib/sqlalchemy/cyextension/resultproxy.pyx", line 79, in sqlalchemy.cyextension.resultproxy._apply_processors
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/sqlalchemy/sql/sqltypes.py", line 1829, in process
-    value = self._object_value_for_elem(value)
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/sqlalchemy/dialects/mysql/enumerated.py", line 110, in _object_value_for_elem
-    return super()._object_value_for_elem(elem)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/sqlalchemy/sql/sqltypes.py", line 1711, in _object_value_for_elem
-    raise LookupError(
-    ...<7 lines>...
-    ) from err
-LookupError: 'block_gambling_enable' is not among the defined enum values. Enum name: configenum. Possible values: dbvalues, create_easy.., wireguard_e.., ..., hiddifycli_..
-
-
-
-Error: Key not found: warp_mode
-
-----------------------------------------------------------------
-- Warp Status:
-  - Profile:
-        2026/01/02 02:57:52 Using config file: wgcf-account.toml
-        2026/01/02 02:57:53 Printing account details:
-
-        ================================================================
-        Account
-        ================================================================
-        Id           : 529ecd57-01ef-48c9-a94b-6a50a6b0dced
-        Account type : free
-        Created      : 2026-01-01T23:10:51.778457Z
-        Updated      : 2026-01-01T23:10:51.778457Z
-        Premium data : 0 B
-        Quota        : 0 B
-        Role         : child
-
-        ================================================================
-        Devices
-        ================================================================
-        Id        : 774df0b6-e57d-4cd2-9d76-25046485673c (current)
-        Type      : Android
-        Model     : hiddify
-        Name      : opsopsops
-        Active    : true
-        Created   : 2026-01-01T23:10:51.356346Z
-        Activated : 2026-01-01T23:10:51.356346Z
-        Role      : parent
-  - Network:
-        "country"      : "Finland",
-        "city"         : "Helsinki",
-        "org"          : "Cloudflare WARP",
-        "query"        : "104.28.254.18"
-----------------------------------------------------------------
-- Global IP:
-Error: Key not found: core_type
-----------------------------------------------------------------
-- Services Status:
-Error: Key not found: warp_mode
-    hiddify-cli                                        activating
-    hiddify-nginx                                          active
-    hiddify-redis                                          active
-    mtproxy                                            activating
-    hiddify-panel-background-tasks                         active
-    hiddify-haproxy                                    activating
-    hiddify-ssh-liberty-bridge                             active
-    hiddify-ss-faketls                                     active
-    hiddify-panel                                          active
-    hiddify-singbox                                        active
-    hiddify-xray                                           failed
-    wg-quick@warp                                          failed
+root@opsopsops:/opt/hiddify-manager# find /opt -name "messages.po" 2>/dev/null
+/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/translations/ru/LC_MESSAGES/messages.po
+/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/translations/fa/LC_MESSAGES/messages.po
+/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/translations/en/LC_MESSAGES/messages.po
+/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/translations/my/LC_MESSAGES/messages.po
+/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/translations/pt/LC_MESSAGES/messages.po
+/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/translations/zh/LC_MESSAGES/messages.po
+/opt/hiddify-manager/hiddify-panel/src/hiddifypanel/translations/ru/LC_MESSAGES/messages.po
+/opt/hiddify-manager/hiddify-panel/src/hiddifypanel/translations/fa/LC_MESSAGES/messages.po
+/opt/hiddify-manager/hiddify-panel/src/hiddifypanel/translations/en/LC_MESSAGES/messages.po
+/opt/hiddify-manager/hiddify-panel/src/hiddifypanel/translations/my/LC_MESSAGES/messages.po
+/opt/hiddify-manager/hiddify-panel/src/hiddifypanel/translations/pt/LC_MESSAGES/messages.po
+/opt/hiddify-manager/hiddify-panel/src/hiddifypanel/translations/zh/LC_MESSAGES/messages.po
+/opt/hiddify-manager/hiddify-panel/src/build/lib/hiddifypanel/translations/ru/LC_MESSAGES/messages.po
+/opt/hiddify-manager/hiddify-panel/src/build/lib/hiddifypanel/translations/fa/LC_MESSAGES/messages.po
+/opt/hiddify-manager/hiddify-panel/src/build/lib/hiddifypanel/translations/en/LC_MESSAGES/messages.po
+/opt/hiddify-manager/hiddify-panel/src/build/lib/hiddifypanel/translations/my/LC_MESSAGES/messages.po
+/opt/hiddify-manager/hiddify-panel/src/build/lib/hiddifypanel/translations/pt/LC_MESSAGES/messages.po
+/opt/hiddify-manager/hiddify-panel/src/build/lib/hiddifypanel/translations/zh/LC_MESSAGES/messages.po
+root@opsopsops:/opt/hiddify-manager# ls -la /opt/hiddify-manager/
+total 592
+drwxr-xr-x 16 root          root             4096 Jan  2 13:49  .
+drwxr-xr-x  3 root          root             4096 Jan  2 13:48  ..
+drwxr-xr-x  6 root          root             4096 Jan  2 13:48  .venv313
+-rw-r--r--  1 root          root             3637 Jan  2 13:43  CONTRIBUTING.md
+-rw-r--r--  1 root          root              566 Jan  2 13:43  Dockerfile
+-rw-r--r--  1 root          root           184615 Jan  2 13:43 'Finalizing GitHub Release Push.md'
+-rw-r--r--  1 root          root           130694 Jan  2 13:43  HISTORY.md
+-rw-r--r--  1 root          root            35149 Jan  2 13:43  LICENSE
+-rw-r--r--  1 root          root             7500 Jan  2 13:43  LICENSE.md
+-rw-r--r--  1 root          root             3003 Jan  2 13:43  Makefile
+-rw-r--r--  1 root          root            16782 Jan  2 13:43  README.md
+-rw-r--r--  1 root          root            13775 Jan  2 13:43  README_cn.md
+-rw-r--r--  1 root          root            16937 Jan  2 13:43  README_fa.md
+-rw-r--r--  1 root          root            14770 Jan  2 13:43  README_ru.md
+-rw-r--r--  1 root          root                8 Jan  2 13:43  VERSION
+drwxr-xr-x  4 root          root             4096 Jan  2 13:49  acme.sh
+-rwxr-xr-x  1 root          root              118 Jan  2 13:43  apply_configs.sh
+drwxr-xr-x  3 root          root             4096 Jan  2 13:43  btn-deploy
+-rw-r--r--  1 root          root              597 Jan  2 13:43  cloud-init.yml
+drwxr-xr-x  3 root          root             4096 Jan  2 13:49  common
+-rw-r--r--  1 root          root              315 Jan  2 13:43  config.env.default
+-rw-------  1 root          root            13794 Jan  2 13:51  current.json
+-rw-r--r--  1 root          root             1796 Jan  2 13:43  docker-compose.yml
+-rwxr-xr-x  1 root          root             1434 Jan  2 13:43  docker-init.sh
+-rw-r--r--  1 root          root               74 Jan  2 13:43  docker.env
+drwxr-xr-x  2 root          root             4096 Jan  2 13:43  docs
+-rw-r--r--  1 root          root             8004 Jan  2 13:43  error.txt
+drwxr-xr-x  6 root          root             4096 Jan  2 13:49  haproxy
+drwxr-xr-x  4 hiddify-panel hiddify-panel    4096 Jan  2 13:49  hiddify-panel
+-rwxr-xr-x  1 root          root             7021 Jan  2 13:43  install.sh
+drwxr-xr-x  3 root          root             4096 Jan  2 13:49  log
+-rwxr-xr-x  1 root          root             6242 Jan  2 13:43  menu.sh
+drwxr-xr-x  5 nginx         hiddify-common   4096 Jan  2 13:49  nginx
+drwxr-xr-x  3 root          root             4096 Jan  2 13:43  operations
+drwxr-xr-x 14 root          root             4096 Jan  2 13:43  other
+-rw-r--r--  1 root          root              634 Jan  2 13:43  release
+-rwxr-xr-x  1 root          root             1678 Jan  2 13:43  restart.sh
+drwxr-xr-x  4 root          hiddify-common   4096 Jan  2 13:49  singbox
+drw-------  2 root          root             4096 Jan  2 13:49  ssl
+-rwxr-xr-x  1 root          root             2138 Jan  2 13:43  status.sh
+-rwxr-xr-x  1 root          root              544 Jan  2 13:43  uninstall.sh
+-rwxr-xr-x  1 root          root             3761 Jan  2 13:43  update.sh
+-rw-r--r--  1 root          root                0 Jan  2 13:43  uv.toml
+drwxr-xr-x  5 root          root             4096 Jan  2 13:49  xray
