@@ -11,22 +11,29 @@ function get_commit_version() {
 }
 
 function get_pre_release_version() {
-    # lastversion "$1" --pre --at github
-    VERSION=$(curl -sL "https://api.github.com/repos/mn-hacker/$1/releases" | jq -r 'map(select(.prerelease == true or .draft == true)) | sort_by(.created_at) | last | .tag_name')
+    # Use tags API instead of releases API - find latest tag containing 'b' (beta)
+    VERSION=$(curl -sL "https://api.github.com/repos/mn-hacker/$1/tags" | jq -r '.[].name' | grep -E 'b$|beta' | head -1)
+    if [ -z "$VERSION" ] || [ "$VERSION" == "null" ]; then
+        # Fallback to releases API if no beta tag found
+        VERSION=$(curl -sL "https://api.github.com/repos/mn-hacker/$1/releases" | jq -r 'map(select(.prerelease == true)) | sort_by(.created_at) | last | .tag_name')
+    fi
     VERSION=${VERSION/#v/}
     echo $VERSION
 }
 
 function get_release_version() {
-    VERSION=$(curl -sL "https://api.github.com/repos/mn-hacker/$1/releases" | jq -r 'map(select(.prerelease == false)) | sort_by(.published_at) | last | .tag_name')
-    if [ -z $VERSION ]; then
-        # COMMIT_URL=https://api.github.com/repos/hiddify/$1/releases/latest
-        # VERSION=$(curl -s --connect-timeout 1 $COMMIT_URL | jq -r .tag_name)
+    # Use tags API instead of releases API - find latest tag NOT containing 'b' (stable)
+    VERSION=$(curl -sL "https://api.github.com/repos/mn-hacker/$1/tags" | jq -r '.[].name' | grep -vE 'b$|beta|dev|alpha' | head -1)
+    if [ -z "$VERSION" ] || [ "$VERSION" == "null" ]; then
+        # Fallback to releases API if no stable tag found
+        VERSION=$(curl -sL "https://api.github.com/repos/mn-hacker/$1/releases" | jq -r 'map(select(.prerelease == false)) | sort_by(.published_at) | last | .tag_name')
+    fi
+    if [ -z "$VERSION" ] || [ "$VERSION" == "null" ]; then
+        # Last fallback - get latest release location
         location=$(curl -sI "https://github.com/mn-hacker/$1/releases/latest" | grep -i location | awk -F' ' '{print $2}' | tr -d '\r')
         if [[ $location == *"latest"* ]]; then
             location=$(curl -sI "$location" | grep -i location | awk -F' ' '{print $2}' | tr -d '\r')
         fi
-
         VERSION=$(echo $location | rev | awk -F/ '{print $1}' | rev)
         VERSION="${VERSION//$'\r'/}"
     fi
