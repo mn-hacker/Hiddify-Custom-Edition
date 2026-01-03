@@ -1,5 +1,5 @@
-
 "network": "httpupgrade",
 "httpupgradeSettings": {		
-    "path": "/{{ path }}", 
+    "path": "/{{ path }}",
+    "acceptProxyProtocol": false
 }

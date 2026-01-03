@@ -3,7 +3,8 @@ shopt -s expand_aliases
 
 source ./lib/acme.sh.env
 source ../common/utils.sh
-# Function to check if a domain is restricted
+
+# Function to check if a domain is restricted for ZeroSSL
 is_ok_domain_zerossl() {
     domain="$1"
     for tld in "${restricted_tlds[@]}"; do
@@ -13,67 +14,170 @@ is_ok_domain_zerossl() {
     done
     return 0 # Domain is not restricted
 }
+
+# List of Certificate Authorities to try (in order of preference)
+# Format: "server_name|description|needs_eab"
+CA_SERVERS=(
+    "letsencrypt|Let's Encrypt|no"
+    "buypass|Buypass|no"
+    "google|Google Trust Services|no"
+    "zerossl|ZeroSSL|eab"
+    "ssl.com|SSL.com|no"
+    "letsencrypt_test|Let's Encrypt Staging|no"
+)
+
+function try_get_cert_with_ca() {
+    local DOMAIN=$1
+    local CA_SERVER=$2
+    local CA_DESC=$3
+    local NEEDS_EAB=$4
+    local MAX_RETRIES=2
+    local RETRY_DELAY=10
+    
+    echo "====== Trying $CA_DESC ($CA_SERVER) for $DOMAIN ======"
+    
+    # Skip ZeroSSL for restricted domains
+    if [[ "$CA_SERVER" == "zerossl" ]] && ! is_ok_domain_zerossl "$DOMAIN"; then
+        echo "Domain $DOMAIN is restricted for ZeroSSL, skipping..."
+        return 1
+    fi
+    
+    for ((i=1; i<=MAX_RETRIES; i++)); do
+        echo "Attempt $i of $MAX_RETRIES..."
+        
+        # Try to issue certificate
+        if [[ "$CA_SERVER" == "letsencrypt_test" ]]; then
+            acme.sh --issue -w /opt/hiddify-manager/acme.sh/www/ -d $DOMAIN \
+                --log $(pwd)/../log/system/acme.log \
+                --server letsencrypt_test \
+                --pre-hook "systemctl restart hiddify-nginx" \
+                --force 2>&1
+        else
+            acme.sh --issue -w /opt/hiddify-manager/acme.sh/www/ -d $DOMAIN \
+                --log $(pwd)/../log/system/acme.log \
+                --server $CA_SERVER \
+                --pre-hook "systemctl restart hiddify-nginx" \
+                --force 2>&1
+        fi
+        
+        local result=$?
+        
+        if [ $result -eq 0 ]; then
+            echo "✓ Success with $CA_DESC!"
+            return 0
+        elif [ $result -eq 2 ]; then
+            # Already issued, try to renew
+            echo "Certificate already exists, attempting renewal..."
+            acme.sh --renew -d $DOMAIN --force 2>&1
+            if [ $? -eq 0 ]; then
+                return 0
+            fi
+        fi
+        
+        if [ $i -lt $MAX_RETRIES ]; then
+            echo "Failed, waiting ${RETRY_DELAY}s before retry..."
+            sleep $RETRY_DELAY
+        fi
+    done
+    
+    echo "✗ Failed with $CA_DESC after $MAX_RETRIES attempts"
+    return 1
+}
+
 function get_cert() {
     cd /opt/hiddify-manager/acme.sh/
     source ./lib/acme.sh.env
-    # ./lib/acme.sh --register-account -m my@example.com
 
     DOMAIN=$1
     ssl_cert_path=/opt/hiddify-manager/ssl
-    rm -f $ssl_cert_path/$DOMAIN.key
+    
+    echo "=========================================="
+    echo "Getting SSL certificate for: $DOMAIN"
+    echo "=========================================="
 
-    if [ ${#DOMAIN} -le 64 ]; then
-        mkdir -p /opt/hiddify-manager/acme.sh/www/.well-known/acme-challenge
-        echo "location /.well-known/acme-challenge {root /opt/hiddify-manager/acme.sh/www/;}" >/opt/hiddify-manager/nginx/parts/acme.conf
-        # systemctl reload --now hiddify-nginx
+    # Check domain length (Let's Encrypt limit is 64 chars)
+    if [ ${#DOMAIN} -gt 64 ]; then
+        echo "ERROR: Domain name too long (${#DOMAIN} > 64 chars)"
+        bash generate_self_signed_cert.sh $DOMAIN
+        return 1
+    fi
 
-        DOMAIN_IP=$(dig +short -t a $DOMAIN.)
-        DOMAIN_IPv6=$(dig +short -t aaaa $DOMAIN.)
-        echo "resolving domain $DOMAIN : IP=$DOMAIN_IP IPv6=$DOMAIN_IPv6   ServerIP=$SERVER_IP ServerIPv6=$SERVER_IPv6"
-        if [[ "$SERVER_IP" == "" || $SERVER_IP != $DOMAIN_IP ]] && [[ "$SERVER_IPv6" == "" || $SERVER_IPv6 != $DOMAIN_IPv6 ]]; then
-            error "maybe it is an error! make sure that it is correct"
-            #sleep 10
+    # Setup ACME challenge directory
+    mkdir -p /opt/hiddify-manager/acme.sh/www/.well-known/acme-challenge
+    echo "location /.well-known/acme-challenge {root /opt/hiddify-manager/acme.sh/www/;}" >/opt/hiddify-manager/nginx/parts/acme.conf
+    systemctl reload --now hiddify-nginx
+
+    # Verify DNS resolution
+    DOMAIN_IP=$(dig +short -t a $DOMAIN. | head -1)
+    DOMAIN_IPv6=$(dig +short -t aaaa $DOMAIN. | head -1)
+    echo "DNS Resolution: $DOMAIN -> IPv4=$DOMAIN_IP, IPv6=$DOMAIN_IPv6"
+    echo "Server IPs: IPv4=$SERVER_IP, IPv6=$SERVER_IPv6"
+
+    if [[ -z "$DOMAIN_IP" && -z "$DOMAIN_IPv6" ]]; then
+        error "ERROR: Domain $DOMAIN does not resolve to any IP!"
+        bash generate_self_signed_cert.sh $DOMAIN
+        return 1
+    fi
+
+    if [[ "$SERVER_IP" != "$DOMAIN_IP" && "$SERVER_IPv6" != "$DOMAIN_IPv6" ]]; then
+        echo "WARNING: Domain IP doesn't match server IP. SSL verification may fail."
+    fi
+
+    # Backup existing certificates
+    if [ -f "$ssl_cert_path/$DOMAIN.crt" ]; then
+        cp "$ssl_cert_path/$DOMAIN.crt" "$ssl_cert_path/$DOMAIN.crt.bk"
+        cp "$ssl_cert_path/$DOMAIN.crt.key" "$ssl_cert_path/$DOMAIN.crt.key.bk"
+    fi
+
+    # Try each CA in order until one succeeds
+    local cert_obtained=0
+    for ca_info in "${CA_SERVERS[@]}"; do
+        IFS='|' read -r ca_server ca_desc needs_eab <<< "$ca_info"
+        
+        if try_get_cert_with_ca "$DOMAIN" "$ca_server" "$ca_desc" "$needs_eab"; then
+            cert_obtained=1
+            echo "Successfully obtained certificate from $ca_desc"
+            break
         fi
+        
+        echo "Moving to next CA provider..."
+        sleep 5
+    done
 
-        flags=
-        # if [ "$SERVER_IPv6" != "" ]; then
-        #     flags="--listen-v6"
-        # fi
-
-        acme.sh --issue -w /opt/hiddify-manager/acme.sh/www/ -d $DOMAIN --log $(pwd)/../log/system/acme.log --server letsencrypt --pre-hook "systemctl restart hiddify-nginx"
-        if is_ok_domain_zerossl "$DOMAIN"; then
-            acme.sh --issue -w /opt/hiddify-manager/acme.sh/www/ -d $DOMAIN --log $(pwd)/../log/system/acme.log --pre-hook "systemctl restart hiddify-nginx"
-        fi
-
-        cp $ssl_cert_path/$DOMAIN.crt $ssl_cert_path/$DOMAIN.crt.bk
-        cp $ssl_cert_path/$DOMAIN.crt.key $ssl_cert_path/$DOMAIN.crt.key.bk
+    if [ $cert_obtained -eq 1 ]; then
+        # Install the certificate
         acme.sh --installcert -d $DOMAIN \
             --fullchainpath $ssl_cert_path/$DOMAIN.crt \
             --keypath $ssl_cert_path/$DOMAIN.crt.key \
             --reloadcmd "echo success"
-        err=$?
-        if [ $err == 0 ]; then
-            rm $ssl_cert_path/$DOMAIN.crt.bk
-            rm $ssl_cert_path/$DOMAIN.crt.key.bk
+        
+        if [ $? -eq 0 ]; then
+            echo "✓ Certificate installed successfully!"
+            rm -f "$ssl_cert_path/$DOMAIN.crt.bk" "$ssl_cert_path/$DOMAIN.crt.key.bk"
         else
-            mv $ssl_cert_path/$DOMAIN.crt.key.bk $ssl_cert_path/$DOMAIN.crt.key
-            mv $ssl_cert_path/$DOMAIN.crt.bk $ssl_cert_path/$DOMAIN.crt
+            echo "ERROR: Failed to install certificate, restoring backup..."
+            [ -f "$ssl_cert_path/$DOMAIN.crt.bk" ] && mv "$ssl_cert_path/$DOMAIN.crt.bk" "$ssl_cert_path/$DOMAIN.crt"
+            [ -f "$ssl_cert_path/$DOMAIN.crt.key.bk" ] && mv "$ssl_cert_path/$DOMAIN.crt.key.bk" "$ssl_cert_path/$DOMAIN.crt.key"
         fi
-
     else
-        err=1
-    fi
-
-    if [[ $err != 0 ]]; then
+        echo "ERROR: All CA providers failed! Generating self-signed certificate..."
+        [ -f "$ssl_cert_path/$DOMAIN.crt.bk" ] && mv "$ssl_cert_path/$DOMAIN.crt.bk" "$ssl_cert_path/$DOMAIN.crt"
+        [ -f "$ssl_cert_path/$DOMAIN.crt.key.bk" ] && mv "$ssl_cert_path/$DOMAIN.crt.key.bk" "$ssl_cert_path/$DOMAIN.crt.key"
         bash generate_self_signed_cert.sh $DOMAIN
     fi
 
-    chmod 600 $ssl_cert_path/$DOMAIN.crt.key
-    chmod 600 -R $ssl_cert_path
+    # Secure permissions
+    chmod 600 $ssl_cert_path/$DOMAIN.crt.key 2>/dev/null
+    chmod 600 -R $ssl_cert_path 2>/dev/null
+    
+    # Cleanup
     echo "" >/opt/hiddify-manager/nginx/parts/acme.conf
     systemctl reload --now hiddify-nginx
-
     systemctl reload hiddify-haproxy
+    
+    echo "=========================================="
+    echo "SSL certificate process completed for $DOMAIN"
+    echo "=========================================="
 }
 
 function has_valid_cert() {

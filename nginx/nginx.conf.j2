@@ -1,6 +1,7 @@
 
 user  nginx;
 worker_processes  auto;
+worker_rlimit_nofile 65535;
 
 # error_log  /opt/hiddify-manager/log/system/nginx.err.log notice;
 {%if hconfigs['log_level']=="CRITICAL"%}
@@ -15,13 +16,14 @@ pid        /run/hiddify-nginx.pid;
 
 
 events {
-    worker_connections  1024;
+    worker_connections  4096;
+    multi_accept on;
+    use epoll;
 }
 
 
 http {
-
-
+    # Basic settings
     include       /etc/nginx/mime.types;
     default_type  application/octet-stream;
 
@@ -35,12 +37,58 @@ http {
     {%else%}
     access_log off;
     {%endif%}
+    
+    # TCP optimizations
     sendfile        on;
-    #tcp_nopush     on;
-
+    tcp_nopush      on;
+    tcp_nodelay     on;
+    
+    # Keepalive
     keepalive_timeout  65;
-
-    #gzip  on;
+    keepalive_requests 1000;
+    
+    # Buffer sizes
+    client_body_buffer_size 16k;
+    client_header_buffer_size 1k;
+    client_max_body_size 16m;
+    large_client_header_buffers 4 16k;
+    
+    # Timeouts
+    client_body_timeout 30;
+    client_header_timeout 30;
+    send_timeout 30;
+    
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_proxied any;
+    gzip_comp_level 6;
+    gzip_buffers 16 8k;
+    gzip_http_version 1.1;
+    gzip_min_length 256;
+    gzip_types
+        application/atom+xml
+        application/javascript
+        application/json
+        application/rss+xml
+        application/vnd.ms-fontobject
+        application/x-font-ttf
+        application/x-web-app-manifest+json
+        application/xhtml+xml
+        application/xml
+        font/opentype
+        image/svg+xml
+        image/x-icon
+        text/css
+        text/plain
+        text/x-component
+        text/xml;
+    
+    # Open file cache
+    open_file_cache max=2000 inactive=20s;
+    open_file_cache_valid 60s;
+    open_file_cache_min_uses 2;
+    open_file_cache_errors on;
 
     include /opt/hiddify-manager/nginx/conf.d/*.conf;
 }

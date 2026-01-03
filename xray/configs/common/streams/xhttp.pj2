@@ -1,5 +1,13 @@
 "network": "xhttp",
 "xhttpSettings": {
     "mode": "auto",
-    "path":"/{{path}}", 
+    "path": "/{{path}}",
+    "host": "",
+    "extra": {
+        "noGRPCHeader": false,
+        "xPaddingBytes": ["100-1000"]
+    },
+    "scMaxEachPostBytes": "1000000-2000000",
+    "scMinPostsIntervalMs": "10-50",
+    "noSSEHeader": false
 }

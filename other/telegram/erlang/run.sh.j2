@@ -7,6 +7,16 @@ cd "$MTPROXY_DIR" || exit 1
 cp /opt/hiddify-manager/other/telegram/erlang/prod-sys.config config/prod-sys.config
 chmod 600 config/prod-sys.config
 
+# Create start.sh script that runs the proxy in foreground
+cat > "$MTPROXY_DIR/start.sh" << 'STARTEOF'
+#!/bin/bash
+cd /opt/hiddify-manager/other/telegram/erlang/mtproto_proxy
+export HOME=/root
+# Run in foreground with production config
+./bin/mtp_proxy foreground -config config/prod-sys.config -vm.args config/prod-vm.args 2>&1
+STARTEOF
+chmod +x "$MTPROXY_DIR/start.sh"
+
 # Create/update systemd service
 cat > /etc/systemd/system/mtproxy.service << 'EOF'
 [Unit]
@@ -19,7 +29,7 @@ Type=simple
 User=root
 WorkingDirectory=/opt/hiddify-manager/other/telegram/erlang/mtproto_proxy
 ExecStart=/opt/hiddify-manager/other/telegram/erlang/mtproto_proxy/start.sh
-ExecStop=/opt/hiddify-manager/other/telegram/erlang/mtproto_proxy/bin/mtp_proxy stop
+ExecStop=/bin/kill -TERM $MAINPID
 Restart=always
 RestartSec=5
 LimitNOFILE=65535
@@ -34,5 +44,5 @@ systemctl daemon-reload
 systemctl enable mtproxy.service
 systemctl restart mtproxy.service
 
-sleep 2
+sleep 3
 systemctl status mtproxy --no-pager
