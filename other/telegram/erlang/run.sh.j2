@@ -13,7 +13,7 @@ cat > "$MTPROXY_DIR/start.sh" << 'STARTEOF'
 cd /opt/hiddify-manager/other/telegram/erlang/mtproto_proxy
 export HOME=/root
 # Run in foreground with production config
-./bin/mtp_proxy foreground -config config/prod-sys.config -vm.args config/prod-vm.args 2>&1
+./_build/prod/rel/mtp_proxy/bin/mtp_proxy foreground -config config/prod-sys.config -vm.args config/prod-vm.args 2>&1
 STARTEOF
 chmod +x "$MTPROXY_DIR/start.sh"
 

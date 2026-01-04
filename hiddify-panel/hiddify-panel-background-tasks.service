@@ -1,15 +1,15 @@
 [Unit]
 Description=hiddify panel background tasks
-After=network-online.target
+After=network-online.target hiddify-panel.service hiddify-redis.service
 Wants=network-online.target
+Requires=hiddify-redis.service
 
 [Service]
 Type=simple
 User=hiddify-panel
 WorkingDirectory=/opt/hiddify-manager/hiddify-panel/
 Environment="LANG=C.UTF-8"
-#maximum 5 worker minimum 1 worker
-ExecStart=/opt/hiddify-manager/.venv313/bin/celery -A hiddifypanel.celery:celery_app worker --beat --loglevel info --concurrency 1 --pool=solo
+ExecStart=/opt/hiddify-manager/.venv313/bin/python -c "from hiddifypanel.base import create_app; app=create_app(); celery=app.extensions['celery']; celery.worker_main(['worker', '--beat', '--loglevel=info', '--concurrency=1', '--pool=solo'])"
 ExecReload=/bin/kill -HUP $MAINPID
 RestartSec=5
 ExecStop=/bin/kill -INT $MAINPID

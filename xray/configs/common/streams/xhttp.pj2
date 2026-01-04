@@ -5,7 +5,7 @@
     "host": "",
     "extra": {
         "noGRPCHeader": false,
-        "xPaddingBytes": ["100-1000"]
+        "xPaddingBytes": "100-1000"
     },
     "scMaxEachPostBytes": "1000000-2000000",
     "scMinPostsIntervalMs": "10-50",
