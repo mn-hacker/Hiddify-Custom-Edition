@@ -4,69 +4,88 @@ source /opt/hiddify-manager/common/utils.sh
 
 install_package mariadb-server
 
+# Ensure MariaDB is running
+systemctl start mariadb 2>/dev/null || true
+sleep 2
+
+# Check if we need to setup MySQL
 if [ ! -f "mysql_pass" ]; then
     echo "Generating a random password..."
-    random_password=$(< /dev/urandom tr -dc 'a-zA-Z0-9' | head -c49; echo)
+    random_password=$(< /dev/urandom tr -dc 'a-zA-Z0-9' | head -c32; echo)
     echo "$random_password" >"mysql_pass"
     chmod 600 "mysql_pass"
     
-    # Wait for MariaDB to start
-    systemctl start mariadb 2>/dev/null || true
-    sleep 2
+    echo "Setting up MariaDB..."
     
-    # Secure MariaDB installation using direct MySQL commands (avoids stty errors)
-    sudo mysql -u root -f <<MYSQL_SCRIPT 2>/dev/null
--- Set root password
-ALTER USER 'root'@'localhost' IDENTIFIED BY '$random_password';
-
--- Remove anonymous users
-DELETE FROM mysql.user WHERE User='';
-
--- Remove remote root login
-DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
-
--- Remove test database
-DROP DATABASE IF EXISTS test;
-DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
-
+    # On fresh Ubuntu 24.04, root can connect via socket without password
+    # Try multiple methods to connect
+    if sudo mysql -e "SELECT 1" 2>/dev/null; then
+        echo "Connected to MySQL via sudo socket auth"
+        sudo mysql <<MYSQL_SCRIPT
 -- Create hiddifypanel user and database
 CREATE DATABASE IF NOT EXISTS hiddifypanel CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER IF NOT EXISTS 'hiddifypanel'@'localhost' IDENTIFIED BY '$random_password';
+DROP USER IF EXISTS 'hiddifypanel'@'localhost';
+CREATE USER 'hiddifypanel'@'localhost' IDENTIFIED BY '$random_password';
 GRANT ALL PRIVILEGES ON hiddifypanel.* TO 'hiddifypanel'@'localhost';
-GRANT ALL PRIVILEGES ON *.* TO 'hiddifypanel'@'localhost';
+GRANT ALL PRIVILEGES ON *.* TO 'hiddifypanel'@'localhost' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 MYSQL_SCRIPT
+        echo "MySQL user 'hiddifypanel' created successfully"
+    elif mysql -u root -e "SELECT 1" 2>/dev/null; then
+        echo "Connected to MySQL via root without password"
+        mysql -u root <<MYSQL_SCRIPT
+CREATE DATABASE IF NOT EXISTS hiddifypanel CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+DROP USER IF EXISTS 'hiddifypanel'@'localhost';
+CREATE USER 'hiddifypanel'@'localhost' IDENTIFIED BY '$random_password';
+GRANT ALL PRIVILEGES ON hiddifypanel.* TO 'hiddifypanel'@'localhost';
+GRANT ALL PRIVILEGES ON *.* TO 'hiddifypanel'@'localhost' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+MYSQL_SCRIPT
+        echo "MySQL user 'hiddifypanel' created successfully"
+    else
+        echo "ERROR: Cannot connect to MySQL. Trying with skip-grant-tables..."
+        systemctl stop mariadb
+        mysqld_safe --skip-grant-tables --skip-networking &
+        sleep 5
+        mysql <<MYSQL_SCRIPT
+FLUSH PRIVILEGES;
+CREATE DATABASE IF NOT EXISTS hiddifypanel CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+DROP USER IF EXISTS 'hiddifypanel'@'localhost';
+CREATE USER 'hiddifypanel'@'localhost' IDENTIFIED BY '$random_password';
+GRANT ALL PRIVILEGES ON hiddifypanel.* TO 'hiddifypanel'@'localhost';
+GRANT ALL PRIVILEGES ON *.* TO 'hiddifypanel'@'localhost' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+MYSQL_SCRIPT
+        pkill -9 mysqld
+        sleep 2
+        systemctl start mariadb
+        echo "MySQL user created via skip-grant-tables"
+    fi
     
-    # Disable external access
-    sudo sed -i 's/bind-address/#bind-address/' /etc/mysql/mariadb.conf.d/50-server.cnf 2>/dev/null || true
-    sudo systemctl restart mariadb
-
+    # Verify the user was created
+    if mysql -u hiddifypanel -p"$random_password" -e "SELECT 1" 2>/dev/null; then
+        echo "SUCCESS: MySQL user 'hiddifypanel' verified!"
+    else
+        echo "WARNING: Could not verify MySQL user creation"
+    fi
+    
     echo "MariaDB setup complete."
-    
 fi
 
 # Path to the MariaDB configuration file
 MARIADB_CONF="/etc/mysql/mariadb.conf.d/50-server.cnf"
 
-# Check if the MariaDB configuration file exists
-if [ ! -f "$MARIADB_CONF" ]; then
-    echo "MariaDB configuration file ($MARIADB_CONF) not found."
-fi
-
-# Check if bind-address is already set to 127.0.0.1
-if ! grep -q "^[^#]*bind-address\s*=\s*127.0.0.1" "$MARIADB_CONF"; then
-    # Add or modify bind-address in the configuration file
-    if grep -q "^#\+bind-address" "$MARIADB_CONF"; then
-        # Uncomment and modify existing bind-address
-        sed -i "s/^#\+bind-address\s*=\s*[0-9.]*/bind-address = 127.0.0.1/" "$MARIADB_CONF"
-    else
-        # Add new bind-address under [mysqld]
-        sed -i "/\[mysqld\]/a bind-address = 127.0.0.1" "$MARIADB_CONF"
+# Set bind-address to localhost only
+if [ -f "$MARIADB_CONF" ]; then
+    if ! grep -q "^[^#]*bind-address\s*=\s*127.0.0.1" "$MARIADB_CONF"; then
+        if grep -q "^#\+bind-address" "$MARIADB_CONF"; then
+            sed -i "s/^#\+bind-address\s*=\s*[0-9.]*/bind-address = 127.0.0.1/" "$MARIADB_CONF"
+        else
+            sed -i "/\[mysqld\]/a bind-address = 127.0.0.1" "$MARIADB_CONF" 2>/dev/null || true
+        fi
+        echo "bind-address set to 127.0.0.1 in $MARIADB_CONF"
+        systemctl restart mariadb
     fi
-    echo "bind-address set to 127.0.0.1 in $MARIADB_CONF"
-    
-    sudo systemctl restart mariadb
-    
 fi
 
 systemctl start mariadb
