@@ -17,10 +17,10 @@ is_ok_domain_zerossl() {
 
 # List of Certificate Authorities to try (in order of preference)
 # Format: "server_name|description|needs_eab"
-# Note: Removed buypass, google, ssl.com as they may not be accessible from all regions
 CA_SERVERS=(
     "letsencrypt|Let's Encrypt|no"
     "zerossl|ZeroSSL|eab"
+    "google|Google Trust Services|no"
 )
 
 function try_get_cert_with_ca() {

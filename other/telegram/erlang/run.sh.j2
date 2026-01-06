@@ -1,11 +1,14 @@
 #!/bin/bash
 
 MTPROXY_DIR="/opt/hiddify-manager/other/telegram/erlang/mtproto_proxy"
+RELEASE_DIR="$MTPROXY_DIR/_build/prod/rel/mtp_proxy"
 
-# Ensure the proxy was built
-if [ ! -d "$MTPROXY_DIR/_build/prod/rel/mtp_proxy" ]; then
-    echo "MTProxy not built, skipping..."
-    exit 0
+# Check if the proxy was built properly
+if [ ! -d "$RELEASE_DIR" ]; then
+    echo "MTProxy Erlang release not found at $RELEASE_DIR"
+    echo "Falling back to tgo implementation..."
+    cd /opt/hiddify-manager/other/telegram/tgo && bash install.sh && bash run.sh
+    exit $?
 fi
 
 cd "$MTPROXY_DIR" || exit 1
@@ -41,8 +44,8 @@ cat > "$MTPROXY_DIR/start.sh" << 'STARTEOF'
 #!/bin/bash
 cd /opt/hiddify-manager/other/telegram/erlang/mtproto_proxy
 export HOME=/root
-# Run in foreground with production config
-./_build/prod/rel/mtp_proxy/bin/mtp_proxy foreground -config config/prod-sys.config -vm.args config/prod-vm.args 2>&1
+# Run in foreground mode
+./_build/prod/rel/mtp_proxy/bin/mtp_proxy foreground 2>&1
 STARTEOF
 chmod +x "$MTPROXY_DIR/start.sh"
 
@@ -74,4 +77,11 @@ systemctl enable mtproxy.service
 systemctl restart mtproxy.service
 
 sleep 3
-systemctl status mtproxy --no-pager
+if systemctl is-active --quiet mtproxy.service; then
+    echo "MTProxy Erlang started successfully!"
+    systemctl status mtproxy --no-pager
+else
+    echo "MTProxy Erlang failed to start, falling back to tgo..."
+    systemctl stop mtproxy.service
+    cd /opt/hiddify-manager/other/telegram/tgo && bash install.sh && bash run.sh
+fi
