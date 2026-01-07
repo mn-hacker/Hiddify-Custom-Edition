@@ -24,6 +24,7 @@ class Command(StrEnum):
     get_cert = os.path.join(HIDDIFY_DIR, 'acme.sh/get_cert.sh')
     # apply-users command is actually "install.sh apply_users"
     apply_users = os.path.join(HIDDIFY_DIR, 'install.sh')
+    install_rathole = os.path.join(HIDDIFY_DIR, 'other/rathole/install_rathole.sh')
     id = 'id'
 
 
@@ -159,6 +160,12 @@ def apply_users():
 def update_wg_usage():
     wg_raw_output = subprocess.check_output(['wg', 'show', 'hiddifywg', 'transfer'])
     print(wg_raw_output.decode())
+
+
+@cli.command('install-rathole')
+def install_rathole():
+    cmd = [Command.install_rathole.value]
+    run(cmd)
 
 
 if __name__ == "__main__":
