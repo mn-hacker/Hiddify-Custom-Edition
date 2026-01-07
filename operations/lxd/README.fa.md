@@ -3,7 +3,7 @@
 
 ```
 bash
-git clone https://github.com/mn-hacker/Hiddify-Manager.git
+git clone https://github.com/mn-hacker/Hiddify-Custom-Edition.git
 cd Hiddify-Manager/operations/lxd
 bash setup_lxc_container.sh
 # پس از پیکربندی Hiddify Manager خود با استفاده از لینک‌های چاپ‌شده:

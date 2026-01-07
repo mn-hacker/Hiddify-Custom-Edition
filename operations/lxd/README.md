@@ -1,7 +1,7 @@
 # Quick Setup (TL;DR)
 Run the following commands:
 ```bash
-git clone https://github.com/mn-hacker/Hiddify-Manager.git
+git clone https://github.com/mn-hacker/Hiddify-Custom-Edition.git
 cd Hiddify-Manager/operations/lxd
 bash setup_lxc_container.sh
 # After configuring your Hiddify Manager using the printed links:

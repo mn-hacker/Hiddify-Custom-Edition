@@ -195,8 +195,8 @@ function update_config() {
         v*)
             update_progress "Updating..." "Hiddify Config from $current_config_version to $latest" 60
             export HIDDIFY_DISABLE_UPDATE=true
-            #update_from_github "hiddify-manager.tar.gz" "https://github.com/mn-hacker/Hiddify-Manager/archive/refs/tags/${package_mode}.tar.gz" $latest
-            update_from_github "hiddify-manager.zip" "https://github.com/mn-hacker/Hiddify-Manager/releases/download/${package_mode}/hiddify-manager.zip" $latest
+            #update_from_github "hiddify-manager.tar.gz" "https://github.com/mn-hacker/Hiddify-Custom-Edition/archive/refs/tags/${package_mode}.tar.gz" $latest
+            update_from_github "hiddify-manager.zip" "https://github.com/mn-hacker/Hiddify-Custom-Edition/releases/download/${package_mode}/hiddify-manager.zip" $latest
             update_progress "Updated..." "Hiddify Config to $latest" 100
             return 0
         ;;
@@ -205,7 +205,7 @@ function update_config() {
             echo "DEVELOP: Current Config Version=$current_config_version -- Latest=$latest"
             if [[ "$force" == "true" || "$latest" != "$current_config_version" ]]; then
                 update_progress "Updating..." "Hiddify Config from $current_config_version to $latest" 60
-                update_from_github "hiddify-manager.tar.gz" "https://github.com/mn-hacker/Hiddify-Manager/archive/refs/heads/dev.tar.gz" $latest
+                update_from_github "hiddify-manager.tar.gz" "https://github.com/mn-hacker/Hiddify-Custom-Edition/archive/refs/heads/dev.tar.gz" $latest
                 
                 update_progress "Updated..." "Hiddify Config to $latest" 100
                 return 0
@@ -216,7 +216,7 @@ function update_config() {
             echo "BETA: Current Config Version=$current_config_version -- Latest=$latest"
             if [[ "$force" == "true" || "$latest" != "$current_config_version" ]]; then
                 update_progress "Updating..." "Hiddify Config from $current_config_version to $latest" 60
-                update_from_github "hiddify-manager.zip" "https://github.com/mn-hacker/Hiddify-Manager/releases/download/v$latest/hiddify-manager.zip"
+                update_from_github "hiddify-manager.zip" "https://github.com/mn-hacker/Hiddify-Custom-Edition/releases/download/v$latest/hiddify-manager.zip"
                 update_progress "Updated..." "Hiddify Config to $latest" 100
                 return 0
             fi
@@ -228,7 +228,7 @@ function update_config() {
             echo "RELEASE: Current Config Version=$current_config_version -- Latest=$latest"
             if [[ "$force" == "true" || "$latest" != "$current_config_version" ]]; then
                 update_progress "Updating..." "Hiddify Config from $current_config_version to $latest" 60
-                update_from_github "hiddify-manager.zip" "https://github.com/mn-hacker/Hiddify-Manager/releases/latest/download/hiddify-manager.zip"
+                update_from_github "hiddify-manager.zip" "https://github.com/mn-hacker/Hiddify-Custom-Edition/releases/latest/download/hiddify-manager.zip"
                 update_progress "Updated..." "Hiddify Config to $latest" 100
                 return 0
             fi

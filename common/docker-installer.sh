@@ -16,7 +16,7 @@ fi
 if [[ "$TAG" == "develop" || "$TAG" == "dev" ]]; then
     # Check if Git is installed, if not, install it
     command -v git &>/dev/null || (echo "Installing Git..."; sudo apt-get update && sudo apt-get install -y git)
-    git clone https://github.com/mn-hacker/Hiddify-Manager.git
+    git clone https://github.com/mn-hacker/Hiddify-Custom-Edition.git
     cd Hiddify-Manager
     git submodule update --init --recursive
     git submodule update --recursive --remote
@@ -25,7 +25,7 @@ else
   # Create the 'hiddify-manager' directory
   mkdir hiddify-manager
   cd hiddify-manager
-  wget https://raw.githubusercontent.com/mn-hacker/Hiddify-Manager/refs/heads/main/docker-compose.yml
+  wget https://raw.githubusercontent.com/mn-hacker/Hiddify-Custom-Edition/refs/heads/main/docker-compose.yml
 fi
 
 # Generate random passwords for MySQL and Redis

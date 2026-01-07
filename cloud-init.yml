@@ -10,7 +10,7 @@ packages:
   - git
 runcmd:
   - cd /opt
-  - git clone https://github.com/mn-hacker/Hiddify-Manager/
+  - git clone https://github.com/mn-hacker/Hiddify-Custom-Edition/
   - cd hiddify-manager
   # uncomment it for using a special secret otherwise it will be createed automatically/
   #- echo "USER_SECRET=44da16ea20ff4bac92afae43ef97f067" >config.env

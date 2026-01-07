@@ -43,24 +43,24 @@ function main() {
     echo "Creating a backup ..."
     ./hiddify-panel/backup.sh
 
-    update_script="https://raw.githubusercontent.com/mn-hacker/Hiddify-Manager/refs/heads/main/common/download.sh"
+    update_script="https://raw.githubusercontent.com/mn-hacker/Hiddify-Custom-Edition/refs/heads/main/common/download.sh"
     case "$package_mode" in
     develop)
         # Use the latest commit from GitHub - only check Hiddify-Manager
         latest_manager=$(get_commit_version Hiddify-Manager)
         latest_panel=$latest_manager
-        update_script="https://raw.githubusercontent.com/mn-hacker/Hiddify-Manager/refs/heads/dev/common/download.sh"
+        update_script="https://raw.githubusercontent.com/mn-hacker/Hiddify-Custom-Edition/refs/heads/dev/common/download.sh"
         ;;
     beta)
         # Use tags instead of releases for beta - only check Hiddify-Manager
         latest_manager=$(get_pre_release_version Hiddify-Manager)
         latest_panel=$latest_manager
-        update_script="https://raw.githubusercontent.com/mn-hacker/Hiddify-Manager/refs/heads/main/common/download.sh"
+        update_script="https://raw.githubusercontent.com/mn-hacker/Hiddify-Custom-Edition/refs/heads/main/common/download.sh"
         ;;
     release)
         latest_manager=$(get_release_version Hiddify-Manager)
         latest_panel=$latest_manager
-        update_script="https://raw.githubusercontent.com/mn-hacker/Hiddify-Manager/refs/heads/main/common/download.sh"
+        update_script="https://raw.githubusercontent.com/mn-hacker/Hiddify-Custom-Edition/refs/heads/main/common/download.sh"
         ;;
     esac
 
