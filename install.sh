@@ -22,11 +22,36 @@ fi
 # Handle --check-only mode (for reboot)
 if [[ " $@ " == *" --check-only "* ]]; then
     echo "Running in check-only mode (post-reboot service start)"
+    echo "Starting critical services after reboot..."
+    
+    # Phase 1: Start Redis first (required by panel)
+    systemctl start hiddify-redis 2>/dev/null || true
+    sleep 1
+    
+    # Phase 2: Start panel
     systemctl start hiddify-panel 2>/dev/null || true
+    sleep 1
+    
+    # Phase 3: Start background tasks (requires panel and redis)
+    systemctl start hiddify-panel-background-tasks 2>/dev/null || true
+    
+    # Phase 4: Start proxy services
     systemctl start hiddify-nginx 2>/dev/null || true
     systemctl start hiddify-haproxy 2>/dev/null || true
     systemctl start hiddify-xray 2>/dev/null || true
     systemctl start hiddify-singbox 2>/dev/null || true
+    
+    # Phase 5: Start optional services if enabled
+    systemctl start hiddify-warp 2>/dev/null || true
+    systemctl start hiddify-ssh-liberty-bridge 2>/dev/null || true
+    systemctl start hiddify-cli 2>/dev/null || true
+    
+    # Start rathole if installed
+    if [ -f /etc/systemd/system/rathole.service ]; then
+        systemctl start rathole 2>/dev/null || true
+    fi
+    
+    echo "All services started successfully"
     exit 0
 fi
 

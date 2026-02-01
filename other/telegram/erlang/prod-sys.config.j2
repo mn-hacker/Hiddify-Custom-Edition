@@ -8,9 +8,10 @@
    %% Ports configuration
    {ports,
     [#{name => mtp_handler_1,
-       listen_ip => "0.0.0.0",
+       listen_ip => "127.0.0.1",
        port => 1001,
        secret => <<"{{ hconfigs['shared_secret'].replace("-","") }}">>
+       ,fake_tls_domain => <<"{{ hconfigs['telegram_fakedomain'] }}">>
        {% if hconfigs['telegram_adtag'] %}
        ,tag => <<"{{ hconfigs['telegram_adtag'] }}">>
        {% endif %}

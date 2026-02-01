@@ -1,12 +1,12 @@
 {
         "log": {
                 "loglevel": "{{hconfigs['log_level'].lower()}}",
-                {%if hconfigs['log_level']=="CRITICAL"%}
+                {%if hconfigs['log_level']=="CRITICAL" and not hconfigs.get('user_limit_enable', False)%}
                         "output": "none",
                         "error": "none",
                         "access": "none",
                         "dnsLog": false,
-                {%elif hconfigs.get('access_log_enable', False)%}
+                {%elif hconfigs.get('access_log_enable', False) or hconfigs.get('user_limit_enable', False)%}
                         "access": "/opt/hiddify-manager/log/xray_access.log",
                 {%endif%}
                 "logid": true,

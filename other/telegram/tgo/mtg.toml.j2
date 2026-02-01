@@ -22,7 +22,7 @@ debug = true
 secret = "ee{{hconfigs['shared_secret'].replace("-","")}}{{hconfigs['telegram_fakedomain']|hexencode}}"
 
 # Host:port pair to run proxy on.
-bind-to = "0.0.0.0:1001"
+bind-to = "127.0.0.1:1001"
 
 # Defines how many concurrent connections are allowed to this proxy.
 # All other incoming connections are going to be dropped.
