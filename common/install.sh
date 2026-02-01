@@ -1,25 +1,18 @@
 #!/bin/bash
+cd $(dirname -- "$0")
 source utils.sh
+
+# Update apt cache once at the start
+apt update -y 2>/dev/null || true
+
 remove_package apache2 needrestart needrestart-session
 install_package apt-transport-https apt-utils at build-essential ca-certificates cron curl default-libmysqlclient-dev dnsutils gawk git gnupg-agent gnupg2 iproute2 iptables jq less libev-dev libevdev2 libssl-dev locales lsb-release lsof pkg-config qrencode software-properties-common sudo ubuntu-keyring wget whiptail
 activate_python_venv
-#python -m pip config set global.index-url https://pypi.org/simple > /dev/null
-# remove_package resolvconf
-# rm /etc/resolv.conf
-# ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
-
-
 
 groupadd -f hiddify-common
 usermod -aG hiddify-common root
 
-# rm /run/resolvconf/interface/*
-#echo "nameserver 8.8.8.8" >/etc/resolv.conf
-#echo "nameserver 1.1.1.1" >>/etc/resolv.conf
-#echo "nameserver 8.8.8.8" >/etc/resolvconf/resolv.conf.d/base
-#echo "nameserver 1.1.1.1" >>/etc/resolvconf/resolv.conf.d/base
-#resolvconf -u
-sudo systemctl unmask --now systemd-resolved.service
+systemctl unmask --now systemd-resolved.service 2>/dev/null || true
 systemctl enable --now systemd-resolved >/dev/null 2>&1
 
 # install requirements for change_dns.py
@@ -43,7 +36,7 @@ if [[ "$ONLY_IPV4" != true ]]; then
     
     curl --connect-timeout 1 -s http://ipv6.google.com 2>&1 >/dev/null
     if [ $? != 0 ]; then
-        ONLY_IPV4=true1
+        ONLY_IPV4=true
     fi
 fi
 
@@ -74,7 +67,8 @@ done
 bash google-bbr.sh > /dev/null
 
 
-echo "@reboot root /opt/hiddify-manager/install.sh --no-gui --no-log >> /opt/hiddify-manager/log/system/reboot.log 2>&1" >/etc/cron.d/hiddify_reinstall_on_reboot
+# Reboot cron - only start services, don't full reinstall
+echo "@reboot root /opt/hiddify-manager/install.sh --check-only --no-gui --no-log >> /opt/hiddify-manager/log/system/reboot.log 2>&1" >/etc/cron.d/hiddify_reinstall_on_reboot
 echo "@daily root /opt/hiddify-manager/common/daily_actions.sh >> /opt/hiddify-manager/log/system/daily_actions.log 2>&1" >/etc/cron.d/hiddify_daily_memory_release
 service cron reload
 

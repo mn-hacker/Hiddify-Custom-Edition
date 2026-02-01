@@ -18,6 +18,18 @@ if [ "$(id -u)" -ne 0 ]; then
     echo 'This script must be run by root' >&2
     exit 1
 fi
+
+# Handle --check-only mode (for reboot)
+if [[ " $@ " == *" --check-only "* ]]; then
+    echo "Running in check-only mode (post-reboot service start)"
+    systemctl start hiddify-panel 2>/dev/null || true
+    systemctl start hiddify-nginx 2>/dev/null || true
+    systemctl start hiddify-haproxy 2>/dev/null || true
+    systemctl start hiddify-xray 2>/dev/null || true
+    systemctl start hiddify-singbox 2>/dev/null || true
+    exit 0
+fi
+
 function main() {
     update_progress "Please wait..." "We are going to install Hiddify..." 0
     export ERROR=0
@@ -34,100 +46,97 @@ function main() {
 
     export USE_VENV=313
 
+    # Check system resources and create swap if needed (BEFORE any installs)
+    check_system_resources
+
     install_python
     activate_python_venv
     
     if [ "$MODE" != "apply_users" ]; then
         clean_files
-        update_progress "${PROGRESS_ACTION}" "Common Tools and Requirements" 2
-        runsh install.sh common &
-        if [ "$MODE" != "docker" ];then
-            install_run other/redis &
-            install_run other/mysql &
-        fi    
-        wait
-        # Because we need to generate reality pair in panel
-        # is_installed xray || bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install --version 1.8.4
         
-        install_run hiddify-panel
+        # ============================================================
+        # PHASE 1: Sequential apt-based installations (no parallel!)
+        # ============================================================
+        update_progress "${PROGRESS_ACTION}" "Common Tools and Requirements" 2
+        runsh install.sh common  # No & - sequential
+        
+        if [ "$MODE" != "docker" ];then
+            update_progress "${PROGRESS_ACTION}" "Redis" 5
+            install_run other/redis  # No & - sequential
+            
+            update_progress "${PROGRESS_ACTION}" "MySQL/MariaDB" 8
+            install_run other/mysql  # No & - sequential
+        fi
+        
+        update_progress "${PROGRESS_ACTION}" "Hiddify Panel" 12
+        install_run hiddify-panel  # No & - sequential
     fi
     
-    # source common/set_config_from_hpanel.sh
     if [ "$DO_NOT_RUN" != "true" ];then
-      update_progress "HiddifyPanel" "Reading Configs from Panel..." 5
-      set_config_from_hpanel
+        update_progress "HiddifyPanel" "Reading Configs from Panel..." 15
+        set_config_from_hpanel
 
-      update_progress "Applying Configs" "..." 8
-
-      bash common/replace_variables.sh
+        update_progress "Applying Configs" "..." 18
+        bash common/replace_variables.sh
     fi
     
     if [ "$MODE" != "apply_users" ]; then
         bash ./other/deprecated/remove_deprecated.sh
-        update_progress "Configuring..." "System and Firewall settings" 10
-        runsh run.sh common &
         
-        update_progress "${PROGRESS_ACTION}" "Nginx" 15
-        install_run nginx &
+        # ============================================================
+        # PHASE 2: More sequential apt installations
+        # ============================================================
+        update_progress "Configuring..." "System and Firewall settings" 20
+        runsh run.sh common  # No & - sequential
         
-        (
-            update_progress "${PROGRESS_ACTION}" "Haproxy for Spliting Traffic" 20
-            install_run haproxy
+        update_progress "${PROGRESS_ACTION}" "Nginx" 25
+        install_run nginx  # No & - sequential (has apt)
         
-            update_progress "${PROGRESS_ACTION}" "Getting Certificates" 30
-            install_run acme.sh 
-        )&
+        update_progress "${PROGRESS_ACTION}" "Haproxy for Splitting Traffic" 35
+        install_run haproxy  # No & - sequential (has apt + add-apt-repository)
         
-        update_progress "${PROGRESS_ACTION}" "Personal SpeedTest" 35
+        update_progress "${PROGRESS_ACTION}" "Getting Certificates" 45
+        install_run acme.sh  # No & - sequential (has apt socat)
+        
+        update_progress "${PROGRESS_ACTION}" "Xray" 55
+        install_run xray 1  # No & - sequential (has apt unzip)
+        
+        update_progress "${PROGRESS_ACTION}" "Singbox" 65
+        install_run singbox  # No & - sequential (has apt unzip)
+        
+        # ============================================================
+        # PHASE 3: Non-apt operations can run in parallel
+        # ============================================================
+        update_progress "${PROGRESS_ACTION}" "Additional Services" 75
+        
+        # These don't have apt in run.sh, safe to parallelize
         install_run other/speedtest $(hconfig "speed_test") &
-        
-        update_progress "${PROGRESS_ACTION}" "Telegram Proxy" 40
         install_run other/telegram $(hconfig "telegram_enable") &
-        
-        update_progress "${PROGRESS_ACTION}" "FakeTlS Proxy" 45
         install_run other/ssfaketls $(hconfig "ssfaketls_enable") &
-        
-        # update_progress "${PROGRESS_ACTION}" "V2ray WS Proxy" 50
-        # install_run other/v2ray $ENABLE_V2RAY
-        
-        update_progress "${PROGRESS_ACTION}" "SSH Proxy" 55
         install_run other/ssh $(hconfig "ssh_server_enable") &
+        install_run other/hiddify-cli $(hconfig "hiddifycli_enable") &
         
-        #update_progress "${PROGRESS_ACTION}" "ShadowTLS" 60
-        #install_run other/shadowtls $(hconfig "shadowtls_enable")
-        
-        update_progress "${PROGRESS_ACTION}" "Warp" 70
-        # Always install WARP dependencies (wgcf) so it's ready when user wants to enable it
+        # WARP install (has apt, run sequentially first)
+        update_progress "${PROGRESS_ACTION}" "Warp" 85
         pushd other/warp > /dev/null && bash install.sh && popd > /dev/null
         if [[ $(hconfig "warp_mode") != "disable" ]];then
             install_run other/warp 1 &
         else   
             install_run other/warp 0 &
         fi
-
-        update_progress "${PROGRESS_ACTION}" "Xray" 75
-        
-        install_run xray 1 &
-        
-        
-        update_progress "${PROGRESS_ACTION}" "HiddifyCli" 80
-        install_run other/hiddify-cli $(hconfig "hiddifycli_enable") &
-        
     fi
 
-
-    update_progress "${PROGRESS_ACTION}" "Wireguard" 85
+    update_progress "${PROGRESS_ACTION}" "Wireguard" 90
     install_run other/wireguard $(hconfig "wireguard_enable") &
     
-    update_progress "${PROGRESS_ACTION}" "Singbox" 95
-    install_run singbox &
+    update_progress "${PROGRESS_ACTION}" "Almost Finished" 95
+    wait  # Wait for all parallel operations
     
-    update_progress "${PROGRESS_ACTION}" "Almost Finished" 98
-    wait 
     echo "---------------------Finished!------------------------"
     remove_lock $NAME
     if [ "$MODE" != "apply_users" ]; then
-        systemctl kill -s SIGTERM hiddify-panel
+        systemctl kill -s SIGTERM hiddify-panel 2>/dev/null || true
     fi
     systemctl start hiddify-panel
     update_progress "${PROGRESS_ACTION}" "Done" 100

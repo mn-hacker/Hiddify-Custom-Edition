@@ -17,10 +17,15 @@ if ! is_installed_package "haproxy=${HAPROXY_VERSION}"; then
     echo "Adding PPA for haproxy-${HAPROXY_VERSION}"
     add-apt-repository -y ppa:vbernat/haproxy-${HAPROXY_VERSION}
     if [ $? -ne 0 ]; then
-        add-apt-repository -y ppa:vbernat/haproxy-${HAPROXY_VERSION}
+        echo "PPA add failed, retrying after apt update..."
+        sleep 3
+        apt update -y
+        add-apt-repository -y ppa:vbernat/haproxy-${HAPROXY_VERSION} || {
+            warning "Could not add haproxy PPA, trying system version"
+        }
     fi
     echo "Installing haproxy ${HAPROXY_VERSION}"
-    install_package "haproxy=${HAPROXY_VERSION}.*"
+    install_package "haproxy=${HAPROXY_VERSION}.*" || install_package haproxy
 else
     echo "haproxy ${HAPROXY_VERSION} is already installed"
 fi

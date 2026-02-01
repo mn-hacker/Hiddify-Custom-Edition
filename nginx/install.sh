@@ -24,7 +24,7 @@ else
     install_package nginx || {
         # If official repo fails, try ubuntu repo
         rm -f /etc/apt/sources.list.d/nginx.list
-        sudo apt update -y >/dev/null 2>&1
+        apt update -y >/dev/null 2>&1
         install_package nginx-full || install_package nginx-light || install_package nginx
     }
 fi

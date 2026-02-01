@@ -185,28 +185,105 @@ function is_installed_package() {
         return 1
     fi
 }
+
+# ============================================================
+# System Resource Management
+# ============================================================
+
+APT_LOCK_FILE="/tmp/hiddify_apt.lock"
+MIN_RAM_MB=1024
+MIN_SWAP_MB=512
+SWAP_SIZE="1G"
+
+check_system_resources() {
+    local total_ram=$(free -m | awk '/^Mem:/{print $2}')
+    local total_swap=$(free -m | awk '/^Swap:/{print $2}')
+    
+    echo "System Resources: RAM=${total_ram}MB, Swap=${total_swap}MB"
+    
+    if [ "$total_ram" -lt "$MIN_RAM_MB" ] && [ "$total_swap" -lt "$MIN_SWAP_MB" ]; then
+        warning "Low RAM detected (${total_ram}MB). Creating swap file..."
+        create_swap_file
+    fi
+}
+
+create_swap_file() {
+    if [ -f /swapfile ]; then
+        echo "Swap file already exists"
+        return 0
+    fi
+    
+    echo "Creating ${SWAP_SIZE} swap file..."
+    fallocate -l ${SWAP_SIZE} /swapfile 2>/dev/null || dd if=/dev/zero of=/swapfile bs=1M count=1024 status=progress
+    chmod 600 /swapfile
+    mkswap /swapfile
+    swapon /swapfile
+    
+    # Add to fstab if not already there
+    if ! grep -q '/swapfile' /etc/fstab; then
+        echo '/swapfile none swap sw 0 0' >> /etc/fstab
+    fi
+    
+    success "Swap file created and activated"
+}
+
+# ============================================================
+# Package Management with Lock Protection
+# ============================================================
+
+wait_for_apt_lock() {
+    local max_wait=300
+    local waited=0
+    
+    while fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1 || \
+          fuser /var/lib/apt/lists/lock >/dev/null 2>&1 || \
+          fuser /var/lib/dpkg/lock >/dev/null 2>&1; do
+        if [ $waited -ge $max_wait ]; then
+            error "Timeout waiting for apt lock after ${max_wait} seconds"
+            return 1
+        fi
+        echo "Waiting for apt lock... (${waited}s)"
+        sleep 5
+        waited=$((waited + 5))
+    done
+    return 0
+}
+
 install_package() {
     local not_installed_packages=""
     local package
 
     for package in "$@"; do
         if ! is_installed_package "$package"; then
-            # The package is not installed, add it to the list
             not_installed_packages+=" $package"
         fi
     done
 
     if [ -n "$not_installed_packages" ]; then
-        apt install -y --no-install-recommends $not_installed_packages
-
-        # Check if installation failed
-        if [ $? -ne 0 ]; then
-            apt --fix-broken install -y
-            apt update
-            #retries for 3 times
-            apt install -y $not_installed_packages ||apt install -y $not_installed_packages||apt install -y $not_installed_packages
+        # Use flock to prevent parallel apt operations
+        (
+            flock -w 600 200 || { error "Failed to acquire apt lock after 600s"; return 1; }
             
-        fi
+            # Also wait for system apt locks
+            wait_for_apt_lock || return 1
+            
+            echo "Installing packages:$not_installed_packages"
+            apt install -y --no-install-recommends $not_installed_packages
+            
+            if [ $? -ne 0 ]; then
+                echo "Installation failed, trying to fix..."
+                apt --fix-broken install -y
+                apt update -y
+                sleep 2
+                apt install -y $not_installed_packages || {
+                    sleep 5
+                    apt install -y $not_installed_packages || {
+                        error "Failed to install:$not_installed_packages"
+                        return 1
+                    }
+                }
+            fi
+        ) 200>$APT_LOCK_FILE
     fi
 }
 
