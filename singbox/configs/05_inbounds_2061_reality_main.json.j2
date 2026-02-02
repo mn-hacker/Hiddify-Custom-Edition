@@ -17,7 +17,6 @@
 				"sniff": true,
 				"sniff_override_destination": true,
 				"domain_strategy": "prefer_ipv4",
-				"proxy_protocol":true,
 				{% with flow="xtls-rprx-vision" if stream=='tcp' else "" %}
 					{% include '/opt/hiddify-manager/singbox/configs/common/protocols/'~protocol~'.pj2' %},
 				{%endwith%}

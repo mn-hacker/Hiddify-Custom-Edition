@@ -11,7 +11,6 @@
                     "sniff": true,
                     "sniff_override_destination": true,
                     "domain_strategy": "prefer_ipv4",
-                    "proxy_protocol":true,	
                     {% include '/opt/hiddify-manager/singbox/configs/common/protocols/'~protocol~'.pj2' %},
                     "transport": {
                         {% with path=hconfigs['path_'~ protocol]~hconfigs['path_'~stream] %}

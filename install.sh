@@ -140,7 +140,7 @@ function main() {
         install_run other/telegram $(hconfig "telegram_enable") &
         install_run other/ssfaketls $(hconfig "ssfaketls_enable") &
         install_run other/ssh $(hconfig "ssh_server_enable") &
-        install_run other/hiddify-cli $(hconfig "hiddifycli_enable") &
+        install_run other/hiddify-cli $(hconfig "hiddifycli_enable" "true") &
         
         # WARP install (has apt, run sequentially first)
         update_progress "${PROGRESS_ACTION}" "Warp" 85
