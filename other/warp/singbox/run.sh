@@ -1,22 +1,40 @@
 #!/bin/bash
+cd "$(dirname "$0")"
+
 ln -sf $(pwd)/hiddify-warp.service /etc/systemd/system/hiddify-warp.service
 systemctl enable hiddify-warp.service
+
+# Check if wgcf is available
+if ! command -v wgcf &>/dev/null; then
+    echo "WARP: wgcf binary not found, cannot proceed"
+    exit 1
+fi
 
 # Register with WARP if not already registered
 if ! [ -f "wgcf-account.toml" ]; then
     echo "WARP: No account found, registering new account..."
-    wgcf register --accept-tos
-    if [ $? -ne 0 ]; then
-        echo "WARP: Registration failed, retrying..."
-        sleep 2
-        wgcf register --accept-tos
-    fi
     
-    if [ $? -eq 0 ]; then
-        wgcf generate
-        echo "WARP: Account registered and profile generated"
-    else
-        echo "WARP: Registration failed after retry"
+    # Remove any old corrupt files
+    rm -f wgcf-account.toml.backup wgcf-profile.conf 2>/dev/null
+    
+    # Try registration up to 3 times
+    for attempt in 1 2 3; do
+        echo "WARP: Registration attempt $attempt..."
+        if wgcf register --accept-tos 2>/dev/null; then
+            if [ -f "wgcf-account.toml" ]; then
+                echo "WARP: Registration successful!"
+                wgcf generate 2>/dev/null
+                break
+            fi
+        fi
+        echo "WARP: Registration attempt $attempt failed, waiting..."
+        sleep 3
+    done
+    
+    # Final check
+    if ! [ -f "wgcf-account.toml" ]; then
+        echo "WARP: All registration attempts failed, WARP will not be available"
+        exit 0
     fi
 fi
 
