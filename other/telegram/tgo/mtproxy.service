@@ -4,9 +4,11 @@ Documentation=https://github.com/9seconds/mtg
 After=network.target
 
 [Service]
+# Wait for config file to be created by run.sh
+ExecStartPre=/bin/bash -c 'for i in $(seq 1 30); do test -f /opt/hiddify-manager/other/telegram/tgo/mtg.toml && exit 0; sleep 1; done; echo "mtg.toml not found"; exit 1'
 ExecStart=/opt/hiddify-manager/other/telegram/tgo/mtg run /opt/hiddify-manager/other/telegram/tgo/mtg.toml
-Restart=always
-RestartSec=3
+Restart=on-failure
+RestartSec=10
 DynamicUser=true
 AmbientCapabilities=CAP_NET_BIND_SERVICE
 StandardOutput=file:/opt/hiddify-manager/log/system/telegram.out.log

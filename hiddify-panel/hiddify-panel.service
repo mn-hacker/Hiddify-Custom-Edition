@@ -1,7 +1,8 @@
 [Unit]
 Description=hiddify panel
-After=network-online.target
+After=network-online.target mariadb.service hiddify-redis.service
 Wants=network-online.target
+Requires=mariadb.service hiddify-redis.service
 
 [Service]
 Type=simple

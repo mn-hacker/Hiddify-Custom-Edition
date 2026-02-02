@@ -1,8 +1,8 @@
 [Unit]
 Description=hiddify panel background tasks
-After=network-online.target hiddify-panel.service hiddify-redis.service
-Wants=network-online.target
-Requires=hiddify-redis.service
+After=network-online.target hiddify-redis.service
+Wants=network-online.target hiddify-redis.service
+BindsTo=hiddify-redis.service
 
 [Service]
 Type=simple

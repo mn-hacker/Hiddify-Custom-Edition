@@ -1,13 +1,16 @@
 [Unit]
 Description=HiddifyCli service
-After=network-online.target
+After=network-online.target hiddify-panel.service
+Wants=hiddify-panel.service
 
 [Service]
 Type=simple
-Restart=always
-RestartSec=3
+Restart=on-failure
+RestartSec=15
 WorkingDirectory=/opt/hiddify-manager/other/hiddify-cli
-EnvironmentFile=/opt/hiddify-manager/other/hiddify-cli/.env
+# Wait for .env file to be created by run.sh (max 60 seconds)
+ExecStartPre=/bin/bash -c 'for i in $(seq 1 60); do test -f /opt/hiddify-manager/other/hiddify-cli/.env && exit 0; sleep 1; done; echo ".env not found, will retry"; exit 1'
+EnvironmentFile=-/opt/hiddify-manager/other/hiddify-cli/.env
 ExecStart=/opt/hiddify-manager/other/hiddify-cli/HiddifyCli run -c $SUB_LINK -d h_client_config.json
 User=hiddify-cli
 [Install]

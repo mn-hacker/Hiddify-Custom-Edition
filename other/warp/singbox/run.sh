@@ -43,14 +43,48 @@ MTU        = 1420
 # Write the new TOML content to a file
 echo "$new_toml" > warp.conf
 
-./warp-go --config=warp.conf --export-singbox=warp-singbox.json
+# Check if warp-go exists before trying to use it
+if [ -f "./warp-go" ] && [ -x "./warp-go" ]; then
+    ./warp-go --config=warp.conf --export-singbox=warp-singbox.json
+    if [ $? -ne 0 ]; then
+        echo "WARP: warp-go export failed"
+    fi
+else
+    echo "WARP: warp-go not found, creating fallback config..."
+    # Create a minimal fallback config using the wgcf profile
+    if [ -f "wgcf-profile.conf" ]; then
+        # Parse wgcf-profile.conf for wireguard settings
+        source <(grep -E '^\[|^[A-Za-z]' wgcf-profile.conf | sed 's/\[/\n\[/g' | grep -A100 'Interface' | grep -E '^(PrivateKey|Address)' | sed 's/ //g')
+        source <(grep -E '^\[|^[A-Za-z]' wgcf-profile.conf | sed 's/\[/\n\[/g' | grep -A100 'Peer' | grep -E '^(PublicKey|Endpoint)' | sed 's/ //g')
+        
+        # Create minimal singbox config
+        cat > warp-singbox.json << EOFSINGBOX
+{
+  "type": "wireguard",
+  "tag": "WARP",
+  "server": "engage.cloudflareclient.com",
+  "server_port": 2408,
+  "local_address": ["172.16.0.2/32"],
+  "private_key": "$PrivateKey",
+  "peer_public_key": "bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo=",
+  "mtu": 1280
+}
+EOFSINGBOX
+        echo "WARP: Created fallback warp-singbox.json"
+    else
+        echo "WARP: No wgcf-profile.conf found, WARP will not be available"
+    fi
+fi
 
-
-sed -i "s|2000|3000|g" warp-singbox.json
-curl --connect-timeout 1 -s http://ipv6.google.com 2>&1 >/dev/null
-if [ $? != 0 ]; then
-sed -i 's/"local_address":\[[^]]*\]/"local_address":["172.16.0.2\/32"]/' warp-singbox.json
-
+# Only process warp-singbox.json if it exists
+if [ -f "warp-singbox.json" ]; then
+    sed -i "s|2000|3000|g" warp-singbox.json
+    curl --connect-timeout 1 -s http://ipv6.google.com 2>&1 >/dev/null
+    if [ $? != 0 ]; then
+        sed -i 's/"local_address":\[[^]]*\]/"local_address":["172.16.0.2\/32"]/' warp-singbox.json
+    fi
+else
+    echo "WARP: warp-singbox.json not found, skipping WARP service"
 fi
 
 
@@ -161,21 +195,29 @@ fi
 
 
 
-systemctl reload hiddify-warp.service
-systemctl start  hiddify-warp.service
-#systemctl status hiddify-warp.service
-
-sleep 5
-echo "Testing singbox warp"
-
-
-curl -x socks://127.0.0.1:3000 --connect-timeout 4 www.ipinfo.io
-curl -x socks://127.0.0.1:3000 --connect-timeout 4 http://ip-api.com?fields=message,country,countryCode,city,isp,org,as,query
-if [ $? != 0 ];then
-    echo "WARP is not working"
+# Only start WARP service if config exists
+if [ -f "warp-singbox.json" ]; then
+    # Try reload if already running, otherwise just start
+    if systemctl is-active --quiet hiddify-warp.service; then
+        systemctl reload hiddify-warp.service || systemctl restart hiddify-warp.service
+    else
+        systemctl start hiddify-warp.service
+    fi
+    
+    sleep 5
+    echo "Testing singbox warp"
+    
+    curl -x socks://127.0.0.1:3000 --connect-timeout 4 www.ipinfo.io
+    curl -x socks://127.0.0.1:3000 --connect-timeout 4 http://ip-api.com?fields=message,country,countryCode,city,isp,org,as,query
+    if [ $? != 0 ]; then
+        echo "WARP is not working"
+    else
+        echo ""
+        echo "==========WARP is working=============="
+    fi
 else
-   echo ""
-   echo "==========WARP is working=============="
+    echo "WARP: Config not available, skipping WARP service"
+    systemctl stop hiddify-warp.service 2>/dev/null || true
 fi
 
 # echo "Remaining..."
