@@ -11,18 +11,26 @@ fi
 # sing-box check -C configs
 echo "ignoring singbox test"
 if [[ $? == 0 ]]; then
-	#systemctl restart hiddify-singbox.service
-	systemctl reload hiddify-singbox.service
-	systemctl start hiddify-singbox.service
-	# systemctl status hiddify-singbox.service --no-pager
+	# Check if service exists before trying to reload
+	if systemctl list-unit-files hiddify-singbox.service &>/dev/null; then
+		if systemctl is-active --quiet hiddify-singbox.service; then
+			systemctl reload hiddify-singbox.service 2>/dev/null || systemctl restart hiddify-singbox.service
+		else
+			systemctl start hiddify-singbox.service
+		fi
+	else
+		echo "hiddify-singbox.service not installed yet"
+	fi
 else
 	echo "Error in singbox Config!!!! do not reload singbox service"
 	sleep 3
 	singbox check -C configs
 	if [[ $? == 0 ]]; then
-		systemctl reload hiddify-singbox.service
-		systemctl start hiddify-singbox.service
-		systemctl status hiddify-singbox.service --no-pager
+		if systemctl is-active --quiet hiddify-singbox.service 2>/dev/null; then
+			systemctl reload hiddify-singbox.service 2>/dev/null || systemctl restart hiddify-singbox.service
+		else
+			systemctl start hiddify-singbox.service 2>/dev/null || true
+		fi
 	else
 		echo "Error in singbox Config!!!! do not reload singbox service"
 	fi

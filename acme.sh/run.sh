@@ -20,6 +20,6 @@ for f in ../ssl/*.crt; do
     get_self_signed_cert $d &
 done
 wait
-systemctl reload hiddify-haproxy
-systemctl reload hiddify-singbox
+systemctl reload hiddify-haproxy 2>/dev/null || true
+systemctl reload hiddify-singbox 2>/dev/null || true
 # systemctl reload hiddify-xray

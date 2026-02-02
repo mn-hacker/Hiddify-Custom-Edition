@@ -2,22 +2,39 @@
 ln -sf $(pwd)/hiddify-warp.service /etc/systemd/system/hiddify-warp.service
 systemctl enable hiddify-warp.service
 
-# if [[ $warp_mode == 'disabled' ]];then
-#   bash disable.sh
-# else
-
-if ! [ -f "wgcf-account.toml" ];then
-    mv wgcf-account.toml wgcf-account.toml.backup
-    wgcf register --accept-tos && wgcf generate   
+# Register with WARP if not already registered
+if ! [ -f "wgcf-account.toml" ]; then
+    echo "WARP: No account found, registering new account..."
+    wgcf register --accept-tos
+    if [ $? -ne 0 ]; then
+        echo "WARP: Registration failed, retrying..."
+        sleep 2
+        wgcf register --accept-tos
+    fi
+    
+    if [ $? -eq 0 ]; then
+        wgcf generate
+        echo "WARP: Account registered and profile generated"
+    else
+        echo "WARP: Registration failed after retry"
+    fi
 fi
 
-#api.zeroteam.top/warp?format=wgcf for change warp
-export WGCF_LICENSE_KEY=$WARP_PLUS_CODE
-wgcf update
-if [ $? != 0 ];then
-  mv wgcf-account.toml wgcf-account.toml.backup
-  wgcf update
-fi 
+# Update with WARP+ code if provided
+if [ -n "$WARP_PLUS_CODE" ]; then
+    export WGCF_LICENSE_KEY=$WARP_PLUS_CODE
+    wgcf update
+    if [ $? != 0 ]; then
+        echo "WARP: Update failed, trying to re-register..."
+        mv wgcf-account.toml wgcf-account.toml.backup 2>/dev/null
+        wgcf register --accept-tos && wgcf generate && wgcf update
+    fi
+fi
+
+# Generate profile if it doesn't exist
+if [ -f "wgcf-account.toml" ] && ! [ -f "wgcf-profile.conf" ]; then
+    wgcf generate
+fi
 
 
 #!/bin/bash
@@ -51,14 +68,43 @@ if [ -f "./warp-go" ] && [ -x "./warp-go" ]; then
     fi
 else
     echo "WARP: warp-go not found, creating fallback config..."
+    
+    # Try to generate profile if account exists but profile doesn't
+    if [ -f "wgcf-account.toml" ] && ! [ -f "wgcf-profile.conf" ]; then
+        echo "WARP: Generating profile from account..."
+        wgcf generate 2>/dev/null
+    fi
+    
     # Create a minimal fallback config using the wgcf profile
     if [ -f "wgcf-profile.conf" ]; then
         # Parse wgcf-profile.conf for wireguard settings
-        source <(grep -E '^\[|^[A-Za-z]' wgcf-profile.conf | sed 's/\[/\n\[/g' | grep -A100 'Interface' | grep -E '^(PrivateKey|Address)' | sed 's/ //g')
-        source <(grep -E '^\[|^[A-Za-z]' wgcf-profile.conf | sed 's/\[/\n\[/g' | grep -A100 'Peer' | grep -E '^(PublicKey|Endpoint)' | sed 's/ //g')
+        PrivateKey=$(grep '^PrivateKey' wgcf-profile.conf | cut -d'=' -f2 | tr -d ' ')
+        Address=$(grep '^Address' wgcf-profile.conf | cut -d'=' -f2 | tr -d ' ')
+        PublicKey=$(grep '^PublicKey' wgcf-profile.conf | cut -d'=' -f2 | tr -d ' ')
+        
+        # Use default Cloudflare WARP public key if not found
+        PublicKey=${PublicKey:-"bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo="}
         
         # Create minimal singbox config
         cat > warp-singbox.json << EOFSINGBOX
+{
+  "type": "wireguard",
+  "tag": "WARP",
+  "server": "engage.cloudflareclient.com",
+  "server_port": 2408,
+  "local_address": ["172.16.0.2/32"],
+  "private_key": "$PrivateKey",
+  "peer_public_key": "$PublicKey",
+  "mtu": 1280
+}
+EOFSINGBOX
+        echo "WARP: Created fallback warp-singbox.json from profile"
+    elif [ -f "wgcf-account.toml" ]; then
+        # Use account data directly
+        PrivateKey=$(grep 'private_key' wgcf-account.toml | grep -oP "'[^']+'" | tr -d "'")
+        
+        if [ -n "$PrivateKey" ]; then
+            cat > warp-singbox.json << EOFSINGBOX
 {
   "type": "wireguard",
   "tag": "WARP",
@@ -70,9 +116,12 @@ else
   "mtu": 1280
 }
 EOFSINGBOX
-        echo "WARP: Created fallback warp-singbox.json"
+            echo "WARP: Created fallback warp-singbox.json from account"
+        else
+            echo "WARP: Could not extract private key, WARP will not be available"
+        fi
     else
-        echo "WARP: No wgcf-profile.conf found, WARP will not be available"
+        echo "WARP: No wgcf-profile.conf or wgcf-account.toml found, WARP will not be available"
     fi
 fi
 
