@@ -36,8 +36,11 @@ if [ -f "wgcf-account.toml" ] && ! [ -f "wgcf-profile.conf" ]; then
     wgcf generate
 fi
 
-
-#!/bin/bash
+# Check if account file exists before proceeding
+if ! [ -f "wgcf-account.toml" ]; then
+    echo "WARP: No account file found, WARP will not be available"
+    exit 0
+fi
 
 # Read the contents of the file
 toml_content=$(cat wgcf-account.toml)

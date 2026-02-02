@@ -8,30 +8,13 @@ if [ -f "configs/01_api.json" ]; then
 fi
 # curl -s -x socks://127.0.0.1:3000 http://ip-api.com?fields=message,country,countryCode,city,isp,org,as,query
 
-# sing-box check -C configs
-echo "ignoring singbox test"
-if [[ $? == 0 ]]; then
-	# Check if service exists before trying to reload
-	if systemctl list-unit-files hiddify-singbox.service &>/dev/null; then
-		if systemctl is-active --quiet hiddify-singbox.service; then
-			systemctl reload hiddify-singbox.service 2>/dev/null || systemctl restart hiddify-singbox.service
-		else
-			systemctl start hiddify-singbox.service
-		fi
+# Start singbox service
+if systemctl list-unit-files hiddify-singbox.service &>/dev/null; then
+	if systemctl is-active --quiet hiddify-singbox.service; then
+		systemctl reload hiddify-singbox.service 2>/dev/null || systemctl restart hiddify-singbox.service
 	else
-		echo "hiddify-singbox.service not installed yet"
+		systemctl start hiddify-singbox.service 2>/dev/null || true
 	fi
 else
-	echo "Error in singbox Config!!!! do not reload singbox service"
-	sleep 3
-	singbox check -C configs
-	if [[ $? == 0 ]]; then
-		if systemctl is-active --quiet hiddify-singbox.service 2>/dev/null; then
-			systemctl reload hiddify-singbox.service 2>/dev/null || systemctl restart hiddify-singbox.service
-		else
-			systemctl start hiddify-singbox.service 2>/dev/null || true
-		fi
-	else
-		echo "Error in singbox Config!!!! do not reload singbox service"
-	fi
+	echo "hiddify-singbox.service not installed yet"
 fi
