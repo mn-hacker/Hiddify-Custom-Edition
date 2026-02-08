@@ -10,6 +10,28 @@ if ! command -v wgcf &>/dev/null; then
     exit 1
 fi
 
+# Check if wgcf version changed - force re-register if so
+WGCF_VERSION=$(wgcf --version 2>/dev/null | head -1 || echo "unknown")
+WGCF_VERSION_FILE=".wgcf_version"
+
+if [ -f "$WGCF_VERSION_FILE" ]; then
+    OLD_VERSION=$(cat "$WGCF_VERSION_FILE" 2>/dev/null || echo "")
+    if [ "$OLD_VERSION" != "$WGCF_VERSION" ]; then
+        echo "WARP: wgcf version changed from '$OLD_VERSION' to '$WGCF_VERSION', forcing re-registration..."
+        rm -f wgcf-account.toml wgcf-profile.conf warp-singbox.json 2>/dev/null
+    fi
+fi
+echo "$WGCF_VERSION" > "$WGCF_VERSION_FILE"
+
+# Validate existing account file if it exists
+if [ -f "wgcf-account.toml" ]; then
+    # Check if account file is valid (has required fields)
+    if ! grep -q "access_token" wgcf-account.toml 2>/dev/null || ! grep -q "private_key" wgcf-account.toml 2>/dev/null; then
+        echo "WARP: Invalid account file detected, removing and re-registering..."
+        rm -f wgcf-account.toml wgcf-profile.conf 2>/dev/null
+    fi
+fi
+
 # Register with WARP if not already registered
 if ! [ -f "wgcf-account.toml" ]; then
     echo "WARP: No account found, registering new account..."

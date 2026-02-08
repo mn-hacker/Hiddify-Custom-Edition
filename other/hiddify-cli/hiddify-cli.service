@@ -2,10 +2,14 @@
 Description=HiddifyCli service
 After=network-online.target hiddify-panel.service
 Wants=hiddify-panel.service
+# Limit restart attempts to prevent infinite loops
+StartLimitIntervalSec=300
+StartLimitBurst=10
 
 [Service]
 Type=simple
-Restart=on-failure
+# Always restart, even on clean exit (e.g., config parse failure)
+Restart=always
 RestartSec=30
 WorkingDirectory=/opt/hiddify-manager/other/hiddify-cli
 # Check if .env exists, exit gracefully if not (will retry via Restart)
@@ -13,5 +17,7 @@ ExecStartPre=/bin/bash -c 'test -f /opt/hiddify-manager/other/hiddify-cli/.env |
 EnvironmentFile=-/opt/hiddify-manager/other/hiddify-cli/.env
 ExecStart=/opt/hiddify-manager/other/hiddify-cli/HiddifyCli run -c $SUB_LINK -d h_client_config.json
 User=hiddify-cli
+
 [Install]
 WantedBy=multi-user.target
+
