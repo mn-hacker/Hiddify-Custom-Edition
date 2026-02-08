@@ -659,12 +659,24 @@ function checkOS() {
     fi
 }
 function disable_panel_services() {
-    # rm /etc/cron.d/hiddify_usage_update
-    # rm /etc/cron.d/hiddify_auto_backup
-    # service cron reload >/dev/null 2>&1
-    # kill -9 $(pgrep -f 'hiddifypanel update-usage')
-    # systemctl restart mariadb
-    echo ""
+    echo "Stopping panel services for update..."
+    
+    # Stop panel services
+    systemctl stop hiddify-panel.service 2>/dev/null || true
+    systemctl stop hiddify-panel-background-tasks.service 2>/dev/null || true
+    
+    # Kill any remaining panel processes
+    pkill -9 -f 'hiddifypanel' 2>/dev/null || true
+    pkill -9 -f 'gunicorn.*hiddify' 2>/dev/null || true
+    
+    # Clear Python bytecode cache to ensure new code is loaded
+    find /opt/hiddify-manager/.venv313/lib -name "*.pyc" -delete 2>/dev/null || true
+    find /opt/hiddify-manager/.venv313/lib -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+    
+    # Clear uv/pip cache for hiddifypanel to force fresh download
+    rm -rf /root/.cache/uv/wheels/*hiddifypanel* 2>/dev/null || true
+    
+    echo "Panel services stopped and cache cleared"
 }
 
 function vercomp () {

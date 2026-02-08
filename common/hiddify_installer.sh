@@ -147,7 +147,8 @@ function update_panel() {
                 update_progress "Updating..." "Hiddify Panel from $current_panel_version to $latest" 10
                 # pip install -U --pre hiddifypanel==$latest
                 disable_panel_services
-                uv pip install -U --pre hiddifypanel
+                uv pip install -U --pre --force-reinstall --no-deps hiddifypanel
+                uv pip install --pre hiddifypanel
                 update_progress "Updated..." "Hiddify Panel to $latest" 50
                 return 0
             fi
@@ -166,7 +167,8 @@ function update_panel() {
                 update_progress "Updating..." "Hiddify Panel from $current_panel_version to $latest" 10
                 # pip3 install -U hiddifypanel==$latest
                 disable_panel_services
-                uv pip install -U wheel hiddifypanel
+                uv pip install -U --force-reinstall --no-deps hiddifypanel
+                uv pip install hiddifypanel
                 update_progress "Updated..." "Hiddify Panel to $latest" 50
                 return 0
             fi
@@ -254,14 +256,24 @@ function post_update_tasks() {
     remove_lock $NAME
 
     if [ "$package_mode" != "docker" ];then
-      if [[ $panel_update == 0 ]]; then
-              systemctl kill -s SIGTERM hiddify-panel
-      fi
+      # Always stop panel first to ensure clean restart
+      systemctl stop hiddify-panel.service 2>/dev/null || true
+      systemctl stop hiddify-panel-background-tasks.service 2>/dev/null || true
 
-      if [[ $panel_update == 0 && $config_update != 0 ]]; then
+      # If panel was updated OR config was updated, apply configs
+      if [[ $panel_update == 0 || $config_update == 0 ]]; then
+          echo "Applying configurations..."
           bash /opt/hiddify-manager/apply_configs.sh --no-gui --no-log
       fi
-      systemctl start hiddify-panel
+      
+      # Restart all core services to ensure new version is used
+      echo "Restarting services..."
+      systemctl daemon-reload
+      systemctl restart hiddify-redis.service 2>/dev/null || true
+      sleep 1
+      systemctl restart hiddify-panel.service 2>/dev/null || true
+      systemctl restart hiddify-panel-background-tasks.service 2>/dev/null || true
+      
       cd /opt/hiddify-manager/hiddify-panel
       if [ "$CREATE_EASYSETUP_LINK" == "true" ];then
           hiddify-panel-cli set-setting --key create_easysetup_link --val True
@@ -275,6 +287,8 @@ function post_update_tasks() {
               hiddify-panel-cli set-setting --key package_mode --val develop
           ;;
       esac
+      
+      echo "Update completed. Panel should now show new features."
     fi
 }
 

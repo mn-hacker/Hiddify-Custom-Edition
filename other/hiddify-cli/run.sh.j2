@@ -1,8 +1,15 @@
 #!/bin/bash
+cd "$(dirname "$0")"
+
 rm clash.db > /dev/null 2>&1
 # TODO: it'll back to the old title after few seconds
 #sed -i 's|<title>yacd</title>|<title>Hiddify Cli \| Admin \| Hiddify Manager</title>|g' webui/index.html
 	
+# Ensure the service symlink and enabling exists (in case it was disabled before)
+ln -sf /opt/hiddify-manager/other/hiddify-cli/hiddify-cli.service /etc/systemd/system/hiddify-cli.service 2>/dev/null || true
+systemctl daemon-reload 2>/dev/null || true
+systemctl enable hiddify-cli.service 2>/dev/null || true
+
 # Create systemd env file
 # Extract panel domain from panel_links (last entry in the array)
 PANEL_DOMAIN=$(echo "{{ panel_links[panel_links|length -1] }}" | sed 's|^https\?://\([^/]\+\).*|\1|')

@@ -1,17 +1,12 @@
 {
         "log": {
-                {%if hconfigs['log_level']=="CRITICAL"%}
+                {%if hconfigs['log_level']=="CRITICAL" and not hconfigs.get('user_limit_enable', False)%}
                 "disabled": true,
                 {%endif%}
                 "level": "{{hconfigs['log_level'].lower()}}",
-                //"output": "box.log",
-                "timestamp": false
-                
-                //"loglevel": "debug",
-                //"output": "/opt/hiddify-manager/log/system/xray.out.log",
-                //"error": "/opt/hiddify-manager/log/system/xray.err.log",
-                //"access": "/opt/hiddify-manager/log/system/xray.access.log",
-                //"logid": true,
-                //"header": true
+                {%if hconfigs.get('access_log_enable', False) or hconfigs.get('user_limit_enable', False)%}
+                "output": "/opt/hiddify-manager/log/singbox.log",
+                {%endif%}
+                "timestamp": true
         }
 }
