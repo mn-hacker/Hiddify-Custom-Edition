@@ -18,28 +18,29 @@
       }
     },
     {
-      {%if hconfigs["only_ipv4"]%}
-      "domainStrategy":"UseIPv4v6",
-      {%endif%}
       "tag": "WARP",
-      "protocol": "freedom",
-      "streamSettings": {
-        "sockopt": {
-          "tcpFastOpen": true,
-          "interface": "warp"
-        }
+      "protocol": "socks",
+      "settings": {
+        "servers": [
+          {
+            "address": "127.0.0.1",
+            "port": 3000
+          }
+        ]
       }
     },
+    // Old WireGuard interface mode (requires wg-quick@warp):
     // {
-    //   "tag":"WARP",
-    //   "protocol":"socks",
-    //   "settings": {
-    //     "servers": [
-    //         {
-    //             "address": "127.0.0.1",
-    //             "port": 3000
-    //         }
-    //     ]
+    //   {%if hconfigs["only_ipv4"]%}
+    //   "domainStrategy":"UseIPv4v6",
+    //   {%endif%}
+    //   "tag": "WARP",
+    //   "protocol": "freedom",
+    //   "streamSettings": {
+    //     "sockopt": {
+    //       "tcpFastOpen": true,
+    //       "interface": "warp"
+    //     }
     //   }
     // },
     {

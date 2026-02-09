@@ -1,30 +1,49 @@
+#!/bin/bash
 source /opt/hiddify-manager/common/package_manager.sh
 
-echo "telegram proxy install.sh $*"
-systemctl kill mtproxy.service >/dev/null 2>&1
-systemctl disable mtproxy.service >/dev/null 2>&1
+echo "Telegram MTProxy (mtg) install.sh $*"
 
-# sudo add-apt-repository -y ppa:longsleep/golang-backports
-# sudo apt update
-# apt install -y make golang
+# Stop and disable existing services
+systemctl stop mtproxy.service 2>/dev/null || true
+systemctl disable mtproxy.service 2>/dev/null || true
 
-# wget -q --show-progress -c https://go.dev/dl/go1.19.linux-$pkg.tar.gz
-# tar -xf go1.19.linux-amd64.tar.gz
-# export PATH=$(pwd)/go/bin:$PATH
+cd "$(dirname "$0")"
 
+# Download mtg binary
+echo "Downloading mtg binary..."
 download_package mtproxygo mtg-linux.tar.gz
-tar -xf mtg-linux.tar.gz || exit 1
-rm -rf mtg-linux 
-mv mtg*/mtg mtg || exit 2
-set_installed_version mtproxygo
-# export GOPATH=/opt/hiddify-manager/other/telegram/tgo/go/
-# export GOCACHE=/opt/hiddify-manager/other/telegram/tgo/gocache/
-# git clone https://github.com/9seconds/mtg/
+if [ $? -ne 0 ]; then
+    echo "ERROR: Failed to download mtg package"
+    exit 1
+fi
 
-# if [ ! -f mtg/mtg ];then
-#     echo "error in installation of telegram"
-#     cd mtg
+# Extract binary
+tar -xf mtg-linux.tar.gz || { echo "ERROR: Failed to extract mtg archive"; exit 1; }
+rm -rf mtg-linux
 
-#     make
+# Find and move mtg binary
+if [ -d "mtg"* ]; then
+    mv mtg*/mtg mtg 2>/dev/null || mv mtg-*/mtg mtg 2>/dev/null || { echo "ERROR: Could not find mtg binary in archive"; exit 1; }
+    rm -rf mtg-* 2>/dev/null
+elif [ ! -f "mtg" ]; then
+    echo "ERROR: mtg binary not found after extraction"
+    exit 1
+fi
 
-# fi
+# Make executable
+chmod +x mtg
+
+# Verify binary works
+if ./mtg --version >/dev/null 2>&1; then
+    echo "MTProxy (mtg) installed successfully!"
+    ./mtg --version
+    set_installed_version mtproxygo
+else
+    echo "ERROR: mtg binary is not working properly"
+    exit 1
+fi
+
+# Create logs directory
+mkdir -p /opt/hiddify-manager/log/system
+
+echo "Installation complete. Run 'bash run.sh' to start the service."

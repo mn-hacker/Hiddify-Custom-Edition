@@ -10,15 +10,16 @@
     },
     {
       "tag": "WARP",
-      "type": "direct",
-      "bind_interface": "warp"
+      "type": "socks",
+      "version": "5",
+      "server": "127.0.0.1",
+      "server_port": 3000
     },
+    // Old WireGuard interface mode (requires wg-quick@warp):
     // {
-    //   "tag":"WARP",
-    //   "type":"socks",
-    //   "version": "5",
-    //   "server":"127.0.0.1",
-    //   "server_port":3000
+    //   "tag": "WARP",
+    //   "type": "direct",
+    //   "bind_interface": "warp"
     // },
     //hiddify!!!!_warp
     {

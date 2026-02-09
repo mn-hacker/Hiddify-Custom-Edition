@@ -128,17 +128,35 @@ else
         # Use default Cloudflare WARP public key if not found
         PublicKey=${PublicKey:-"bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo="}
         
-        # Create minimal singbox config
+        # Create complete singbox config with socks inbound
         cat > warp-singbox.json << EOFSINGBOX
 {
-  "type": "wireguard",
-  "tag": "WARP",
-  "server": "engage.cloudflareclient.com",
-  "server_port": 2408,
-  "local_address": ["172.16.0.2/32"],
-  "private_key": "$PrivateKey",
-  "peer_public_key": "$PublicKey",
-  "mtu": 1280
+  "log": {
+    "level": "warn"
+  },
+  "inbounds": [
+    {
+      "type": "socks",
+      "tag": "socks-in",
+      "listen": "127.0.0.1",
+      "listen_port": 3000
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "wireguard",
+      "tag": "WARP",
+      "server": "engage.cloudflareclient.com",
+      "server_port": 2408,
+      "local_address": ["172.16.0.2/32"],
+      "private_key": "$PrivateKey",
+      "peer_public_key": "$PublicKey",
+      "mtu": 1280
+    }
+  ],
+  "route": {
+    "final": "WARP"
+  }
 }
 EOFSINGBOX
         echo "WARP: Created fallback warp-singbox.json from profile"
@@ -149,14 +167,32 @@ EOFSINGBOX
         if [ -n "$PrivateKey" ]; then
             cat > warp-singbox.json << EOFSINGBOX
 {
-  "type": "wireguard",
-  "tag": "WARP",
-  "server": "engage.cloudflareclient.com",
-  "server_port": 2408,
-  "local_address": ["172.16.0.2/32"],
-  "private_key": "$PrivateKey",
-  "peer_public_key": "bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo=",
-  "mtu": 1280
+  "log": {
+    "level": "warn"
+  },
+  "inbounds": [
+    {
+      "type": "socks",
+      "tag": "socks-in",
+      "listen": "127.0.0.1",
+      "listen_port": 3000
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "wireguard",
+      "tag": "WARP",
+      "server": "engage.cloudflareclient.com",
+      "server_port": 2408,
+      "local_address": ["172.16.0.2/32"],
+      "private_key": "$PrivateKey",
+      "peer_public_key": "bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo=",
+      "mtu": 1280
+    }
+  ],
+  "route": {
+    "final": "WARP"
+  }
 }
 EOFSINGBOX
             echo "WARP: Created fallback warp-singbox.json from account"

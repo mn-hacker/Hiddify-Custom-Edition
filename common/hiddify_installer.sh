@@ -138,7 +138,7 @@ function update_panel() {
         ;;
         beta)
             activate_python_venv
-            latest=$(get_pre_release_version hiddifypanel)
+            latest=$(get_pre_release_version Hiddify-Custom-Edition)
             warning "BETA: hiddify panel version current=$current_panel_version latest=$latest"
             if [[ "$current_panel_version" != "$latest" ]]; then
                 error "The current beta version is outdated! Updating..."
@@ -158,7 +158,7 @@ function update_panel() {
             activate_python_venv
             # error "you can not install release version 8 using this script"
             # exit 1
-            latest=$(get_release_version hiddify-panel)
+            latest=$(get_release_version Hiddify-Custom-Edition)
             if [[ "$current_panel_version" != "$latest" ]]; then
                 error "The current beta version is outdated! Updating..."
             fi
