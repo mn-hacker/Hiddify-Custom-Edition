@@ -14,8 +14,16 @@ systemctl disable mtproxy.service >/dev/null 2>&1
 
 download_package mtproxygo mtg-linux.tar.gz
 tar -xf mtg-linux.tar.gz || exit 1
-rm -rf mtg-linux 
-mv mtg*/mtg mtg || exit 2
+# remove old dir if exists
+rm -rf mtg-linux
+# find the directory extracted
+DIR=$(ls -d mtg-*/ 2>/dev/null || ls -d mtg*/ 2>/dev/null | head -n 1)
+if [ -z "$DIR" ]; then
+    echo "ERROR: Could not find extracted directory for mtg"
+    ls -l
+    exit 1
+fi
+mv "$DIR/mtg" mtg || { echo "ERROR: mtg binary not found in $DIR"; exit 2; }
 set_installed_version mtproxygo
 # export GOPATH=/opt/hiddify-manager/other/telegram/tgo/go/
 # export GOCACHE=/opt/hiddify-manager/other/telegram/tgo/gocache/
