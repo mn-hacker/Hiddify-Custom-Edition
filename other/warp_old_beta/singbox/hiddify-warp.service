@@ -1,4 +1,5 @@
 [Unit]
+Description=Hiddify WARP Service
 After=network.target nss-lookup.target
 
 [Service]

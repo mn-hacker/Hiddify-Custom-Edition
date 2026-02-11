@@ -9,7 +9,8 @@ ExecStartPre=/bin/bash -c 'test -x /opt/hiddify-manager/other/telegram/tgo/mtg |
 ExecStartPre=/bin/bash -c 'test -f /opt/hiddify-manager/other/telegram/tgo/mtg.toml || { echo "mtg.toml not found"; exit 1; }'
 ExecStart=/opt/hiddify-manager/other/telegram/tgo/mtg run /opt/hiddify-manager/other/telegram/tgo/mtg.toml
 Restart=on-failure
-RestartSec=30
+RestartSec=10
+
 # Limit restart attempts to prevent infinite loops
 StartLimitBurst=3
 StartLimitIntervalSec=300

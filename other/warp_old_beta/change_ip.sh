@@ -1,0 +1,1 @@
+cd wireguard&&bash change_ip.sh

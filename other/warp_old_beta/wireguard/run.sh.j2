@@ -6,8 +6,13 @@ systemctl disable hiddify-warp.service >/dev/null 2>&1
 function check_wireguard_connection() {
   echo "Checking WARP ..."
   if ! [ -f "wgcf-account.toml" ]; then
-    mv wgcf-account.toml wgcf-account.toml.backup
+    echo "No WARP account found, registering new account..."
     ./wgcf register --accept-tos -m hiddify -n $(hostname) >/dev/null 2>&1
+    if [ $? -ne 0 ]; then
+      error "Failed to register WARP account"
+      return 1
+    fi
+    success "WARP account registered successfully"
   fi
   ./wgcf update >/dev/null 2>&1 || return $?
   generate_warp_config
