@@ -24,7 +24,7 @@ ln -sf $(pwd)/mtproxy.service /etc/systemd/system/mtproxy.service
 systemctl daemon-reload
 
 # Set proper permissions for config
-chmod 600 *toml* 2>/dev/null || true
+chmod 644 *toml* 2>/dev/null || true
 
 # Check if binary exists
 if [ ! -x "./mtg" ]; then

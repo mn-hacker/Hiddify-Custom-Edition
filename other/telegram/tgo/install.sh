@@ -28,18 +28,7 @@ set_installed_version mtproxygo
 # export GOCACHE=/opt/hiddify-manager/other/telegram/tgo/gocache/
 # git clone https://github.com/9seconds/mtg/
 
-# Extract binary
-tar -xf mtg-linux.tar.gz || { echo "ERROR: Failed to extract mtg archive"; exit 1; }
-rm -rf mtg-linux
 
-# Find and move mtg binary
-if [ -d "mtg"* ]; then
-    mv mtg*/mtg mtg 2>/dev/null || mv mtg-*/mtg mtg 2>/dev/null || { echo "ERROR: Could not find mtg binary in archive"; exit 1; }
-    rm -rf mtg-* 2>/dev/null
-elif [ ! -f "mtg" ]; then
-    echo "ERROR: mtg binary not found after extraction"
-    exit 1
-fi
 
 # Make executable
 chmod +x mtg
