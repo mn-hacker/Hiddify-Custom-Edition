@@ -37,3 +37,7 @@ else
     echo "Error: warp-go download failed or not a gzip file."
     rm -f /tmp/warp-go.tar.gz
 fi
+
+cp hiddify-warp.service /etc/systemd/system/hiddify-warp.service
+systemctl enable hiddify-warp.service
+systemctl daemon-reload
