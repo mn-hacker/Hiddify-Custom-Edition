@@ -7,6 +7,11 @@ if ! [ -f "wgcf-account.toml" ];then
     curl --connect-timeout 10 -fsSL "${URL}" -o ./wgcf && chmod +x ./wgcf && mv ./wgcf /usr/bin
 fi
 
+if ! [ -f "wgcf-account.toml" ];then
+    wgcf register --accept-tos
+    wgcf generate
+fi
+
 
 
 ARCHITECTURE=$(dpkg --print-architecture)
