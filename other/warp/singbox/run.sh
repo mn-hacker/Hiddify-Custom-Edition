@@ -53,21 +53,63 @@ PEER_ENDPOINT=$(grep 'Endpoint' wgcf-profile.conf | cut -d' ' -f3)
 PEER_IP=${PEER_ENDPOINT%:*}
 PEER_PORT=${PEER_ENDPOINT##*:}
 
-# Create separate JSON for WARP outsite
+# Create FULL sing-box config
 cat <<EOF > warp-singbox.json
 {
-  "type": "wireguard",
-  "tag": "WARP",
-  "server": "$PEER_IP",
-  "server_port": $PEER_PORT,
-  "local_address": [
-    "172.16.0.2/32",
-    "2606:4700:110:8f80:5553:6c97:546:9097/128"
+  "log": {
+    "level": "info",
+    "timestamp": true
+  },
+  "inbounds": [
+    {
+      "type": "socks",
+      "tag": "socks-in",
+      "listen": "127.0.0.1",
+      "listen_port": 3000,
+      "users": []
+    }
   ],
-  "private_key": "$PRIVATE_KEY",
-  "peer_public_key": "$PEER_PUBLIC_KEY",
-  "reserved": [0, 0, 0],
-  "mtu": 1280
+  "outbounds": [
+    {
+      "type": "wireguard",
+      "tag": "WARP",
+      "server": "$PEER_IP",
+      "server_port": $PEER_PORT,
+      "local_address": [
+        "172.16.0.2/32",
+        "2606:4700:110:8f80:5553:6c97:546:9097/128"
+      ],
+      "private_key": "$PRIVATE_KEY",
+      "peer_public_key": "$PEER_PUBLIC_KEY",
+      "reserved": [0, 0, 0],
+      "mtu": 1280
+    },
+    {
+      "type": "direct",
+      "tag": "direct"
+    },
+    {
+      "type": "block",
+      "tag": "block"
+    },
+    {
+      "type": "dns",
+      "tag": "dns-out"
+    }
+  ],
+  "route": {
+    "rules": [
+      {
+        "protocol": "dns",
+        "outbound": "dns-out"
+      },
+      {
+        "outbound": "WARP"
+      }
+    ],
+    "auto_detect_interface": true,
+    "final": "WARP"
+  }
 }
 EOF
 
