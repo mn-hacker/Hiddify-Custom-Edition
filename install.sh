@@ -137,14 +137,14 @@ function main() {
         update_progress "${PROGRESS_ACTION}" "Additional Services" 75
         
         # These don't have apt in run.sh, safe to parallelize
-        install_run other/speedtest $(hconfig "speed_test") &
-        install_run other/telegram $(hconfig "telegram_enable") &
-        install_run other/ssfaketls $(hconfig "ssfaketls_enable") &
-        install_run other/ssh $(hconfig "ssh_server_enable") &
-        install_run other/hiddify-cli $(hconfig "hiddifycli_enable" "true") &
+        install_run other/speedtest $(hconfig "speed_test")
+        install_run other/telegram $(hconfig "telegram_enable")
+        install_run other/ssfaketls $(hconfig "ssfaketls_enable")
+        install_run other/ssh $(hconfig "ssh_server_enable")
+        install_run other/hiddify-cli $(hconfig "hiddifycli_enable" "true")
 
         # IP Limiter (Connection Enforcement)
-        msg "Installing IP Limiter Service..."
+        echo "Installing IP Limiter Service..."
         cp hiddify-panel/hiddify-ip-limiter.service /etc/systemd/system/
         systemctl enable hiddify-ip-limiter.service
         systemctl restart hiddify-ip-limiter.service
@@ -154,17 +154,17 @@ function main() {
         update_progress "${PROGRESS_ACTION}" "Warp" 85
         pushd other/warp > /dev/null && bash install.sh && popd > /dev/null
         if [[ $(hconfig "warp_mode") != "disable" ]];then
-            install_run other/warp 1 &
+            install_run other/warp 1
         else   
-            install_run other/warp 0 &
+            install_run other/warp 0
         fi
     fi
 
     update_progress "${PROGRESS_ACTION}" "Wireguard" 90
-    install_run other/wireguard $(hconfig "wireguard_enable") &
+    install_run other/wireguard $(hconfig "wireguard_enable")
     
     update_progress "${PROGRESS_ACTION}" "Almost Finished" 95
-    wait  # Wait for all parallel operations
+    # wait  # Wait for all parallel operations
     
     echo "---------------------Finished!------------------------"
     remove_lock $NAME
