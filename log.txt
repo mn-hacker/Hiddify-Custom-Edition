@@ -1,236 +1,52 @@
-####0####Please wait...####We are going to install Hiddify...####
-System Resources: RAM=1967MB, Swap=0MB
-####2####Applying...####Common Tools and Requirements####
-===install.sh common
-Hit:1 http://nginx.org/packages/mainline/ubuntu noble InRelease
-Hit:2 http://security.ubuntu.com/ubuntu noble-security InRelease
-Hit:3 http://nova.clouds.archive.ubuntu.com/ubuntu noble InRelease
-Hit:4 https://ppa.launchpadcontent.net/vbernat/haproxy-3.2/ubuntu noble InRelease
-Hit:5 http://nova.clouds.archive.ubuntu.com/ubuntu noble-updates InRelease
-Hit:6 http://nova.clouds.archive.ubuntu.com/ubuntu noble-backports InRelease
-Reading package lists...
-Building dependency tree...
-Reading state information...
-4 packages can be upgraded. Run 'apt list --upgradable' to see them.
-Using Python 3.13.12 environment at: /opt/hiddify-manager/.venv313
-net.ipv6.conf.all.disable_ipv6 = 0
-net.ipv6.conf.default.disable_ipv6 = 0
-net.ipv6.conf.lo.disable_ipv6 = 0
-IPv6 Disabled for eth0
-IPv6 Disabled for hiddifywg
- * Reloading configuration files for periodic command scheduler cron
-   ...done.
-####5####Applying...####Redis####
-======================other/redis====================================={
-===run.sh other/redis
-}========================other/redis===================================
-####8####Applying...####MySQL/MariaDB####
-======================other/mysql====================================={
-}========================other/mysql===================================
-####12####Applying...####Hiddify Panel####
-======================hiddify-panel====================================={
-===run.sh hiddify-panel
-run.sh: MySQL password loaded (length: 32)
-}========================hiddify-panel===================================
-####15####HiddifyPanel####Reading Configs from Panel...####
-####18####Applying Configs####...####
-Rendering: /opt/hiddify-manager/xray/configs/05_inbounds_02_kcp_main.json.j2
-Rendering: /opt/hiddify-manager/xray/configs/01_api.json.j2
-Rendering: /opt/hiddify-manager/xray/configs/06_outbounds.json.j2
-Rendering: /opt/hiddify-manager/xray/configs/05_inbounds_01_api.json.j2
-Rendering: /opt/hiddify-manager/xray/configs/08_stats.json.j2
-Rendering: /opt/hiddify-manager/xray/configs/05_inbounds_03_dispatcher.json.j2
-Rendering: /opt/hiddify-manager/xray/configs/02_dns.json.j2
-Rendering: /opt/hiddify-manager/xray/configs/05_inbounds_03_dispatcher_h2.json.j2
-Rendering: /opt/hiddify-manager/singbox/configs/05_inbounds_new.json.j2
-Rendering: /opt/hiddify-manager/singbox/configs/06_outbounds.json.j2
-Rendering: /opt/hiddify-manager/singbox/configs/03_routing.json.j2
-Rendering: /opt/hiddify-manager/haproxy/maps/http_domain.j2
-Rendering: /opt/hiddify-manager/haproxy/maps/path_h2.j2
-Rendering: /opt/hiddify-manager/nginx/nginx.conf.j2
-Rendering: /opt/hiddify-manager/nginx/conf.d/speedtest.conf.j2
-Rendering: /opt/hiddify-manager/nginx/parts/proxy_to_panel.conf.j2
-Rendering: /opt/hiddify-manager/nginx/parts/hiddify.conf.j2
-Rendering: /opt/hiddify-manager/nginx/parts/proxy_to_static.conf.j2
-Rendering: /opt/hiddify-manager/xray/configs/05_inbounds_02_socks_main.json.j2
-Rendering: /opt/hiddify-manager/xray/configs/05_inbounds_02_xtls_main.json.j2
-Rendering: /opt/hiddify-manager/xray/configs/09_reverse.json.j2
-Rendering: /opt/hiddify-manager/xray/configs/05_inbounds_02_reality_main.json.j2
-Rendering: /opt/hiddify-manager/singbox/configs/00_log.json.j2
-Rendering: /opt/hiddify-manager/singbox/configs/01_api.json.j2
-Rendering: /opt/hiddify-manager/singbox/configs/05_inbounds_2000_socks_main.json.j2
-Rendering: /opt/hiddify-manager/singbox/configs/05_inbounds_10_ss_new.json.j2
-Rendering: /opt/hiddify-manager/singbox/configs/05_inbounds_1030_shadowtls.json.j2
-Rendering: /opt/hiddify-manager/singbox/configs/05_inbounds_10_ss_ws_new.json.j2
-Rendering: /opt/hiddify-manager/singbox/configs/05_inbounds_4010_tuic.json.j2
-Rendering: /opt/hiddify-manager/other/warp/wireguard/run.sh.j2
-Rendering: /opt/hiddify-manager/other/deprecated/shadowtls/shadowtls.conf.j2
-Rendering: /opt/hiddify-manager/other/ssfaketls/hiddify-ss-faketls.service.j2
-Rendering: /opt/hiddify-manager/other/telegram/install.sh.j2
-Rendering: /opt/hiddify-manager/other/telegram/run.sh.j2
-Rendering: /opt/hiddify-manager/other/telegram/erlang/install.sh.j2
-Rendering: /opt/hiddify-manager/other/telegram/erlang/prod-sys.config.j2
-Rendering: /opt/hiddify-manager/other/telegram/orig/tgproxy_run.sh.j2
-Rendering: /opt/hiddify-manager/other/hiddify-cli/install.sh.j2
-Rendering: /opt/hiddify-manager/other/hiddify-cli/run.sh.j2
-Rendering: /opt/hiddify-manager/other/wireguard/install.sh.j2
-Rendering: /opt/hiddify-manager/haproxy/haproxy.cfg.j2
-Rendering: /opt/hiddify-manager/nginx/conf.d/xray-base.conf.j2
-Rendering: /opt/hiddify-manager/nginx/parts/proxy_path.conf.j2
-Rendering: /opt/hiddify-manager/xray/configs/05_inbounds_new.json.j2
-Rendering: /opt/hiddify-manager/xray/configs/00_log.json.j2
-Rendering: /opt/hiddify-manager/xray/configs/07_transport.json.j2
-Rendering: /opt/hiddify-manager/xray/configs/04_policy.json.j2
-Rendering: /opt/hiddify-manager/xray/configs/03_routing.json.j2
-Rendering: /opt/hiddify-manager/singbox/configs/05_inbounds_2039_vmess_new.json.j2
-Rendering: /opt/hiddify-manager/singbox/configs/05_inbounds_2061_reality_main.json.j2
-Rendering: /opt/hiddify-manager/singbox/configs/02_dns.json.j2
-Rendering: /opt/hiddify-manager/singbox/configs/05_inbounds_4100_hysteria.json.j2
-Rendering: /opt/hiddify-manager/other/telegram/erlang/run.sh.j2
-Rendering: /opt/hiddify-manager/other/telegram/python/config.py.j2
-Rendering: /opt/hiddify-manager/other/telegram/tgo/mtg.toml.j2
-Rendering: /opt/hiddify-manager/other/warp_old_beta/wireguard/run.sh.j2
-Rendering: /opt/hiddify-manager/other/wireguard/run.sh.j2
-Rendering: /opt/hiddify-manager/other/v2ray/config-v2ray.json.j2
-Rendering: /opt/hiddify-manager/haproxy/maps/decoy_domain.j2
-Rendering: /opt/hiddify-manager/haproxy/maps/path_v10.j2
-Rendering: /opt/hiddify-manager/haproxy/maps/sni_h2.j2
-Rendering: /opt/hiddify-manager/haproxy/maps/path.j2
-Rendering: /opt/hiddify-manager/haproxy/maps/sni.j2
-Rendering: /opt/hiddify-manager/common/run.sh.j2
-Rendering: /opt/hiddify-manager/nginx/conf.d/singbox-base.conf.j2
-Rendering: /opt/hiddify-manager/nginx/parts/short-link.conf.j2
-Rendering: /opt/hiddify-manager/nginx/parts/def-link.conf.j2
-Rendering: /opt/hiddify-manager/nginx/parts/common.conf.j2
-Cleaning up deprecated components...
-Deprecated components cleanup completed.
-####20####Configuring...####System and Firewall settings####
-===run.sh common
-Service is running on port 22 and path /usr/sbin/sshd
-Service not found or not running
-iptables: Bad rule (does a matching rule exist in that chain?).
-ip6tables: Bad rule (does a matching rule exist in that chain?).
-ip6tables-restore: COMMIT expected at line 48
-iptables-restore: COMMIT expected at line 49
- * Reloading configuration files for periodic command scheduler cron
-   ...done.
-####25####Applying...####Nginx####
-======================nginx====================================={
-===run.sh nginx
-Setting permissions on /opt/hiddify-manager/nginx/parts/short-link.conf
-Setting permissions on /opt/hiddify-manager/nginx/parts
-Setting permissions on /opt/hiddify-manager/nginx
-}========================nginx===================================
-####35####Applying...####Haproxy for Splitting Traffic####
-======================haproxy====================================={
-===run.sh haproxy
-}========================haproxy===================================
-####45####Applying...####Getting Certificates####
-======================acme.sh====================================={
-===run.sh acme.sh
-==========================================
-Getting SSL certificate for: d-watashi-i-vip-r.watashi-php.ir
-==========================================
-✓ Existing certificate is valid for 89 more days, skipping renewal.
-Not an RSA key
-read EC key
-EC Key valid.
-writing EC key
-writing RSA key
-}========================acme.sh===================================
-####55####Applying...####Xray####
-======================xray====================================={
-===run.sh xray
-Ignoring xray test
-}========================xray===================================
-####65####Applying...####Singbox####
-======================singbox====================================={
-===run.sh singbox
-Setting permissions on /opt/hiddify-manager/singbox/configs/01_api.json
-Setting permissions on /opt/hiddify-manager/singbox/configs
-Setting permissions on /opt/hiddify-manager/singbox
-}========================singbox===================================
-####75####Applying...####Additional Services####
-####85####Applying...####Warp####
-======================other/telegram====================================={
-===run.sh other/telegram
-======================other/speedtest====================================={
-}========================other/speedtest===================================
-======================other/ssfaketls====================================={
-===run.sh other/ssfaketls
-======================other/ssh====================================={
-===run.sh other/ssh
-======================other/hiddify-cli====================================={
-===run.sh other/hiddify-cli
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
- 24 25022   24  6186    0     0   7925      0  0:00:03 --:--:--  0:00:03  7920
-100 25022  100 25022    0     0  24515      0  0:00:01  0:00:01 --:--:-- 24531
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
-100    14  100    14    0     0     40      0 --:--:-- --:--:-- --:--:--    40
-Error: warp-go download failed or not a gzip file.
-======================other/warp====================================={
-####90####Applying...####Wireguard####
-####95####Applying...####Almost Finished####
-===run.sh other/warp
-======================other/wireguard====================================={
-===run.sh other/wireguard
-}========================other/ssfaketls===================================
-}========================other/ssh===================================
-}========================other/hiddify-cli===================================
-2026/02/11 23:58:02 Using config file: wgcf-account.toml
-2026/02/11 23:58:02 Successfully generated WireGuard profile: wgcf-profile.conf
-Created symlink /etc/systemd/system/multi-user.target.wants/mtproxy.service → /opt/hiddify-manager/other/telegram/tgo/mtproxy.service.
-}========================other/wireguard===================================
-Testing singbox warp
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
-100   111  100   111    0     0    887      0 --:--:-- --:--:-- --:--:--   895
-{
-  "status": 429,
-  "error": {
-    "title": "Rate limit exceeded",
-    "message": "Sign up at ipinfo.io"
-  }
-}  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
-100   391  100   391    0     0  11245      0 --:--:-- --:--:-- --:--:-- 11500
-{
-  "country"      : "France",
-  "countryCode"  : "FR",
-  "city"         : "Paris",
-  "isp"          : "Cloudflare, Inc.",
-  "org"          : "Cloudflare WARP",
-  "as"           : "AS13335 Cloudflare, Inc.",
-  "query"        : "104.28.211.186"
-}
-
-==========WARP is working==============
-}========================other/warp===================================
-MTProxy (mtg) started successfully!
-● mtproxy.service - mtg - MTProto proxy server
-     Loaded: loaded (/etc/systemd/system/mtproxy.service; enabled; preset: enabled)
-     Active: active (running) since Wed 2026-02-11 23:58:07 +0330; 3s ago
-       Docs: https://github.com/9seconds/mtg
-    Process: 96931 ExecStartPre=/bin/bash -c test -x /opt/hiddify-manager/other/telegram/tgo/mtg || { echo "mtg binary not found or not executable"; exit 1; } (code=exited, status=0/SUCCESS)
-    Process: 96932 ExecStartPre=/bin/bash -c test -f /opt/hiddify-manager/other/telegram/tgo/mtg.toml || { echo "mtg.toml not found"; exit 1; } (code=exited, status=0/SUCCESS)
-   Main PID: 96933 (mtg)
-      Tasks: 6 (limit: 2276)
-     Memory: 2.0M (peak: 2.1M)
-        CPU: 68ms
-     CGroup: /system.slice/mtproxy.service
-             └─96933 /opt/hiddify-manager/other/telegram/tgo/mtg run /opt/hiddify-manager/other/telegram/tgo/mtg.toml
-
-Feb 11 23:58:07 nex1077698372-3138364 systemd[1]: Starting mtproxy.service - mtg - MTProto proxy server...
-Feb 11 23:58:07 nex1077698372-3138364 systemd[1]: Started mtproxy.service - mtg - MTProto proxy server.
-}========================other/telegram===================================
----------------------Finished!------------------------
+======================hiddify-panel====================================={                     │ ▒
+▒│ ===install.sh hiddify-panel                                                                   │ ▒
+▒│ MySQL password loaded (length: 32)                                                            │ ▒
+▒│ MySQL URI configured in app.cfg                                                               │ ▒
+▒│ Redis URI configured in app.cfg                                                               │ ▒
+▒│ Created symlink /etc/systemd/system/multi-user.target.wants/hiddify-panel.service → /opt/hidd>│ ▒
+▒│ Created symlink /etc/systemd/system/multi-user.target.wants/hiddify-panel-background-tasks.se>│ ▒
+▒│ NOTICE: installing hiddifypanel from bundled src/...                                          │ ▒
+▒│ Using Python 3.13.12 environment at: /opt/hiddify-manager/.venv313                            │ ▒
+▒│ Resolved 115 packages in 184ms                                                                │ ▒
+▒│    Building hiddifypanel @ file:///opt/hiddify-manager/hiddify-panel/src                      │ ▒
+▒│       Built hiddifypanel @ file:///opt/hiddify-manager/hiddify-panel/src                      │ ▒
+▒│ Prepared 5 packages in 2.62s                                                                  │ ▒
+▒│ Uninstalled 5 packages in 20ms                                                                │ ▒
+▒│ Installed 5 packages in 17ms                                                                  │ ▒
+▒│  - click==8.3.1                                                                               │ ▒
+▒│  + click==8.1.7                                                                               │ ▒
+▒│  - flask==3.1.2                                                                               │ ▒
+▒│  + flask==3.0.3                                                                               │ ▒
+▒│  - hiddifypanel==11.0.17                                                                      │ ▒
+▒│  + hiddifypanel==12.0.12 (from file:///opt/hiddify-manager/hiddify-panel/src)                 │ ▒
+▒│  - markupsafe==3.0.3                                                                          │ ▒
+▒│  + markupsafe==3.0.2                                                                          │ ▒
+▒│  - werkzeug==3.1.5                                                                            │ ▒
+▒│  + werkzeug==3.0.6                                                                            │ ▒
+▒│ ===run.sh hiddify-panel
+ run.sh: MySQL password loaded (length: 32)                                                    │ ▒
+▒│ 2026-02-12 23:27:44.631 | WARNING  | hiddifypanel.panel.init_db:current_db_version:859 - db v>│ ▒
+▒│ 2026-02-12 23:27:45.497 | DEBUG    | hiddifypanel.panel.init_db:execute:807 - migrating_db: (>│ ▒
+▒│ [SQL: ALTER TABLE child DROP INDEX `name`;]                                                   │ ▒
+▒│ (Background on this error at: https://sqlalche.me/e/20/e3q8)                                  │ ▒
+▒│ 2026-02-12 23:27:45.497 | DEBUG    | hiddifypanel.panel.init_db:execute:807 - migrating_db: (>│ ▒
+▒│ [SQL: ALTER TABLE user_detail DROP COLUMN connected_ips;]                                     │ ▒
+▒│ (Background on this error at: https://sqlalche.me/e/20/e3q8)                                  │ ▒
+▒│ 2026-02-12 23:27:45.619 | DEBUG    | hiddifypanel.panel.init_db:execute:807 - migrating_db: (>│ ▒
+▒│ [SQL: ALTER TABLE proxy DROP INDEX `name`;]                                                   │ ▒
+▒│ (Background on this error at: https://sqlalche.me/e/20/e3q8)                                  │ ▒
+▒│ 2026-02-12 23:27:45.687 | DEBUG    | hiddifypanel.panel.init_db:execute:807 - migrating_db: (>│ ▒
+▒│ [SQL: ALTER TABLE user RENAME COLUMN monthly_usage_limit_GB TO usage_limit_GB]                │ ▒
+▒│ (Background on this error at: https://sqlalche.me/e/20/e3q8)                                  │ ▒
+▒│ 2026-02-12 23:27:45.688 | DEBUG    | hiddifypanel.panel.init_db:execute:807 - migrating_db: (>│ ▒
+▒│ [SQL: update dailyusage set child_id=0 where child_id is NULL]                                │ ▒
+▒│ (Background on this error at: https://sqlalche.me/e/20/f405)                                  │ ▒
+▒│ 2026-02-12 23:27:45.688 | DEBUG    | hiddifypanel.panel.init_db:execute:807 - migrating_db: (>│ ▒
+▒│ [SQL: update dailyusage set admin_id=1 where admin_id is NULL]                                │ ▒
+▒│ (Background on this error at: https://sqlalche.me/e/20/f405)                                  │ ▒
+▒│ 2026-02-12 23:27:45.689 | DEBUG    | hiddifypanel.panel.init_db:execute:807 - migrating_db: (>│ ▒
+▒│ [SQL: update dailyusage set admin_id=1 where admin_id = 0]                                    │ ▒
+▒│ (Background on this error at: https://sqlalche.me/e/20/f405)                                  │ ▒
+▒│ 2026-02-12 23:27:45.715 | INFO     | hiddifypanel.panel.init_db:upgrade_database:880 - no bac>│ ▒
+▒│ 2026-02-12 23:27:45.728 | WARNING  | hiddifypanel.models.config:hconfig:79 - str db_version n>│ ▒
+▒│ 2026-02-12 23:27:45.730 | INFO     | hiddifypanel.panel.init_db:init_db:955 - Updating db fro>
