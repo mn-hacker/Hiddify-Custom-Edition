@@ -1,230 +1,236 @@
-root@nex1077698372-3138364:/opt/hiddify-manager# cat /opt/hiddify-manager/log/system/telegram.err.log
-mtg: error: cannot init config: cannot read config file: open /opt/hiddify-manager/other/telegram/tgo/mtg.toml: permission denied
-root@nex1077698372-3138364:/opt/hiddify-manager# /opt/hiddify-manager/other/telegram/tgo/mtg run /opt/hiddify-manager/other/telegram/tgo/mtg.toml
-{"level":"debug","configuration":{"debug":true,"allowFallbackOnUnknownDc":true,"secret":"7sydAjMy80PymUvC9L7ahqZ3ZWJyYW16LmNvbQ","bindTo":"127.0.0.1:1001","preferIp":"prefer-ipv4","domainFrontingPort":443,"tolerateTimeSkewness":"5s","concurrency":8192,"defense":{"antiReplay":{"enabled":true,"maxSize":"1mib","errorRate":0.001},"blocklist":{"enabled":false,"downloadConcurrency":2,"urls":["https://iplists.firehol.org/files/firehol_level1.netset"],"updateEach":"24h0m0s"},"allowlist":{"enabled":false,"downloadConcurrency":2,"urls":null,"updateEach":"24h0m0s"}},"network":{"timeout":{"tcp":"5s","http":"10s","idle":"1m0s"},"dohIp":"9.9.9.9","proxies":null},"stats":{"statsd":{"enabled":false,"address":"127.0.0.1:8888","metricPrefix":"mtg","tagFormat":"datadog"},"prometheus":{"enabled":false,"bindTo":"127.0.0.1:3129","httpPath":"/","metricPrefix":"mtg"}}}
-,"logger":"","timestamp":1770830391600,"message":"configuration"}
-{"level":"info","logger":"allowlist.ipblocklist.firehol","timestamp":1770830391602,"message":"ip list was updated"}
-^Croot@nex1077698372-3138364:/opt/hiddify-manager# cat /opt/hiddify-manager/other/telegram/tgo/mtg.toml
-# This is an example of the configuration file for mtg. You actually can
-# run mtg with it. It starts a proxy on all interfaces with a secret
-# ee367a189aee18fa31c190054efd4a8e9573746f726167652e676f6f676c65617069732e636f6d
-#
-# It has all possible options with default values. So, a real world
-# configuration file should contain only those options you are going to
-# use. You do not need to enumerate all of them. In other words, each
-# option here has a default value. If you comment a key-value pair, it
-# should not make any effect.
-#
-# stats is the only exception.
+####0####Please wait...####We are going to install Hiddify...####
+System Resources: RAM=1967MB, Swap=0MB
+####2####Applying...####Common Tools and Requirements####
+===install.sh common
+Hit:1 http://nginx.org/packages/mainline/ubuntu noble InRelease
+Hit:2 http://security.ubuntu.com/ubuntu noble-security InRelease
+Hit:3 http://nova.clouds.archive.ubuntu.com/ubuntu noble InRelease
+Hit:4 https://ppa.launchpadcontent.net/vbernat/haproxy-3.2/ubuntu noble InRelease
+Hit:5 http://nova.clouds.archive.ubuntu.com/ubuntu noble-updates InRelease
+Hit:6 http://nova.clouds.archive.ubuntu.com/ubuntu noble-backports InRelease
+Reading package lists...
+Building dependency tree...
+Reading state information...
+4 packages can be upgraded. Run 'apt list --upgradable' to see them.
+Using Python 3.13.12 environment at: /opt/hiddify-manager/.venv313
+net.ipv6.conf.all.disable_ipv6 = 0
+net.ipv6.conf.default.disable_ipv6 = 0
+net.ipv6.conf.lo.disable_ipv6 = 0
+IPv6 Disabled for eth0
+IPv6 Disabled for hiddifywg
+ * Reloading configuration files for periodic command scheduler cron
+   ...done.
+####5####Applying...####Redis####
+======================other/redis====================================={
+===run.sh other/redis
+}========================other/redis===================================
+####8####Applying...####MySQL/MariaDB####
+======================other/mysql====================================={
+}========================other/mysql===================================
+####12####Applying...####Hiddify Panel####
+======================hiddify-panel====================================={
+===run.sh hiddify-panel
+run.sh: MySQL password loaded (length: 32)
+}========================hiddify-panel===================================
+####15####HiddifyPanel####Reading Configs from Panel...####
+####18####Applying Configs####...####
+Rendering: /opt/hiddify-manager/xray/configs/05_inbounds_02_kcp_main.json.j2
+Rendering: /opt/hiddify-manager/xray/configs/01_api.json.j2
+Rendering: /opt/hiddify-manager/xray/configs/06_outbounds.json.j2
+Rendering: /opt/hiddify-manager/xray/configs/05_inbounds_01_api.json.j2
+Rendering: /opt/hiddify-manager/xray/configs/08_stats.json.j2
+Rendering: /opt/hiddify-manager/xray/configs/05_inbounds_03_dispatcher.json.j2
+Rendering: /opt/hiddify-manager/xray/configs/02_dns.json.j2
+Rendering: /opt/hiddify-manager/xray/configs/05_inbounds_03_dispatcher_h2.json.j2
+Rendering: /opt/hiddify-manager/singbox/configs/05_inbounds_new.json.j2
+Rendering: /opt/hiddify-manager/singbox/configs/06_outbounds.json.j2
+Rendering: /opt/hiddify-manager/singbox/configs/03_routing.json.j2
+Rendering: /opt/hiddify-manager/haproxy/maps/http_domain.j2
+Rendering: /opt/hiddify-manager/haproxy/maps/path_h2.j2
+Rendering: /opt/hiddify-manager/nginx/nginx.conf.j2
+Rendering: /opt/hiddify-manager/nginx/conf.d/speedtest.conf.j2
+Rendering: /opt/hiddify-manager/nginx/parts/proxy_to_panel.conf.j2
+Rendering: /opt/hiddify-manager/nginx/parts/hiddify.conf.j2
+Rendering: /opt/hiddify-manager/nginx/parts/proxy_to_static.conf.j2
+Rendering: /opt/hiddify-manager/xray/configs/05_inbounds_02_socks_main.json.j2
+Rendering: /opt/hiddify-manager/xray/configs/05_inbounds_02_xtls_main.json.j2
+Rendering: /opt/hiddify-manager/xray/configs/09_reverse.json.j2
+Rendering: /opt/hiddify-manager/xray/configs/05_inbounds_02_reality_main.json.j2
+Rendering: /opt/hiddify-manager/singbox/configs/00_log.json.j2
+Rendering: /opt/hiddify-manager/singbox/configs/01_api.json.j2
+Rendering: /opt/hiddify-manager/singbox/configs/05_inbounds_2000_socks_main.json.j2
+Rendering: /opt/hiddify-manager/singbox/configs/05_inbounds_10_ss_new.json.j2
+Rendering: /opt/hiddify-manager/singbox/configs/05_inbounds_1030_shadowtls.json.j2
+Rendering: /opt/hiddify-manager/singbox/configs/05_inbounds_10_ss_ws_new.json.j2
+Rendering: /opt/hiddify-manager/singbox/configs/05_inbounds_4010_tuic.json.j2
+Rendering: /opt/hiddify-manager/other/warp/wireguard/run.sh.j2
+Rendering: /opt/hiddify-manager/other/deprecated/shadowtls/shadowtls.conf.j2
+Rendering: /opt/hiddify-manager/other/ssfaketls/hiddify-ss-faketls.service.j2
+Rendering: /opt/hiddify-manager/other/telegram/install.sh.j2
+Rendering: /opt/hiddify-manager/other/telegram/run.sh.j2
+Rendering: /opt/hiddify-manager/other/telegram/erlang/install.sh.j2
+Rendering: /opt/hiddify-manager/other/telegram/erlang/prod-sys.config.j2
+Rendering: /opt/hiddify-manager/other/telegram/orig/tgproxy_run.sh.j2
+Rendering: /opt/hiddify-manager/other/hiddify-cli/install.sh.j2
+Rendering: /opt/hiddify-manager/other/hiddify-cli/run.sh.j2
+Rendering: /opt/hiddify-manager/other/wireguard/install.sh.j2
+Rendering: /opt/hiddify-manager/haproxy/haproxy.cfg.j2
+Rendering: /opt/hiddify-manager/nginx/conf.d/xray-base.conf.j2
+Rendering: /opt/hiddify-manager/nginx/parts/proxy_path.conf.j2
+Rendering: /opt/hiddify-manager/xray/configs/05_inbounds_new.json.j2
+Rendering: /opt/hiddify-manager/xray/configs/00_log.json.j2
+Rendering: /opt/hiddify-manager/xray/configs/07_transport.json.j2
+Rendering: /opt/hiddify-manager/xray/configs/04_policy.json.j2
+Rendering: /opt/hiddify-manager/xray/configs/03_routing.json.j2
+Rendering: /opt/hiddify-manager/singbox/configs/05_inbounds_2039_vmess_new.json.j2
+Rendering: /opt/hiddify-manager/singbox/configs/05_inbounds_2061_reality_main.json.j2
+Rendering: /opt/hiddify-manager/singbox/configs/02_dns.json.j2
+Rendering: /opt/hiddify-manager/singbox/configs/05_inbounds_4100_hysteria.json.j2
+Rendering: /opt/hiddify-manager/other/telegram/erlang/run.sh.j2
+Rendering: /opt/hiddify-manager/other/telegram/python/config.py.j2
+Rendering: /opt/hiddify-manager/other/telegram/tgo/mtg.toml.j2
+Rendering: /opt/hiddify-manager/other/warp_old_beta/wireguard/run.sh.j2
+Rendering: /opt/hiddify-manager/other/wireguard/run.sh.j2
+Rendering: /opt/hiddify-manager/other/v2ray/config-v2ray.json.j2
+Rendering: /opt/hiddify-manager/haproxy/maps/decoy_domain.j2
+Rendering: /opt/hiddify-manager/haproxy/maps/path_v10.j2
+Rendering: /opt/hiddify-manager/haproxy/maps/sni_h2.j2
+Rendering: /opt/hiddify-manager/haproxy/maps/path.j2
+Rendering: /opt/hiddify-manager/haproxy/maps/sni.j2
+Rendering: /opt/hiddify-manager/common/run.sh.j2
+Rendering: /opt/hiddify-manager/nginx/conf.d/singbox-base.conf.j2
+Rendering: /opt/hiddify-manager/nginx/parts/short-link.conf.j2
+Rendering: /opt/hiddify-manager/nginx/parts/def-link.conf.j2
+Rendering: /opt/hiddify-manager/nginx/parts/common.conf.j2
+Cleaning up deprecated components...
+Deprecated components cleanup completed.
+####20####Configuring...####System and Firewall settings####
+===run.sh common
+Service is running on port 22 and path /usr/sbin/sshd
+Service not found or not running
+iptables: Bad rule (does a matching rule exist in that chain?).
+ip6tables: Bad rule (does a matching rule exist in that chain?).
+ip6tables-restore: COMMIT expected at line 48
+iptables-restore: COMMIT expected at line 49
+ * Reloading configuration files for periodic command scheduler cron
+   ...done.
+####25####Applying...####Nginx####
+======================nginx====================================={
+===run.sh nginx
+Setting permissions on /opt/hiddify-manager/nginx/parts/short-link.conf
+Setting permissions on /opt/hiddify-manager/nginx/parts
+Setting permissions on /opt/hiddify-manager/nginx
+}========================nginx===================================
+####35####Applying...####Haproxy for Splitting Traffic####
+======================haproxy====================================={
+===run.sh haproxy
+}========================haproxy===================================
+####45####Applying...####Getting Certificates####
+======================acme.sh====================================={
+===run.sh acme.sh
+==========================================
+Getting SSL certificate for: d-watashi-i-vip-r.watashi-php.ir
+==========================================
+✓ Existing certificate is valid for 89 more days, skipping renewal.
+Not an RSA key
+read EC key
+EC Key valid.
+writing EC key
+writing RSA key
+}========================acme.sh===================================
+####55####Applying...####Xray####
+======================xray====================================={
+===run.sh xray
+Ignoring xray test
+}========================xray===================================
+####65####Applying...####Singbox####
+======================singbox====================================={
+===run.sh singbox
+Setting permissions on /opt/hiddify-manager/singbox/configs/01_api.json
+Setting permissions on /opt/hiddify-manager/singbox/configs
+Setting permissions on /opt/hiddify-manager/singbox
+}========================singbox===================================
+####75####Applying...####Additional Services####
+####85####Applying...####Warp####
+======================other/telegram====================================={
+===run.sh other/telegram
+======================other/speedtest====================================={
+}========================other/speedtest===================================
+======================other/ssfaketls====================================={
+===run.sh other/ssfaketls
+======================other/ssh====================================={
+===run.sh other/ssh
+======================other/hiddify-cli====================================={
+===run.sh other/hiddify-cli
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
 
-# Debug starts application in debug mode. It starts to be quite verbose
-# in output. Actually, the idea is that you run it in debug mode only if
-# you have any issue.
-debug = true
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+ 24 25022   24  6186    0     0   7925      0  0:00:03 --:--:--  0:00:03  7920
+100 25022  100 25022    0     0  24515      0  0:00:01  0:00:01 --:--:-- 24531
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
 
-# A secret. Please remember that mtg supports only FakeTLS mode, legacy
-# simple and secured mode are prohibited. For you it means that secret
-# should either be base64-encoded or starts with ee.
-# secret = "eeTELEGRAM_USER_SECREThextelegramdomain"
-secret = "eecc9d023332f343f2994bc2f4beda86a677656272616d7a2e636f6d"
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+100    14  100    14    0     0     40      0 --:--:-- --:--:-- --:--:--    40
+Error: warp-go download failed or not a gzip file.
+======================other/warp====================================={
+####90####Applying...####Wireguard####
+####95####Applying...####Almost Finished####
+===run.sh other/warp
+======================other/wireguard====================================={
+===run.sh other/wireguard
+}========================other/ssfaketls===================================
+}========================other/ssh===================================
+}========================other/hiddify-cli===================================
+2026/02/11 23:58:02 Using config file: wgcf-account.toml
+2026/02/11 23:58:02 Successfully generated WireGuard profile: wgcf-profile.conf
+Created symlink /etc/systemd/system/multi-user.target.wants/mtproxy.service → /opt/hiddify-manager/other/telegram/tgo/mtproxy.service.
+}========================other/wireguard===================================
+Testing singbox warp
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
 
-# Host:port pair to run proxy on.
-bind-to = "127.0.0.1:1001"
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+100   111  100   111    0     0    887      0 --:--:-- --:--:-- --:--:--   895
+{
+  "status": 429,
+  "error": {
+    "title": "Rate limit exceeded",
+    "message": "Sign up at ipinfo.io"
+  }
+}  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
 
-# Defines how many concurrent connections are allowed to this proxy.
-# All other incoming connections are going to be dropped.
-concurrency = 8192
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+100   391  100   391    0     0  11245      0 --:--:-- --:--:-- --:--:-- 11500
+{
+  "country"      : "France",
+  "countryCode"  : "FR",
+  "city"         : "Paris",
+  "isp"          : "Cloudflare, Inc.",
+  "org"          : "Cloudflare WARP",
+  "as"           : "AS13335 Cloudflare, Inc.",
+  "query"        : "104.28.211.186"
+}
 
-# A size of user-space buffer for TCP to use. Since we do 2 connections,
-# then we have tcp-buffer * (4 + 2) per each connection: read/write for
-# each connection + 2 copy buffers to pump the data between sockets.
-#
-# Deprecated: this setting is no longer makes any effect.
-# tcp-buffer = "4kb"
+==========WARP is working==============
+}========================other/warp===================================
+MTProxy (mtg) started successfully!
+● mtproxy.service - mtg - MTProto proxy server
+     Loaded: loaded (/etc/systemd/system/mtproxy.service; enabled; preset: enabled)
+     Active: active (running) since Wed 2026-02-11 23:58:07 +0330; 3s ago
+       Docs: https://github.com/9seconds/mtg
+    Process: 96931 ExecStartPre=/bin/bash -c test -x /opt/hiddify-manager/other/telegram/tgo/mtg || { echo "mtg binary not found or not executable"; exit 1; } (code=exited, status=0/SUCCESS)
+    Process: 96932 ExecStartPre=/bin/bash -c test -f /opt/hiddify-manager/other/telegram/tgo/mtg.toml || { echo "mtg.toml not found"; exit 1; } (code=exited, status=0/SUCCESS)
+   Main PID: 96933 (mtg)
+      Tasks: 6 (limit: 2276)
+     Memory: 2.0M (peak: 2.1M)
+        CPU: 68ms
+     CGroup: /system.slice/mtproxy.service
+             └─96933 /opt/hiddify-manager/other/telegram/tgo/mtg run /opt/hiddify-manager/other/telegram/tgo/mtg.toml
 
-# Sometimes you want to enforce mtg to use some types of
-# IP connectivity to Telegram. We have 4 modes:
-#   - prefer-ipv6:
-#     We can use both ipv4 and ipv6 but ipv6 has a preference
-#   - prefer-ipv4:
-#     We can use both ipv4 and ipv6 but ipv4 has a preference
-#   - only-ipv6:
-#     Only ipv6 connectivity is used
-#   - only-ipv4:
-#     Only ipv4 connectivity is used
-prefer-ip = "prefer-ipv4"
-
-# FakeTLS uses domain fronting protection. So it needs to know a port to
-# access.
-domain-fronting-port = 443
-
-# FakeTLS can compare timestamps to prevent probes. Each message has
-# encrypted timestamp. So, mtg can compare this timestamp and decide if
-# we need to proceed with connection or not.
-#
-# Sometimes time can be skewed so we accept all messages within a
-# time range of this parameter.
-tolerate-time-skewness = "5s"
-
-# Telegram has a concept of DC. You can think about DC as a number of a cluster
-# with a certain purpose. Some clusters serve media, some - messages, some rule
-# channels and so on. But sometimes unknown DC number is requested by client.
-# It could be a bug or some global reconfiguration of the Telegram.
-#
-# By default, proxy rejects such requests. But it is also possible to fallback
-# this request to any DC. Telegram works in a way that any DC is able to serve
-# any request but sacrificing a latency.
-#
-# If this setting is disabled (default), mtg will reject a connection.
-# Otherwise, chose a new DC.
-allow-fallback-on-unknown-dc = true
-
-# network defines different network-related settings
-[network]
-# please be aware that mtg needs to do some external requests. For
-# example, if you do not pass public ips, it will request your public ip
-# address from some external service.
-#
-# As for 2.0, if you set a public-ip on your own, mtg won't issue any
-# network requests except of those required for Telegram.
-#
-# so, in order of doing them, it needs to do DNS lookup. mtg ignores DNS
-# resolver of the operating system and uses DOH instead. This is a host
-# it has to access.
-#
-# By default we use Quad9.
-doh-ip = "9.9.9.9"
-
-# mtg can work via proxies (for now, we support only socks5). Proxy
-# configuration is done via list. So, you can specify many proxies
-# there.
-#
-# Actually, if you supply an empty list, then no proxies are going to be
-# used. If you supply a single proxy, then mtg will use it exclusively.
-# If you supply >= 2, then mtg will load balance between them.
-#
-# If you add an empty string here, this is an equivalent of 'plain network',
-# with no proxy usage.
-#
-# Proxy configuration is done via ordinary URI schema:
-#
-#     socks5://user:password@host:port?open_threshold=5&half_open_timeout=1m&reset_failures_timeout=10s
-#
-# Only socks5 proxy is used. user/password is optional. As you can
-# see, you can specify some parameters in GET query. These parameters
-# configure circuit breaker.
-#
-# open_threshold means a number of errors which should happen so we stop
-# use a proxy.
-#
-# half_open_timeout means a time period (in Golang duration notation)
-# after which we can retry with this proxy
-#
-# reset_failures_timeout means a time period when we flush out errors
-# when circuit breaker in closed state.
-#
-# Please see https://docs.microsoft.com/en-us/azure/architecture/patterns/circuit-breaker
-# on details about circuit breakers.
-proxies = [
-    # "socks5://user:password@host:port?open_threshold=5&half_open_timeout=1m&reset_failures_timeout=10s"
-]
-
-# network timeouts define different settings for timeouts. tcp timeout
-# define a global timeout on establishing of network connections. idle
-# means a timeout on pumping data between sockset when nothing is
-# happening.
-#
-# please be noticed that handshakes have no timeouts intentionally. You can
-# find a reasoning here:
-# https://www.ndss-symposium.org/wp-content/uploads/2020/02/23087-paper.pdf
-[network.timeout]
-tcp = "5s"
-http = "10s"
-idle = "1m"
-
-# Some countries do active probing on Telegram connections. This technique
-# allows to protect from such effort.
-#
-# mtg has a cache of some connection fingerprints. Actually, first bytes
-# of each connection. So, it stores them in some in-memory LRU+TTL cache.
-# You can configure this cache here.
-[defense.anti-replay]
-# You can enable/disable this feature.
-enabled = true
-# max size of such a cache. Please be aware that this number is
-# approximate we try hard to store data quite dense but it is possible
-# that we can go over this limit for 10-20% under some conditions and
-# architectures.
-max-size = "1mib"
-# we use stable bloom filters for anti-replay cache. This helps
-# to maintain a desired error ratio.
-error-rate = 0.001
-
-# You can protect proxies by using different blocklists. If client has
-# ip from the given range, we do not try to do a proper handshake. We
-# actually route it to fronting domain. So, this client will never ever
-# have a chance to use mtg to access Telegram.
-#
-# Please remember that blocklists are initialized in async way. So,
-# when you start a proxy, blocklists are empty, they are populated and
-# processed in backgrounds. An error in any URL is ignored.
-[defense.blocklist]
-# You can enable/disable this feature.
-enabled = false
-# This is a limiter for concurrency. In order to protect website
-# from overloading, we download files in this number of threads.
-download-concurrency = 2
-# A list of URLs in FireHOL format (https://iplists.firehol.org/)
-# You can provider links here (starts with https:// or http://) or
-# path to a local file, but in this case it should be absolute.
-urls = [
-    "https://iplists.firehol.org/files/firehol_level1.netset",
-    # "/local.file"
-]
-# How often do we need to update a blocklist set.
-update-each = "24h"
-
-# Allowlist is an opposite to a blocklist. Only those IPs that are coming from
-# subnets defined in these lists are allowed. All others will be rejected.
-#
-# If this feature is disabled, then there won't be any check performed by this
-# validator. It is possible to combine both blocklist and whitelist.
-[defense.allowlist]
-# You can enable/disable this feature.
-enabled = false
-# This is a limiter for concurrency. In order to protect website
-# from overloading, we download files in this number of threads.
-download-concurrency = 2
-# A list of URLs in FireHOL format (https://iplists.firehol.org/)
-# You can provider links here (starts with https:// or http://) or
-# path to a local file, but in this case it should be absolute.
-urls = [
-    # "https://iplists.firehol.org/files/firehol_level1.netset",
-    # "/local.file"
-
-]
-update-each = "24h"
-
-# statsd statistics integration.
-[stats.statsd]
-# enabled/disabled
-enabled = false
-# host:port for UDP endpoint of statsd
-address = "127.0.0.1:8888"
-# prefix of metric for statsd
-metric-prefix = "mtg"
-# tag format to use
-# supported values are 'datadog', 'influxdb' and 'graphite'
-# default format is graphite.
-tag-format = "datadog"
-
-# prometheus metrics integration.
-[stats.prometheus]
-# enabled/disabled
-enabled = false
-# host:port where to start http server for endpoint
-bind-to = "127.0.0.1:3129"
-# prefix of http path
-http-path = "/"
-# prefix for metrics for prometheus
-metric-prefix = "mtg"root@nex1077698372-3138364:/opt/hiddify-manager#
+Feb 11 23:58:07 nex1077698372-3138364 systemd[1]: Starting mtproxy.service - mtg - MTProto proxy server...
+Feb 11 23:58:07 nex1077698372-3138364 systemd[1]: Started mtproxy.service - mtg - MTProto proxy server.
+}========================other/telegram===================================
+---------------------Finished!------------------------

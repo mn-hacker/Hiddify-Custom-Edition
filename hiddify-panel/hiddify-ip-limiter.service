@@ -1,0 +1,18 @@
+[Unit]
+Description=Hiddify IP Limit Enforcer
+After=network.target hiddify-redis.service
+Wants=hiddify-redis.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/hiddify-manager/
+Environment="PYTHONPATH=/opt/hiddify-manager/hiddify-panel/src/"
+ExecStart=/opt/hiddify-manager/.venv313/bin/python -m hiddifypanel.panel.limit_enforcer
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

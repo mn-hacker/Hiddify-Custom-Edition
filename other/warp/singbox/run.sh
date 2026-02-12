@@ -237,8 +237,8 @@ sleep 5
 echo "Testing singbox warp"
 
 
-curl -x socks://127.0.0.1:3000 --connect-timeout 4 www.ipinfo.io
-curl -x socks://127.0.0.1:3000 --connect-timeout 4 http://ip-api.com?fields=message,country,countryCode,city,isp,org,as,query
+curl -s -x socks://127.0.0.1:3000 --connect-timeout 4 www.ipinfo.io >/dev/null 2>&1
+curl -s -x socks://127.0.0.1:3000 --connect-timeout 4 http://ip-api.com?fields=message,country,countryCode,city,isp,org,as,query
 if [ $? != 0 ];then
     echo "WARP is not working"
 else
