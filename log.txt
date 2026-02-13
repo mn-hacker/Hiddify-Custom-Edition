@@ -1,56 +1,97 @@
-root@ip-172-26-9-143:/opt/hiddify-manager# export HIDDIFY_CFG_PATH=/opt/hiddify-manager/hiddify-panel/app.cfg
-root@ip-172-26-9-143:/opt/hiddify-manager# export HIDDIFY_CONFIG_PATH=/opt/hiddify-manager/hiddify-panel/
-root@ip-172-26-9-143:/opt/hiddify-manager#
-root@ip-172-26-9-143:/opt/hiddify-manager# cd /opt/hiddify-manager/hiddify-panel/src
-root@ip-172-26-9-143:/opt/hiddify-manager/hiddify-panel/src# /opt/hiddify-manager/.venv313/bin/python hiddifypanel/panel/admin/restore_job.py /tmp/backup.json '{"enable_user_restore": true, "enable_config_restore": true, "enable_domain_restore": true, "override_root_admin": false}'
-Reading backup file...
-Restoring database from backup (this may take a while)...
-PARENTS set()
-abondon uuids ['1edd4bb6-2e76-4c38-b829-400c0f05ebac']
-uuids_without_parent=============== ['1edd4bb6-2e76-4c38-b829-400c0f05ebac']
-uuids_not admin exist=============== ['1edd4bb6-2e76-4c38-b829-400c0f05ebac']
-PARENTS {'66e73ab7-5981-4942-bbe4-6a649443ccce'}
-abondon uuids [1]
-Database restoration complete. Triggering installation...
-sudo: /opt/hiddify-manager/hiddify-panel/common/commander.py: command not found
+500
+خطایی رخ داده است!! Hiddify Panel 12.0.20
+لطفاً یک مشکل در Github ایجاد کنید
+
+        
+name 's_ip' is not defined
 Traceback (most recent call last):
-  File "/opt/hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/restore_job.py", line 116, in <module>
-    restore_backup(json_path, options)
-    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/restore_job.py", line 17, in restore_backup
-    app = create_app()
-  File "/opt/hiddify-manager/hiddify-panel/src/hiddifypanel/base.py", line 58, in create_app
-    app.config.load_extensions("EXTENSIONS")
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/dynaconf/contrib/flask_dynaconf.py", line 231, in load_extensions
-    initializer(app)
-    ~~~~~~~~~~~^^^^^
-  File "/opt/hiddify-manager/hiddify-panel/src/hiddifypanel/panel/common_bp/__init__.py", line 7, in init_app
-    LoginView.register(bp, route_base="/")
-    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask_classful.py", line 183, in register
-    app.add_url_rule(
-    ~~~~~~~~~~~~~~~~^
-        rule, endpoint, proxy,
-        ^^^^^^^^^^^^^^^^^^^^^^
-        subdomain=subdomain, **options)
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/apiflask/route.py", line 96, in add_url_rule
-    super(cls, self).add_url_rule(
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        rule,
-        ^^^^^
-    ...<3 lines>...
-        **options,
-        ^^^^^^^^^^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask/app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask_admin/base.py", line 69, in inner
+    return self._run_view(f, *args, **kwargs)
+           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask_admin/base.py", line 369, in _run_view
+    return fn(self, *args, **kwargs)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask_admin/model/base.py", line 2029, in index_view
+    return self.render(
+           ~~~~~~~~~~~^
+        self.list_template,
+        ^^^^^^^^^^^^^^^^^^^
+    ...<49 lines>...
+        extra_args=view_args.extra_args,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask/sansio/scaffold.py", line 46, in wrapper_func
-    self._check_setup_finished(f_name)
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
-  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask/sansio/blueprints.py", line 215, in _check_setup_finished
-    raise AssertionError(
-    ...<5 lines>...
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask_admin/base.py", line 308, in render
+    return render_template(template, **kwargs)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/panel/admin/templates/model/domain_list.html", line 1, in top-level template code
+    {% extends 'hiddify-flask-admin/list.html' %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/templates/hiddify-flask-admin/list.html", line 6, in top-level template code
+    {% import 'flask-admin/model/row_actions.html' as row_actions with context %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask_adminlte3/templates/flask-admin/master.html", line 1, in top-level template code
+    {% extends admin_base_template %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/templates/flaskadmin-layout.html", line 1, in top-level template code
+    {% extends 'admin-layout.html' %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/templates/admin-layout.html", line 2, in top-level template code
+    {% from 'macros.html' import icon,render_nav_item %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/templates/master.html", line 120, in top-level template code
+    {% block page_body %}
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/templates/master.html", line 152, in block 'page_body'
+    {% block body %}{% endblock %}
+    ^^^^^^^^^^^^^^^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/panel/admin/templates/model/domain_list.html", line 4, in block 'body'
+    {{super()}}
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/templates/hiddify-flask-admin/list.html", line 80, in block 'body'
+    {% block model_list_table %}
+    ^^^^^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/templates/hiddify-flask-admin/list.html", line 130, in block 'model_list_table'
+    {% block list_row scoped %}
+    
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/templates/hiddify-flask-admin/list.html", line 159, in block 'list_row'
+    {{ get_value(row, c) }}
+    
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask_admin/model/base.py", line 1877, in get_list_value
+    return self._get_list_value(
+           ~~~~~~~~~~~~~~~~~~~~^
+        context,
+        ^^^^^^^^
+    ...<3 lines>...
+        self.column_type_formatters,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
-AssertionError: The setup method 'add_url_rule' can no longer be called on the blueprint 'common_bp'. It has already been registered at least once, any changes will not be applied consistently.
-Make sure all imports, decorators, functions, etc. needed to set up the blueprint are done before registering it.
+    ^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask_admin/model/base.py", line 1836, in _get_list_value
+    value = column_fmt(self, context, model, name)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/panel/admin/DomainAdmin.py", line 112, in _domain_ip
+    myips = set(hutils.network.get_ips())
+                ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/redis_cache/__init__.py", line 231, in inner
+    parsed_result = fn(*args, **kwargs)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/hutils/network/net.py", line 135, in get_ips
+    return [*get_ips(4), *get_ips(6)]
+             ~~~~~~~^^^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/redis_cache/__init__.py", line 231, in inner
+    parsed_result = fn(*args, **kwargs)
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/hutils/network/net.py", line 142, in get_ips
+    if s_ip:
+       ^^^^
+NameError: name 's_ip' is not defined. Did you mean: 'is_ip'?
+
+                    
