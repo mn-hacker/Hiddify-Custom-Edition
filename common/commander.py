@@ -236,9 +236,12 @@ def truncate(file: str):
     with open(file_path, 'w') as f:
         f.write("")
     
-    # Set permissions so hiddify-panel can write to it if needed?
-    # os.chmod(file_path, 0o666)  # Dangerous? 
-    # Better to leave permissions as is, assuming caller has rights or root (commander runs as root)
+    # Set permissions so hiddify-panel can write to it
+    import shutil
+    try:
+        shutil.chown(file_path, user='hiddify-panel', group='hiddify-panel')
+    except Exception as e:
+        print(f"Failed to chown {file_path}: {e}")
 
 
 if __name__ == "__main__":
