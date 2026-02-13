@@ -1,0 +1,295 @@
+                                                                                               │ ▒
+▒│ System Resources: RAM=1910MB, Swap=0MB                                                        │ ▒
+▒│ ===install.sh common                                                                          │ ▒
+▒│ Hit:1 http://nginx.org/packages/ubuntu noble InRelease                                        │ ▒
+▒│ Hit:2 http://eu-central-1.ec2.archive.ubuntu.com/ubuntu noble InRelease                       │ ▒
+▒│ Hit:3 http://eu-central-1.ec2.archive.ubuntu.com/ubuntu noble-updates InRelease               │ ▒
+▒│ Hit:4 http://eu-central-1.ec2.archive.ubuntu.com/ubuntu noble-backports InRelease             │ ▒
+▒│ Hit:5 http://security.ubuntu.com/ubuntu noble-security InRelease                              │ ▒
+▒│ Hit:6 https://ppa.launchpadcontent.net/vbernat/haproxy-3.2/ubuntu noble InRelease             │ ▒
+▒│ Reading package lists...                                                                      │ ▒
+▒│ Building dependency tree...                                                                   │ ▒
+▒│ Reading state information...                                                                  │ ▒
+▒│ 19 packages can be upgraded. Run 'apt list --upgradable' to see them.                         │ ▒
+▒│ Using Python 3.13.11 environment at: /opt/hiddify-manager/.venv313                            │ ▒
+▒│ net.ipv6.conf.all.disable_ipv6 = 0                                                            │ ▒
+▒│ net.ipv6.conf.default.disable_ipv6 = 0                                                        │ ▒
+▒│ net.ipv6.conf.lo.disable_ipv6 = 0                                                             │ ▒
+▒│ IPv6 Disabled for ens5                                                                        │ ▒
+▒│ IPv6 Disabled for hiddifywg                                                                   │ ▒
+▒│  * Reloading configuration files for periodic command scheduler cron                          │ ▒
+▒│    ...done.                                                                                   │ ▒
+▒│ ======================other/redis====================================={                       │ ▒
+▒│ ===install.sh other/redis                                                                     │ ▒
+▒│ ===run.sh other/redis                                                                         │ ▒
+▒│ }========================other/redis===================================                       │ ▒
+▒│ ======================other/mysql====================================={
+===install.sh other/mysql                                                                     │ ▒
+▒│ }========================other/mysql===================================                       │ ▒
+▒│ ======================hiddify-panel====================================={                     │ ▒
+▒│ ===install.sh hiddify-panel                                                                   │ ▒
+▒│ MySQL password loaded (length: 32)                                                            │ ▒
+▒│ MySQL URI configured in app.cfg                                                               │ ▒
+▒│ Redis URI configured in app.cfg                                                               │ ▒
+▒│ NOTICE: installing hiddifypanel from bundled src/...                                          │ ▒
+▒│ Using Python 3.13.11 environment at: /opt/hiddify-manager/.venv313                            │ ▒
+▒│ Resolved 115 packages in 275ms                                                                │ ▒
+▒│    Building hiddifypanel @ file:///opt/hiddify-manager/hiddify-panel/src                      │ ▒
+▒│       Built hiddifypanel @ file:///opt/hiddify-manager/hiddify-panel/src                      │ ▒
+▒│ Prepared 1 package in 4.73s                                                                   │ ▒
+▒│ Uninstalled 1 package in 26ms                                                                 │ ▒
+▒│ Installed 1 package in 27ms                                                                   │ ▒
+▒│  ~ hiddifypanel==12.0.22 (from file:///opt/hiddify-manager/hiddify-panel/src)                 │ ▒
+▒│ ===run.sh hiddify-panel                                                                       │ ▒
+▒│ run.sh: MySQL password loaded (length: 32)                                                    │ ▒
+▒│ Traceback (most recent call last):                                                            │ ▒
+▒│   File "<frozen runpy>", line 198, in _run_module_as_main                                     │ ▒
+▒│   File "<frozen runpy>", line 88, in _run_code                                                │ ▒
+▒│   File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/__main__.py",>│ ▒
+▒│     main()                                                                                    │ ▒
+▒│     ~~~~^^                                                                                    │ ▒
+▒│   File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/click/core.py", line 1157,>│ ▒
+▒│     return self.main(*args, **kwargs)
+            ~~~~~~~~~^^^^^^^^^^^^^^^^^                                                         │ ▒
+▒│   File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/click/core.py", line 1078,>│ ▒
+▒│     rv = self.invoke(ctx)                                                                     │ ▒
+▒│   File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/click/core.py", line 1682,>│ ▒
+▒│     cmd_name, cmd, args = self.resolve_command(ctx, args)                                     │ ▒
+▒│                           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^                                     │ ▒
+▒│   File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/click/core.py", line 1729,>│ ▒
+▒│     cmd = self.get_command(ctx, cmd_name)                                                     │ ▒
+▒│   File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask/cli.py", line 611, i>│ ▒
+▒│     app = info.load_app()                                                                     │ ▒
+▒│   File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask/cli.py", line 328, i>│ ▒
+▒│     app: Flask | None = self.create_app()                                                     │ ▒
+▒│                         ~~~~~~~~~~~~~~~^^                                                     │ ▒
+▒│   File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/base.py", lin>│ ▒
+▒│     app = create_app(app_mode="cli" if cli else "web")                                        │ ▒
+▒│   File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/base.py", lin>│ ▒
+▒│     app.config.load_extensions("EXTENSIONS")                                                  │ ▒
+▒│     ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^                                                  │ ▒
+▒│   File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/dynaconf/contrib/flask_dyn>│ ▒
+▒│     initializer = entry_point.load()                                                          │ ▒
+▒│   File "/usr/local/share/uv/cpython-3.13.11-linux-x86_64-gnu/lib/python3.13/importlib/metadat>│ ▒
+▒│     module = import_module(match.group('module'))                                             │ ▒
+▒│   File "/usr/local/share/uv/cpython-3.13.11-linux-x86_64-gnu/lib/python3.13/importlib/__init_>│ ▒
+▒│     return _bootstrap._gcd_import(name[level:], package, level)                               │ ▒
+▒│            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^                               │ ▒
+▒│   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load                          │ ▒
+▒│   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked                 │ ▒
+▒│   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked                           │ ▒
+▒│   File "<frozen importlib._bootstrap_external>", line 1023, in exec_module                    │ ▒
+▒│   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed                │ ▒
+▒│   File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/panel/cli.py">│ ▒
+▒│     from hiddifypanel.panel import hiddify, usage                                             │ ▒
+▒│   File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/panel/hiddify>│ ▒
+▒│     from hiddifypanel.panel.run_commander import commander, Command                           │ ▒
+▒│   File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/panel/run_com>│ ▒
+▒│     class Command(StrEnum):                                                                   │ ▒
+▒│     ...<18 lines>...                                                                          │ ▒
+▒│         truncate = 'truncate'                                                                 │ ▒
+▒│   File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/panel/run_com>│ ▒
+▒│     delete_tunnel = 'delete-tunnel'                                                           │ ▒
+▒│     ^^^^^^^^^^^^^                                                                             │ ▒
+▒│   File "/usr/local/share/uv/cpython-3.13.11-linux-x86_64-gnu/lib/python3.13/enum.py", line 40>│ ▒
+▒│     raise TypeError('%r already defined as %r' % (key, self[key]))                            │ ▒
+▒│ TypeError: 'delete_tunnel' already defined as 'delete-tunnel'                                 │ ▒
+▒│ }========================hiddify-panel===================================                     │ ▒
+▒│ Traceback (most recent call last):                                                            │ ▒
+▒│   File "<frozen runpy>", line 198, in _run_module_as_main                                     │ ▒
+▒│   File "<frozen runpy>", line 88, in _run_code                                                │ ▒
+▒│   File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/__main__.py",>│ ▒
+▒│     main()                                                                                    │ ▒
+▒│     ~~~~^^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/click/core.py", line 1157,>│ ▒
+▒│     return self.main(*args, **kwargs)                                                         │ ▒
+▒│            ~~~~~~~~~^^^^^^^^^^^^^^^^^                                                         │ ▒
+▒│   File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/click/core.py", line 1078,>│ ▒
+▒│     rv = self.invoke(ctx)                                                                     │ ▒
+▒│   File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/click/core.py", line 1682,>│ ▒
+▒│     cmd_name, cmd, args = self.resolve_command(ctx, args)                                     │ ▒
+▒│                           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^                                     │ ▒
+▒│   File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/click/core.py", line 1729,>│ ▒
+▒│     cmd = self.get_command(ctx, cmd_name)                                                     │ ▒
+▒│   File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask/cli.py", line 611, i>│ ▒
+▒│     app = info.load_app()                                                                     │ ▒
+▒│   File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask/cli.py", line 328, i>│ ▒
+▒│     app: Flask | None = self.create_app()                                                     │ ▒
+▒│                         ~~~~~~~~~~~~~~~^^                                                     │ ▒
+▒│   File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/base.py", lin>│ ▒
+▒│     app = create_app(app_mode="cli" if cli else "web")                                        │ ▒
+▒│   File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/base.py", lin>│ ▒
+▒│     app.config.load_extensions("EXTENSIONS")                                                  │ ▒
+▒│     ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^                                                  │ ▒
+▒│   File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/dynaconf/contrib/flask_dyn>│ ▒
+▒│     initializer = entry_point.load()                                                          │ ▒
+▒│   File "/usr/local/share/uv/cpython-3.13.11-linux-x86_64-gnu/lib/python3.13/importlib/metadat>│ ▒
+▒│     module = import_module(match.group('module'))                                             │ ▒
+▒│   File "/usr/local/share/uv/cpython-3.13.11-linux-x86_64-gnu/lib/python3.13/importlib/__init_>│ ▒
+▒│     return _bootstrap._gcd_import(name[level:], package, level)
+            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^                               │ ▒
+▒│   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import                             │ ▒
+▒│   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load                          │ ▒
+▒│   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked                 │ ▒
+▒│   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked                           │ ▒
+▒│   File "<frozen importlib._bootstrap_external>", line 1023, in exec_module                    │ ▒
+▒│   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed                │ ▒
+▒│   File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/panel/cli.py">│ ▒
+▒│     from hiddifypanel.panel import hiddify, usage                                             │ ▒
+▒│   File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/panel/hiddify>│ ▒
+▒│     from hiddifypanel.panel.run_commander import commander, Command                           │ ▒
+▒│   File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/panel/run_com>│ ▒
+▒│     class Command(StrEnum):                                                                   │ ▒
+▒│     ...<18 lines>...                                                                          │ ▒
+▒│         truncate = 'truncate'                                                                 │ ▒
+▒│   File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/hiddifypanel/panel/run_com>│ ▒
+▒│     delete_tunnel = 'delete-tunnel'                                                           │ ▒
+▒│     ^^^^^^^^^^^^^                                                                             │ ▒
+▒│   File "/usr/local/share/uv/cpython-3.13.11-linux-x86_64-gnu/lib/python3.13/enum.py", line 40>│ ▒
+▒│     raise TypeError('%r already defined as %r' % (key, self[key]))                            │ ▒
+▒│ TypeError: 'delete_tunnel' already defined as 'delete-tunnel'                                 │ ▒
+▒│ Traceback (most recent call last):                                                            │ ▒
+▒│   File "/opt/hiddify-manager/common/jinja.py", line 15, in <module>                           │ ▒
+▒│     configs = json.load(f)                                                                    │ ▒
+▒│   File "/usr/local/share/uv/cpython-3.13.11-linux-x86_64-gnu/lib/python3.13/json/__init__.py">│ ▒
+▒│     return loads(fp.read(),
+        cls=cls, object_hook=object_hook,                                                     │ ▒
+▒│         parse_float=parse_float, parse_int=parse_int,                                         │ ▒
+▒│         parse_constant=parse_constant, object_pairs_hook=object_pairs_hook, **kw)             │ ▒
+▒│   File "/usr/local/share/uv/cpython-3.13.11-linux-x86_64-gnu/lib/python3.13/json/__init__.py">│ ▒
+▒│     return _default_decoder.decode(s)                                                         │ ▒
+▒│            ~~~~~~~~~~~~~~~~~~~~~~~^^^                                                         │ ▒
+▒│   File "/usr/local/share/uv/cpython-3.13.11-linux-x86_64-gnu/lib/python3.13/json/decoder.py",>│ ▒
+▒│     obj, end = self.raw_decode(s, idx=_w(s, 0).end())                                         │ ▒
+▒│                ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^                                         │ ▒
+▒│   File "/usr/local/share/uv/cpython-3.13.11-linux-x86_64-gnu/lib/python3.13/json/decoder.py",>│ ▒
+▒│     raise JSONDecodeError("Expecting value", s, err.value) from None                          │ ▒
+▒│ json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)                       │ ▒
+▒│ Cleaning up deprecated components...                                                          │ ▒
+▒│ Deprecated components cleanup completed.                                                      │ ▒
+▒│ ===run.sh common                                                                              │ ▒
+▒│ Service is running on port 22 and path /usr/sbin/sshd                                         │ ▒
+▒│ Service not found or not running                                                              │ ▒
+▒│ iptables: Bad rule (does a matching rule exist in that chain?).                               │ ▒
+▒│ ip6tables: Bad rule (does a matching rule exist in that chain?).                              │ ▒
+▒│ sed: can't read /etc/motd: No such file or directory                                          │ ▒
+▒│ ip6tables-restore: COMMIT expected at line 66                                                 │ ▒
+▒│ iptables-restore: COMMIT expected at line 65                                                  │ ▒
+▒│  * Reloading configuration files for periodic command scheduler cron                          │ ▒
+▒│    ...done.                                                                                   │ ▒
+▒│ ======================nginx====================================={                             │ ▒
+▒│ ===install.sh nginx                                                                           │ ▒
+▒└───────────────────────────────────────────────
+nginx is already installed                                                                    │ ▒
+▒│ ===run.sh nginx                                                                               │ ▒
+▒│ Setting permissions on /opt/hiddify-manager/nginx/parts/short-link.conf                       │ ▒
+▒│ Setting permissions on /opt/hiddify-manager/nginx/parts                                       │ ▒
+▒│ Setting permissions on /opt/hiddify-manager/nginx                                             │ ▒
+▒│ }========================nginx===================================                             │ ▒
+▒│ ======================haproxy====================================={                           │ ▒
+▒│ ===install.sh haproxy                                                                         │ ▒
+▒│ haproxy 3.2 is already installed                                                              │ ▒
+▒│ ===run.sh haproxy                                                                             │ ▒
+▒│ Job for hiddify-haproxy.service failed because the control process exited with error code.    │ ▒
+▒│ See "systemctl status hiddify-haproxy.service" and "journalctl -xeu hiddify-haproxy.service" >│ ▒
+▒│ }========================haproxy===================================                           │ ▒
+▒│ ======================acme.sh====================================={                           │ ▒
+▒│ ===install.sh acme.sh                                                                         │ ▒
+▒│ [Fri Feb 13 17:09:52 +0330 2026] Removing cron job                                            │ ▒
+▒│ no crontab for root                                                                           │ ▒
+▒│ [Fri Feb 13 17:09:53 +0330 2026] Registering account: https://acme.zerossl.com/v2/DV90        │ ▒
+▒│ [Fri Feb 13 17:09:54 +0330 2026] Already registered                                           │ ▒
+▒│ [Fri Feb 13 17:09:54 +0330 2026] ACCOUNT_THUMBPRINT='bLoztb97QfELly4okH9_H8wuLdJ7JYvh0HinxWpb>│ ▒
+▒│ hiddify-haproxy.service is not active, cannot reload.                                         │ ▒
+▒│ ===run.sh acme.sh                                                                             │ ▒
+▒│ Certificate cert_utils.sh (/opt/hiddify-manager/ssl/cert_utils.sh.crt) file not found. Genera>│ ▒
+▒│ Private key file cert_utils.sh (/opt/hiddify-manager/ssl/cert_utils.sh.crt.key) not found. Ge>│ ▒
+▒│ ......+.......+..+.+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*......+.>│ ▒
+▒│ .+.....+...+............+......+...+.+...............+.........+..+...+......++++++++++++++++>│ ▒
+▒└──────────────────────────────────────────────────────────────────────────────────
+-----                                                                                         │ ▒
+▒│ New certificate and private key generated.                                                    │ ▒
+▒│ }========================acme.sh===================================                           │ ▒
+▒│ ======================xray====================================={                              │ ▒
+▒│ ===install.sh xray                                                                            │ ▒
+▒│ Downloading enhanced geo files for adblock...                                                 │ ▒
+▒│ ===run.sh xray                                                                                │ ▒
+▒│ Ignoring xray test                                                                            │ ▒
+▒│ }========================xray===================================                              │ ▒
+▒│ ======================singbox====================================={                           │ ▒
+▒│ ===install.sh singbox                                                                         │ ▒
+▒│ ===run.sh singbox                                                                             │ ▒
+▒│ }========================singbox===================================                           │ ▒
+▒│ ======================other/speedtest====================================={                   │ ▒
+▒│ ===install.sh other/speedtest                                                                 │ ▒
+▒│ }========================other/speedtest===================================                   │ ▒
+▒│ ======================other/telegram====================================={                    │ ▒
+▒│ ===install.sh other/telegram                                                                  │ ▒
+▒│ Telegram MTProxy (mtg) install.sh                                                             │ ▒
+▒│ Downloading mtg binary...                                                                     │ ▒
+▒│ Updated installed version of mtproxygo for  to 2.1.7.                                         │ ▒
+▒│ MTProxy (mtg) installed successfully!                                                         │ ▒
+▒│ 2.1.7 (go1.19: 2022-08-09T14:26:42Z on 269852a4f1287ef10762a0d27b1f2605532804c1, modules chec>│ ▒
+▒│ Updated installed version of mtproxygo for  to 2.1.7.                                         │ ▒
+▒│ Installation complete. Run 'bash run.sh' to start the service.                                │ ▒
+▒│ ===run.sh other/telegram
+Created symlink /etc/systemd/system/multi-user.target.wants/mtproxy.service → /opt/hiddify-ma>│ ▒
+▒│ MTProxy (mtg) started successfully!                                                           │ ▒
+▒│ ● mtproxy.service - mtg - MTProto proxy server                                                │ ▒
+▒│      Loaded: loaded (/etc/systemd/system/mtproxy.service; enabled; preset: enabled)           │ ▒
+▒│      Active: active (running) since Fri 2026-02-13 17:10:06 +0330; 3s ago                     │ ▒
+▒│        Docs: https://github.com/9seconds/mtg                                                  │ ▒
+▒│     Process: 162253 ExecStartPre=/bin/bash -c test -x /opt/hiddify-manager/other/telegram/tgo>│ ▒
+▒│     Process: 162254 ExecStartPre=/bin/bash -c test -f /opt/hiddify-manager/other/telegram/tgo>│ ▒
+▒│    Main PID: 162255 (mtg)                                                                     │ ▒
+▒│       Tasks: 7 (limit: 2213)                                                                  │ ▒
+▒│      Memory: 2.2M (peak: 2.6M)                                                                │ ▒
+▒│         CPU: 45ms                                                                             │ ▒
+▒│      CGroup: /system.slice/mtproxy.service                                                    │ ▒
+▒│              └─162255 /opt/hiddify-manager/other/telegram/tgo/mtg run /opt/hiddify-manager/ot>│ ▒
+▒│                                                                                               │ ▒
+▒│ Feb 13 17:10:06 ip-172-26-9-143 systemd[1]: Starting mtproxy.service - mtg - MTProto proxy se>│ ▒
+▒│ Feb 13 17:10:06 ip-172-26-9-143 systemd[1]: Started mtproxy.service - mtg - MTProto proxy ser>│ ▒
+▒│ }========================other/telegram===================================                    │ ▒
+▒│ ======================other/ssfaketls====================================={                   │ ▒
+▒│ ===install.sh other/ssfaketls                                                                 │ ▒
+▒│ ===run.sh other/ssfaketls                                                                     │ ▒
+▒│ }========================other/ssfaketls===================================                   │ ▒
+▒│ ======================other/ssh====================================={                         │ ▒
+▒│ ===install.sh other/ssh                                                                       │ ▒
+▒│ ===run.sh other/ssh                                                                           │ ▒
+▒│ }========================other/ssh===================================                         │ ▒
+▒└──────────────────────────────────────────────────
+ ======================other/hiddify-cli====================================={                 │ ▒
+▒│ ===install.sh other/hiddify-cli                                                               │ ▒
+▒│ Warning: Could not get version, downloading latest...                                         │ ▒
+▒│ ===run.sh other/hiddify-cli                                                                   │ ▒
+▒│ }========================other/hiddify-cli===================================                 │ ▒
+▒│ Installing IP Limiter Service...                                                              │ ▒
+▒│ ======================other/warp====================================={                        │ ▒
+▒│ ===install.sh other/warp                                                                      │ ▒
+▒│ ===run.sh other/warp                                                                          │ ▒
+▒│ 2026/02/13 17:10:19 Using config file: wgcf-account.toml                                      │ ▒
+▒│ 2026/02/13 17:10:19 Successfully generated WireGuard profile: wgcf-profile.conf               │ ▒
+▒│ Testing singbox warp                                                                          │ ▒
+▒│ {                                                                                             │ ▒
+▒│   "country"      : "Germany",                                                                 │ ▒
+▒│   "countryCode"  : "DE",                                                                      │ ▒
+▒│   "city"         : "Frankfurt am Main",                                                       │ ▒
+▒│   "isp"          : "Cloudflare, Inc.",                                                        │ ▒
+▒│   "org"          : "Cloudflare WARP",                                                         │ ▒
+▒│   "as"           : "AS13335 Cloudflare, Inc.",                                                │ ▒
+▒│   "query"        : "104.28.197.15"                                                            │ ▒
+▒│ }                                                                                             │ ▒
+▒│                                                                                               │ ▒
+▒│ ==========WARP is working==============                                                       │ ▒
+▒│ }========================other/warp===================================                        │ ▒
+▒│ ======================other/wireguard====================================={                   │ ▒
+▒│ ===install.sh other/wireguard
+===run.sh other/wireguard                                                                     │ ▒
+▒│ }========================other/wireguard===================================                   │ ▒
+▒│ ---------------------Finished!------------------------                                        │ ▒
+▒└────────────────────────────────────────────────
+Process Finished... To Exit Press Q
+                                                100 %

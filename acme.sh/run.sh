@@ -4,6 +4,9 @@ source ./cert_utils.sh
 # domains=$(cat ../current.json | jq -r '.domains[] | select(.mode | IN("direct", "cdn", "worker", "relay", "auto_cdn_ip", "old_xtls_direct", "sub_link_only")) | .domain')
 domains=$(cat ../current.json | jq -r '.domains[] | select(.mode | IN("direct",   "relay", "old_xtls_direct", "sub_link_only")) | .domain')
 
+# Cleanup erroneous certificate file if it exists
+rm -f ../ssl/cert_utils.sh.crt ../ssl/cert_utils.sh.crt.key
+
 for d in $domains; do
     get_cert $d &
 done
