@@ -229,13 +229,12 @@ def truncate(file: str):
     if ".." in file or "/" in file:
         raise Exception("Access denied")
 
+    # Ensure directory exists
+    os.makedirs(log_dir, exist_ok=True)
+
     # Truncate
-    if os.path.exists(file_path):
-        with open(file_path, 'w') as f:
-            f.write("")
-    else:
-        # Create empty file
-        open(file_path, 'a').close()
+    with open(file_path, 'w') as f:
+        f.write("")
     
     # Set permissions so hiddify-panel can write to it if needed?
     # os.chmod(file_path, 0o666)  # Dangerous? 
