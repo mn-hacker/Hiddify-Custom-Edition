@@ -1,52 +1,56 @@
-======================hiddify-panel====================================={                     │ ▒
-▒│ ===install.sh hiddify-panel                                                                   │ ▒
-▒│ MySQL password loaded (length: 32)                                                            │ ▒
-▒│ MySQL URI configured in app.cfg                                                               │ ▒
-▒│ Redis URI configured in app.cfg                                                               │ ▒
-▒│ Created symlink /etc/systemd/system/multi-user.target.wants/hiddify-panel.service → /opt/hidd>│ ▒
-▒│ Created symlink /etc/systemd/system/multi-user.target.wants/hiddify-panel-background-tasks.se>│ ▒
-▒│ NOTICE: installing hiddifypanel from bundled src/...                                          │ ▒
-▒│ Using Python 3.13.12 environment at: /opt/hiddify-manager/.venv313                            │ ▒
-▒│ Resolved 115 packages in 184ms                                                                │ ▒
-▒│    Building hiddifypanel @ file:///opt/hiddify-manager/hiddify-panel/src                      │ ▒
-▒│       Built hiddifypanel @ file:///opt/hiddify-manager/hiddify-panel/src                      │ ▒
-▒│ Prepared 5 packages in 2.62s                                                                  │ ▒
-▒│ Uninstalled 5 packages in 20ms                                                                │ ▒
-▒│ Installed 5 packages in 17ms                                                                  │ ▒
-▒│  - click==8.3.1                                                                               │ ▒
-▒│  + click==8.1.7                                                                               │ ▒
-▒│  - flask==3.1.2                                                                               │ ▒
-▒│  + flask==3.0.3                                                                               │ ▒
-▒│  - hiddifypanel==11.0.17                                                                      │ ▒
-▒│  + hiddifypanel==12.0.12 (from file:///opt/hiddify-manager/hiddify-panel/src)                 │ ▒
-▒│  - markupsafe==3.0.3                                                                          │ ▒
-▒│  + markupsafe==3.0.2                                                                          │ ▒
-▒│  - werkzeug==3.1.5                                                                            │ ▒
-▒│  + werkzeug==3.0.6                                                                            │ ▒
-▒│ ===run.sh hiddify-panel
- run.sh: MySQL password loaded (length: 32)                                                    │ ▒
-▒│ 2026-02-12 23:27:44.631 | WARNING  | hiddifypanel.panel.init_db:current_db_version:859 - db v>│ ▒
-▒│ 2026-02-12 23:27:45.497 | DEBUG    | hiddifypanel.panel.init_db:execute:807 - migrating_db: (>│ ▒
-▒│ [SQL: ALTER TABLE child DROP INDEX `name`;]                                                   │ ▒
-▒│ (Background on this error at: https://sqlalche.me/e/20/e3q8)                                  │ ▒
-▒│ 2026-02-12 23:27:45.497 | DEBUG    | hiddifypanel.panel.init_db:execute:807 - migrating_db: (>│ ▒
-▒│ [SQL: ALTER TABLE user_detail DROP COLUMN connected_ips;]                                     │ ▒
-▒│ (Background on this error at: https://sqlalche.me/e/20/e3q8)                                  │ ▒
-▒│ 2026-02-12 23:27:45.619 | DEBUG    | hiddifypanel.panel.init_db:execute:807 - migrating_db: (>│ ▒
-▒│ [SQL: ALTER TABLE proxy DROP INDEX `name`;]                                                   │ ▒
-▒│ (Background on this error at: https://sqlalche.me/e/20/e3q8)                                  │ ▒
-▒│ 2026-02-12 23:27:45.687 | DEBUG    | hiddifypanel.panel.init_db:execute:807 - migrating_db: (>│ ▒
-▒│ [SQL: ALTER TABLE user RENAME COLUMN monthly_usage_limit_GB TO usage_limit_GB]                │ ▒
-▒│ (Background on this error at: https://sqlalche.me/e/20/e3q8)                                  │ ▒
-▒│ 2026-02-12 23:27:45.688 | DEBUG    | hiddifypanel.panel.init_db:execute:807 - migrating_db: (>│ ▒
-▒│ [SQL: update dailyusage set child_id=0 where child_id is NULL]                                │ ▒
-▒│ (Background on this error at: https://sqlalche.me/e/20/f405)                                  │ ▒
-▒│ 2026-02-12 23:27:45.688 | DEBUG    | hiddifypanel.panel.init_db:execute:807 - migrating_db: (>│ ▒
-▒│ [SQL: update dailyusage set admin_id=1 where admin_id is NULL]                                │ ▒
-▒│ (Background on this error at: https://sqlalche.me/e/20/f405)                                  │ ▒
-▒│ 2026-02-12 23:27:45.689 | DEBUG    | hiddifypanel.panel.init_db:execute:807 - migrating_db: (>│ ▒
-▒│ [SQL: update dailyusage set admin_id=1 where admin_id = 0]                                    │ ▒
-▒│ (Background on this error at: https://sqlalche.me/e/20/f405)                                  │ ▒
-▒│ 2026-02-12 23:27:45.715 | INFO     | hiddifypanel.panel.init_db:upgrade_database:880 - no bac>│ ▒
-▒│ 2026-02-12 23:27:45.728 | WARNING  | hiddifypanel.models.config:hconfig:79 - str db_version n>│ ▒
-▒│ 2026-02-12 23:27:45.730 | INFO     | hiddifypanel.panel.init_db:init_db:955 - Updating db fro>
+root@ip-172-26-9-143:/opt/hiddify-manager# export HIDDIFY_CFG_PATH=/opt/hiddify-manager/hiddify-panel/app.cfg
+root@ip-172-26-9-143:/opt/hiddify-manager# export HIDDIFY_CONFIG_PATH=/opt/hiddify-manager/hiddify-panel/
+root@ip-172-26-9-143:/opt/hiddify-manager#
+root@ip-172-26-9-143:/opt/hiddify-manager# cd /opt/hiddify-manager/hiddify-panel/src
+root@ip-172-26-9-143:/opt/hiddify-manager/hiddify-panel/src# /opt/hiddify-manager/.venv313/bin/python hiddifypanel/panel/admin/restore_job.py /tmp/backup.json '{"enable_user_restore": true, "enable_config_restore": true, "enable_domain_restore": true, "override_root_admin": false}'
+Reading backup file...
+Restoring database from backup (this may take a while)...
+PARENTS set()
+abondon uuids ['1edd4bb6-2e76-4c38-b829-400c0f05ebac']
+uuids_without_parent=============== ['1edd4bb6-2e76-4c38-b829-400c0f05ebac']
+uuids_not admin exist=============== ['1edd4bb6-2e76-4c38-b829-400c0f05ebac']
+PARENTS {'66e73ab7-5981-4942-bbe4-6a649443ccce'}
+abondon uuids [1]
+Database restoration complete. Triggering installation...
+sudo: /opt/hiddify-manager/hiddify-panel/common/commander.py: command not found
+Traceback (most recent call last):
+  File "/opt/hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/restore_job.py", line 116, in <module>
+    restore_backup(json_path, options)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hiddify-manager/hiddify-panel/src/hiddifypanel/panel/admin/restore_job.py", line 17, in restore_backup
+    app = create_app()
+  File "/opt/hiddify-manager/hiddify-panel/src/hiddifypanel/base.py", line 58, in create_app
+    app.config.load_extensions("EXTENSIONS")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/dynaconf/contrib/flask_dynaconf.py", line 231, in load_extensions
+    initializer(app)
+    ~~~~~~~~~~~^^^^^
+  File "/opt/hiddify-manager/hiddify-panel/src/hiddifypanel/panel/common_bp/__init__.py", line 7, in init_app
+    LoginView.register(bp, route_base="/")
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask_classful.py", line 183, in register
+    app.add_url_rule(
+    ~~~~~~~~~~~~~~~~^
+        rule, endpoint, proxy,
+        ^^^^^^^^^^^^^^^^^^^^^^
+        subdomain=subdomain, **options)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/apiflask/route.py", line 96, in add_url_rule
+    super(cls, self).add_url_rule(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        rule,
+        ^^^^^
+    ...<3 lines>...
+        **options,
+        ^^^^^^^^^^
+    )
+    ^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask/sansio/scaffold.py", line 46, in wrapper_func
+    self._check_setup_finished(f_name)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "/opt/hiddify-manager/.venv313/lib/python3.13/site-packages/flask/sansio/blueprints.py", line 215, in _check_setup_finished
+    raise AssertionError(
+    ...<5 lines>...
+    )
+AssertionError: The setup method 'add_url_rule' can no longer be called on the blueprint 'common_bp'. It has already been registered at least once, any changes will not be applied consistently.
+Make sure all imports, decorators, functions, etc. needed to set up the blueprint are done before registering it.
