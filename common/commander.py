@@ -216,5 +216,31 @@ def control_tunnel(action, type, tunnel_port):
     run(cmd)
 
 
+@cli.command('truncate')
+@click.option('--file', '-f', type=str, help='The log file to truncate', required=True)
+def truncate(file: str):
+    # Security check: only allow files in log/system/
+    log_dir = os.path.join(HIDDIFY_DIR, 'log/system')
+    file_path = os.path.join(log_dir, f"{file}.log")
+    
+    # Resolve absolute path and ensure it starts with log_dir
+    # Note: realpath resolves symlinks, abspath doesn't. 
+    # Since we construct the path using HIDDIFY_DIR/log/system, it should be safe unless file contains ..
+    if ".." in file or "/" in file:
+        raise Exception("Access denied")
+
+    # Truncate
+    if os.path.exists(file_path):
+        with open(file_path, 'w') as f:
+            f.write("")
+    else:
+        # Create empty file
+        open(file_path, 'a').close()
+    
+    # Set permissions so hiddify-panel can write to it if needed?
+    # os.chmod(file_path, 0o666)  # Dangerous? 
+    # Better to leave permissions as is, assuming caller has rights or root (commander runs as root)
+
+
 if __name__ == "__main__":
     cli()
