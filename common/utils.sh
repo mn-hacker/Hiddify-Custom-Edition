@@ -534,10 +534,10 @@ function allow_apps_ports() {
 function save_firewall() {
     mkdir -p /etc/iptables/
     iptables-save >/etc/iptables/rules.v4
-    awk -i inplace '!seen[$0]++' /etc/iptables/rules.v4
+    # awk -i inplace '!seen[$0]++' /etc/iptables/rules.v4
     # Note: iptables-save already includes COMMIT at end of each table
     ip6tables-save >/etc/iptables/rules.v6
-    awk -i inplace '!seen[$0]++' /etc/iptables/rules.v6
+    # awk -i inplace '!seen[$0]++' /etc/iptables/rules.v6
     # Note: ip6tables-save already includes COMMIT at end of each table
     ip6tables-restore </etc/iptables/rules.v6
     iptables-restore </etc/iptables/rules.v4

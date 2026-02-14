@@ -68,6 +68,7 @@ function main() {
     fi
     if [ "$DO_NOT_INSTALL" == "true" ];then
         PROGRESS_ACTION="Applying..."
+        export DO_NOT_INSTALL
     fi
 
     export USE_VENV=313
