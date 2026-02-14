@@ -21,7 +21,6 @@ CA_SERVERS=(
     "letsencrypt|Let's Encrypt|no"
     "zerossl|ZeroSSL|eab"
     "google|Google Trust Services|no"
-    "buypass|Buypass Go SSL|no"
 )
 
 function try_get_cert_with_ca() {

@@ -201,8 +201,8 @@ function set_config_from_hpanel() {
         exit 4
     fi
     
-    export SERVER_IP=$(curl --connect-timeout 1 -s https://v4.ident.me/)
-    export SERVER_IPv6=$(curl --connect-timeout 1 -s https://v6.ident.me/)
+    export SERVER_IP=$(get_public_ip)
+    export SERVER_IPv6=$(get_public_ipv6)
 }
 
 function install_run() {

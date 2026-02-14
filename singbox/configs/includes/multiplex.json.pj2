@@ -1,4 +1,4 @@
-{%if hconfigs['mux_enable']%}
+{%if hconfigs['mux_enable'] and false%}
 "multiplex": {
     "enabled": true,
     "padding": {% if hconfigs['mux_padding_enable'] %} true {% else %} false {% endif %},

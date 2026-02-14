@@ -2,11 +2,13 @@
 cd $(dirname -- "$0")
 source utils.sh
 
-# Update apt cache once at the start
-apt update -y 2>/dev/null || true
+if [ "$DO_NOT_INSTALL" != "true" ]; then
+    # Update apt cache once at the start
+    apt update -y 2>/dev/null || true
 
-remove_package apache2 needrestart needrestart-session
-install_package apt-transport-https apt-utils at build-essential ca-certificates cron curl default-libmysqlclient-dev dnsutils gawk git gnupg-agent gnupg2 iproute2 iptables jq less libev-dev libevdev2 libssl-dev locales lsb-release lsof pkg-config qrencode software-properties-common sudo ubuntu-keyring wget whiptail
+    remove_package apache2 needrestart needrestart-session
+    install_package apt-transport-https apt-utils at build-essential ca-certificates cron curl default-libmysqlclient-dev dnsutils gawk git gnupg-agent gnupg2 iproute2 iptables jq less libev-dev libevdev2 libssl-dev locales lsb-release lsof pkg-config qrencode software-properties-common sudo ubuntu-keyring wget whiptail
+fi
 activate_python_venv
 
 groupadd -f hiddify-common

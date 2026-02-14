@@ -804,3 +804,41 @@ set_files_in_folder_readable_to_hiddify_common_group() {
         parent=$(dirname "$parent")  # Move to the next parent directory
     done
 }
+
+function get_public_ip() {
+    # Try different services to get the public IP (IPv4)
+    services=(
+        "https://ipv4.icanhazip.com"
+        "https://api.ipify.org"
+        "https://checkip.amazonaws.com"
+        "https://v4.ident.me"
+    )
+
+    for service in "${services[@]}"; do
+        ip=$(curl --connect-timeout 3 --max-time 5 -s "$service")
+        if [[ -n "$ip" && "$ip" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "$ip"
+            return 0
+        fi
+    done
+    return 1
+}
+
+function get_public_ipv6() {
+    # Try different services to get the public IPv6
+    services=(
+        "https://ipv6.icanhazip.com"
+        "https://api64.ipify.org"
+        "https://v6.ident.me"
+    )
+
+    for service in "${services[@]}"; do
+        ip=$(curl --connect-timeout 3 --max-time 5 -s "$service")
+        # Simple regex check for IPv6 (contains at least two colons)
+        if [[ -n "$ip" && "$ip" =~ :.*: ]]; then
+            echo "$ip"
+            return 0
+        fi
+    done
+    return 1
+}
