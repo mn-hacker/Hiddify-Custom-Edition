@@ -10,6 +10,12 @@ systemctl enable hiddify-xray.service
 source /opt/hiddify-manager/common/utils.sh
 activate_python_venv
 
+# Ensure logs are readable by hiddify-panel
+touch /opt/hiddify-manager/log/xray_access.log
+chmod 644 /opt/hiddify-manager/log/xray_access.log
+chown hiddify-panel:root /opt/hiddify-manager/log/xray_access.log 2>/dev/null || true
+
+
 # Fix the issue in xray that it can not read multiple inbound from single file
 # python <<EOF
 # import json,os

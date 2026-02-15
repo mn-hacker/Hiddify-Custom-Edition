@@ -1,4 +1,12 @@
 source /opt/hiddify-manager/common/utils.sh
+
+# Ensure logs are readable by hiddify-panel
+touch /opt/hiddify-manager/log/singbox.log
+touch /opt/hiddify-manager/log/system/singbox.log
+chmod 644 /opt/hiddify-manager/log/singbox.log 2>/dev/null || true
+chmod 644 /opt/hiddify-manager/log/system/singbox.log 2>/dev/null || true
+chown hiddify-panel:root /opt/hiddify-manager/log/singbox.log 2>/dev/null || true
+
 ln -sf $(pwd)/hiddify-singbox.service /etc/systemd/system/hiddify-singbox.service 2>/dev/null || true
 systemctl enable hiddify-singbox.service 2>/dev/null || true
 
