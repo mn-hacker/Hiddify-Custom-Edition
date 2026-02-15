@@ -168,12 +168,13 @@
                 {% endfor %}
               ]
           },
-          {% if hconfigs.get('warp_sites','').split('\n') %}
+          {% set warp_sites = hconfigs.get('warp_sites','').split('\n') | map('trim') | reject('equalto', '') | list %}
+          {% if warp_sites %}
           {
               "outbound": "WARP",
               "domain":[                
-                    {%for d in hconfigs.get('warp_sites','').split('\n')%}
-                        "{{d.strip()}}",
+                    {%for d in warp_sites %}
+                        "{{d}}"{% if not loop.last %},{% endif %}
                     {% endfor %}
               ]
           },

@@ -1,0 +1,37 @@
+root@nex1077698372-3138364:/opt/hiddify-manager# ls -lh /opt/hiddify-manager/other/hiddify-cli/
+total 44M
+-rwxr-xr-x 1 hiddify-cli         128  44M Jul 11  2025 HiddifyCli
+-rw-r--r-- 1 hiddify-cli root           7 Feb 11 17:11 VERSION
+-rw-r--r-- 1 hiddify-cli hiddify-cli  32K Feb 15 00:45 cache.db
+drwxr-xr-x 3 hiddify-cli hiddify-cli 4.0K Feb 15 16:08 data
+-rwxr-xr-x 1 hiddify-cli root         449 Feb 15 01:15 disable.sh
+-rw-r--r-- 1 hiddify-cli root        1.6K Feb 15 01:15 h_client_config.json
+-rw-r--r-- 1 hiddify-cli root         827 Feb 15 01:15 hiddify-cli.service
+-rw-r--r-- 1 hiddify-cli root         973 Feb 15 15:28 install.sh
+-rw-r--r-- 1 hiddify-cli root         973 Feb 15 01:15 install.sh.j2
+-rw-r--r-- 1 hiddify-cli root        1.3K Feb 15 15:28 run.sh
+-rw-r--r-- 1 hiddify-cli root        1.2K Feb 15 01:15 run.sh.j2
+drwxr-xr-x 2 hiddify-cli hiddify-cli 4.0K Feb 11 17:11 tmp
+drwxr-xr-x 3 hiddify-cli         128 4.0K Mar 14  2024 webui
+root@nex1077698372-3138364:/opt/hiddify-manager# journalctl -u hiddify-cli -n 20 --no-pager
+Feb 15 16:08:14 nex1077698372-3138364 systemd[1]: Started hiddify-cli.service - HiddifyCli service.
+Feb 15 16:08:14 nex1077698372-3138364 HiddifyCli[721885]: DEBUG CORE libbox.Setup success ./tmp ./ ./tmp true
+Feb 15 16:08:14 nex1077698372-3138364 HiddifyCli[721885]: DEBUG CORE StartGrpcServerByMode 127.0.0.1:17078 3
+Feb 15 16:08:14 nex1077698372-3138364 HiddifyCli[721885]: DEBUG CORE grpcServer started on 127.0.0.1:17078
+Feb 15 16:08:14 nex1077698372-3138364 HiddifyCli[721885]: Running in standalone mode
+Feb 15 16:08:14 nex1077698372-3138364 HiddifyCli[721885]: Refresh interval: 1
+Feb 15 16:08:14 nex1077698372-3138364 HiddifyCli[721885]: Convert using json
+Feb 15 16:08:14 nex1077698372-3138364 HiddifyCli[721885]: Error in read and build config failed to parse config content: [SingboxParser] unmarshal error: outbounds[6].udp: json: unknown field "udp"
+Feb 15 16:08:14 nex1077698372-3138364 systemd[1]: hiddify-cli.service: Deactivated successfully.
+Feb 15 16:08:44 nex1077698372-3138364 systemd[1]: hiddify-cli.service: Scheduled restart job, restart counter is at 1711.
+Feb 15 16:08:44 nex1077698372-3138364 systemd[1]: Starting hiddify-cli.service - HiddifyCli service...
+Feb 15 16:08:44 nex1077698372-3138364 systemd[1]: Started hiddify-cli.service - HiddifyCli service.
+Feb 15 16:08:45 nex1077698372-3138364 HiddifyCli[721945]: DEBUG CORE libbox.Setup success ./tmp ./ ./tmp true
+Feb 15 16:08:45 nex1077698372-3138364 HiddifyCli[721945]: DEBUG CORE StartGrpcServerByMode 127.0.0.1:17078 3
+Feb 15 16:08:45 nex1077698372-3138364 HiddifyCli[721945]: DEBUG CORE grpcServer started on 127.0.0.1:17078
+Feb 15 16:08:45 nex1077698372-3138364 HiddifyCli[721945]: Running in standalone mode
+Feb 15 16:08:46 nex1077698372-3138364 HiddifyCli[721945]: Refresh interval: 1
+Feb 15 16:08:46 nex1077698372-3138364 HiddifyCli[721945]: Convert using json
+Feb 15 16:08:46 nex1077698372-3138364 HiddifyCli[721945]: Error in read and build config failed to parse config content: [SingboxParser] unmarshal error: outbounds[6].udp: json: unknown field "udp"
+Feb 15 16:08:46 nex1077698372-3138364 systemd[1]: hiddify-cli.service: Deactivated successfully.
+root@nex1077698372-3138364:/opt/hiddify-manager#
