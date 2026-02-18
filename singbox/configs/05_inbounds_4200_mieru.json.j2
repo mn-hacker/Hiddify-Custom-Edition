@@ -1,0 +1,27 @@
+{
+	{% if hconfigs['mieru_enable'] %}
+		"inbounds": [
+			{% for d in domains if d['internal_port_mieru']  %}
+			{%set domain=d['domain']%}
+			{%set port=d['internal_port_mieru']%}
+
+			{
+				"type": "mieru",
+				"tag": "mieru_in_{{port}}",
+				"listen": "::",
+				"listen_port": {{ port }},
+				"users": [
+					{% for u in users %}
+						{"name": "{{ u['uuid'] }}@hiddify.com", "uuid": "{{ u['uuid'] }}", "password": "{{ u['uuid'] }}"},
+					{% endfor%}
+				],
+                "transport": {
+                    "type": "mieru",
+                    "path": "/",
+                    "method": "brutal" 
+                }
+			},
+			{%endfor%}
+		]
+	{% endif %}
+}

@@ -5,12 +5,12 @@ rm -rf configs/*.template 2>/dev/null || true
 # latest= #$(get_release_version hiddify-sing-box)
 version="" #use specific version if needed otherwise it will use the latest
 
-download_package singbox sb.zip $version
+download_package singbox sb.tar.gz $version
 if [ "$?" == "0"  ] || ! is_installed ./sing-box; then
-    install_package unzip 
+    # install_package unzip 
     
     # Extract archive
-    unzip -o sb.zip > /dev/null 2>&1 || { echo "ERROR: Failed to extract singbox"; exit 1; }
+    tar -xzf sb.tar.gz > /dev/null 2>&1 || { echo "ERROR: Failed to extract singbox"; exit 1; }
     
     # Find and copy binary - handle both directory format and flat format
     if [ -d "sing-box-"* ]; then
@@ -24,7 +24,7 @@ if [ "$?" == "0"  ] || ! is_installed ./sing-box; then
         exit 2
     fi
     
-    rm -rf sb.zip sing-box-* 2>/dev/null || true
+    rm -rf sb.tar.gz sing-box-* 2>/dev/null || true
     chown root:root sing-box 2>/dev/null || exit 3
     chmod +x sing-box || exit 4
     ln -sf /opt/hiddify-manager/singbox/sing-box /usr/bin/sing-box
