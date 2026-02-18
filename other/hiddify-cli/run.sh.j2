@@ -13,15 +13,10 @@ systemctl enable hiddify-cli.service 2>/dev/null || true
 # Create systemd env file
 # Extract panel domain from panel_links (last entry in the array)
 PANEL_DOMAIN=$(echo "{{ panel_links[panel_links|length -1] }}" | sed 's|^https\?://\([^/]\+\).*|\1|')
-# Use https for external domain, or localhost for local access
-if [ -n "$PANEL_DOMAIN" ] && [ "$PANEL_DOMAIN" != "" ]; then
-    PANEL_BASE="https://$PANEL_DOMAIN"
-else
-    PANEL_BASE="http://127.0.0.1:9000"
-fi
-SUB_LINK="$PANEL_BASE/{{ hconfigs['proxy_path_client'] }}/{{ users[0]['uuid'] }}/singbox/"
+PANEL_DOMAIN=http://127.0.0.1:9000
+SUB_LINK="$PANEL_DOMAIN/{{ hconfigs['proxy_path_client'] }}/{{ users[0]['uuid'] }}/singbox/"
 echo "SUB_LINK=$SUB_LINK" > .env
 chown hiddify-cli .env
-chmod 600 .env*
+chmod 600 .env
 chown hiddify-cli -R .
 systemctl restart hiddify-cli.service
