@@ -15,7 +15,7 @@ WorkingDirectory=/opt/hiddify-manager/other/hiddify-cli
 # Check if .env exists, exit gracefully if not (will retry via Restart)
 ExecStartPre=/bin/bash -c 'test -f /opt/hiddify-manager/other/hiddify-cli/.env || { echo ".env not found, waiting for run.sh to create it"; exit 1; }'
 EnvironmentFile=-/opt/hiddify-manager/other/hiddify-cli/.env
-ExecStart=/opt/hiddify-manager/other/hiddify-cli/HiddifyCli run -c $SUB_LINK -d h_client_config.json
+ExecStart=/opt/hiddify-manager/other/hiddify-cli/hiddify-cli run -c $SUB_LINK -d h_client_config.json
 User=hiddify-cli
 
 [Install]

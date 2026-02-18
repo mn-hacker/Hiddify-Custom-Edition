@@ -191,9 +191,9 @@ function is_installed_package() {
 # ============================================================
 
 APT_LOCK_FILE="/tmp/hiddify_apt.lock"
-MIN_RAM_MB=1024
+MIN_RAM_MB=2048
 MIN_SWAP_MB=512
-SWAP_SIZE="1G"
+SWAP_SIZE="2G"
 
 check_system_resources() {
     local total_ram=$(free -m | awk '/^Mem:/{print $2}')
