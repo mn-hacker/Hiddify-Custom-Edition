@@ -18,12 +18,13 @@
 			"path": "cache.db",
 			"store_warp_config": true
 		},
-		"clash_api": {
-			"external_controller": "127.0.0.1:9090",
-			"external_ui": "ui",
-			"secret": "",
-			"store_selected": true,
-			"cache_file": "cache.db"
+		"monitoring": {
+			"interval": "10m0s",
+			"urls": [
+				"https://google.com/generate_204"
+			],
+			"debounce_window": "500ms",
+			"idle_timeout": "18ms"
 		}
 	}
 }
