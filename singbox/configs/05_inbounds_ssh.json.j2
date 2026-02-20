@@ -1,7 +1,7 @@
 {
     "inbounds":[
-        {% if  hconfigs['ssh_server_enable'] %}
-                {
+        {# if  hconfigs['ssh_server_enable'] #}
+        {#         {
                     "tag":"v10-ssh",
                     "listen": "0.0.0.0",
                     "listen_port":{{ hconfigs['ssh_server_port'] }},
@@ -11,13 +11,13 @@
                     "domain_strategy": "prefer_ipv4",
                     
                     "host_key":[
-                        "{{hconfigs['ssh_host_rsa_pk'].replace("\n","\\n")}}",
-                        "{{hconfigs['ssh_host_ecdsa_pk'].replace("\n","\\n")}}",
-                        "{{hconfigs['ssh_host_ed25519_pk'].replace("\n","\\n")}}"
+                        "{{hconfigs['ssh_host_rsa_pk'].replace('\n','\\n')}}",
+                        "{{hconfigs['ssh_host_ecdsa_pk'].replace('\n','\\n')}}",
+                        "{{hconfigs['ssh_host_ed25519_pk'].replace('\n','\\n')}}"
                     ],
-                    {% include '/opt/hiddify-manager/singbox/configs/common/protocols/ssh.pj2' %},
+                    include '/opt/hiddify-manager/singbox/configs/common/protocols/ssh.pj2'
                 }
                 
-        {%endif%}
+        endif #}
     ]
 }
