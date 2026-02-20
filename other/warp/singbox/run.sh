@@ -60,6 +60,12 @@ cat <<EOF > warp-singbox.json
     "level": "info",
     "timestamp": true
   },
+  "experimental": {
+    "cache_file": {
+      "enabled": true,
+      "path": "warp-cache.db"
+    }
+  },
   "inbounds": [
     {
       "type": "socks",

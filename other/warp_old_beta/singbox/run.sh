@@ -131,6 +131,16 @@ else
         # Create minimal singbox config
         cat > warp-singbox.json << EOFSINGBOX
 {
+  "log": {
+    "level": "info",
+    "timestamp": true
+  },
+  "experimental": {
+    "cache_file": {
+      "enabled": true,
+      "path": "warp-cache.db"
+    }
+  },
   "type": "wireguard",
   "tag": "WARP",
   "server": "engage.cloudflareclient.com",
@@ -149,6 +159,16 @@ EOFSINGBOX
         if [ -n "$PrivateKey" ]; then
             cat > warp-singbox.json << EOFSINGBOX
 {
+  "log": {
+    "level": "info",
+    "timestamp": true
+  },
+  "experimental": {
+    "cache_file": {
+      "enabled": true,
+      "path": "warp-cache.db"
+    }
+  },
   "type": "wireguard",
   "tag": "WARP",
   "server": "engage.cloudflareclient.com",
