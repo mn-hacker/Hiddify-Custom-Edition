@@ -1,6 +1,6 @@
 {
-    "region":"other",
-    "web-secret":"hiddify",
+    "region": "other",
+    "web-secret": "hiddify",
     "execute-config-as-is": false,
     "log-level": "warn",
     "resolve-destination": false,
@@ -18,6 +18,7 @@
     "url-test-interval": 600,
     "enable-clash-api": true,
     "clash-api-port": 16756,
+    "external-ui": "ui",
     "enable-tun": false,
     "enable-tun-service": false,
     "set-system-proxy": false,

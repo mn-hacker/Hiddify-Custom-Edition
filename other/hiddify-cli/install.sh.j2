@@ -27,5 +27,15 @@ if [ "$(cat 'VERSION' 2>/dev/null)" != "$latest" ] || ! is_installed ./HiddifyCl
     echo $latest> VERSION
 fi
 
+if [ ! -d "ui" ]; then
+    echo "Downloading Yacd UI..."
+    mkdir -p ui
+    curl -sLo ui.zip "https://mirror.ghproxy.com/https://github.com/MetaCubeX/Yacd-meta/archive/gh-pages.zip"
+    unzip -q -o ui.zip -d ui/
+    mv ui/Yacd-meta-gh-pages/* ui/ 2>/dev/null
+    rm -rf ui/Yacd-meta-gh-pages ui.zip
+fi
+
+
 ln -sf /opt/hiddify-manager/other/hiddify-cli/hiddify-cli.service /etc/systemd/system/hiddify-cli.service
 systemctl enable hiddify-cli.service
