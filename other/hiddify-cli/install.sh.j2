@@ -10,8 +10,8 @@ if [ -z "$latest" ]; then
     latest="latest"
 fi
 
-if [ "$(cat 'VERSION' 2>/dev/null)" != "$latest" ] || ! is_installed ./HiddifyCli; then
-    echo "Downloading HiddifyCli..."
+if [ "$(cat 'VERSION' 2>/dev/null)" != "$latest" ] || ! is_installed ./hiddify-cli; then
+    echo "Downloading hiddify-cli..."
     pkg=$(dpkg --print-architecture)
 
     if [ "$latest" == "latest" ]; then
@@ -22,6 +22,12 @@ if [ "$(cat 'VERSION' 2>/dev/null)" != "$latest" ] || ! is_installed ./HiddifyCl
 
     tar -xzf hiddify-cli.tar.gz
     rm hiddify-cli.tar.gz
+    # Move binaries from nested directory if present (build creates hiddify-cli-linux-*/hiddify-cli)
+    if ls hiddify-cli-linux-*/hiddify-cli 2>/dev/null; then
+        mv hiddify-cli-linux-*/hiddify-cli ./hiddify-cli
+        cp hiddify-cli-linux-*/lib/*.so ./lib/ 2>/dev/null || true
+        rm -rf hiddify-cli-linux-*/
+    fi
     rm -f HiddifyCli # Cleanup legacy binary
     chmod +x hiddify-cli
     echo $latest> VERSION
