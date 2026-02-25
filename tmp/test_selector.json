@@ -1,0 +1,21 @@
+{
+    "endpoints": [
+        {
+            "type": "awg",
+            "tag": "my-awg",
+            "server": "1.1.1.1",
+            "server_port": 1234,
+            "private_key": "some_private_key",
+            "peer_public_key": "some_public_key"
+        }
+    ],
+    "outbounds": [
+        {
+            "type": "selector",
+            "tag": "Auto",
+            "outbounds": [
+                "my-awg"
+            ]
+        }
+    ]
+}
