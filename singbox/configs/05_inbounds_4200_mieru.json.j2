@@ -1,8 +1,10 @@
 {
     "inbounds":[
         {% if  hconfigs['mieru_enable'] %}
-            {% set ports = hconfigs["mieru_tcp_ports"].split(",") if hconfigs["mieru_tcp_ports"] else [d['internal_port_mieru'] for d in domains if d['internal_port_mieru']] %}
-            {% set udp_ports = hconfigs["mieru_udp_ports"].split(",") if hconfigs["mieru_udp_ports"] else [d['internal_port_mieru'] for d in domains if d['internal_port_mieru']] %}
+            {% set default_ports = domains | selectattr('internal_port_mieru') | map(attribute='internal_port_mieru') | list %}
+            {% set default_ports = default_ports if default_ports else [4200] %}
+            {% set ports = hconfigs["mieru_tcp_ports"].split(",") if hconfigs["mieru_tcp_ports"] else default_ports %}
+            {% set udp_ports = hconfigs["mieru_udp_ports"].split(",") if hconfigs["mieru_udp_ports"] else default_ports %}
             
                 {
                     "tag":"v10-mieru-tcp",
