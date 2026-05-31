@@ -33,13 +33,23 @@ if [ "$(cat 'VERSION' 2>/dev/null)" != "$latest" ] || ! is_installed ./hiddify-c
     echo $latest> VERSION
 fi
 
-if [ ! -d "ui" ]; then
-    echo "Downloading Yacd UI..."
+# Yacd UI is bundled locally in this repo (other/hiddify-cli/ui) to avoid
+# depending on external upstream (MetaCubeX/Yacd-meta) which may change or be blocked.
+# The 'ui' directory ships with the panel, so no download is needed.
+if [ ! -f "ui/index.html" ]; then
+    echo "Warning: bundled Yacd UI not found at ui/index.html"
+    # Fallback: attempt download from upstream only if the bundled UI is missing
+    echo "Attempting fallback download of Yacd UI..."
     mkdir -p ui
-    curl -sLo ui.zip "https://mirror.ghproxy.com/https://github.com/MetaCubeX/Yacd-meta/archive/gh-pages.zip"
-    unzip -q -o ui.zip -d ui/
-    mv ui/Yacd-meta-gh-pages/* ui/ 2>/dev/null
-    rm -rf ui/Yacd-meta-gh-pages ui.zip
+    curl -sLo ui.zip "https://github.com/MetaCubeX/Yacd-meta/archive/gh-pages.zip" \
+        || curl -sLo ui.zip "https://mirror.ghproxy.com/https://github.com/MetaCubeX/Yacd-meta/archive/gh-pages.zip"
+    if [ -f ui.zip ]; then
+        unzip -q -o ui.zip -d ui/
+        mv ui/Yacd-meta-gh-pages/* ui/ 2>/dev/null
+        rm -rf ui/Yacd-meta-gh-pages ui.zip
+    fi
+else
+    echo "Using bundled Yacd UI (local)."
 fi
 
 
