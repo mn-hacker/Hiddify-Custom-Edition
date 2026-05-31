@@ -32,9 +32,6 @@
 					"key_path": "{{cert}}.key",
 					{%endif%}
 				}
-                {% if hconfigs['naive_padding'] %}
-                ,"padding": true
-                {% endif %}
 			},
 			{%endfor%}
 		]
