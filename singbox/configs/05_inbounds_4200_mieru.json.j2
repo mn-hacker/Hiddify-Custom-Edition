@@ -15,6 +15,7 @@
                     "sniff_override_destination": true,
                     "domain_strategy": "prefer_ipv4",
                     {% include '/opt/hiddify-manager/singbox/configs/common/protocols/mieru.pj2' %},
+                    "portBindings": [ { "port": {{ ports[0] }}, "protocol": "TCP" } ]
                 },    
             
                 {
@@ -25,6 +26,7 @@
                     "sniff_override_destination": true,
                     "domain_strategy": "prefer_ipv4",
                     {% include '/opt/hiddify-manager/singbox/configs/common/protocols/mieru.pj2' %},
+                    "portBindings": [ { "port": {{ udp_ports[0] }}, "protocol": "UDP" } ]
                 },    
             
         {%endif%}
