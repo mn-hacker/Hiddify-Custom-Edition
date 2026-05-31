@@ -8,8 +8,8 @@
 			{
 				"type": "awg",
 				"tag": "amnezia_in_{{port}}",
-				"private_key": "{{ hconfigs['wg_private_key'] }}",
-				"address": ["10.111.0.1/24", "fc00::1/64"],
+				"private_key": "{{ hconfigs['wireguard_private_key'] }}",
+				"address": ["{{ hconfigs['wireguard_ipv4'] }}/24", "{{ hconfigs['wireguard_ipv6'] }}/64"],
 				"listen_port": {{ port }},
 				"mtu": 1380,
 				"s1": {{ hconfigs['amnezia_s1'] }},
