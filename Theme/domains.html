@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watashi⚡️Manager - Domains</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        /* --- Theme Variables --- */
+        :root {
+            --bg-body: #0b0f19;
+            --bg-sidebar: #111522;
+            --bg-card: #151a2a;
+            --bg-card-hover: #1a2035;
+            --bg-detail: #0f131f;
+            --bg-modal: #1a2035;
+            --text-main: #ffffff;
+            --text-muted: #8b92a5;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --mouse-glow-color: rgba(139, 92, 246, 0.12);
+            --switch-bg: #2d3748;
+            --card-shadow: none;
+
+            --primary-purple: #7c3aed;
+            --primary-blue: #3b82f6;
+            --primary-green: #10b981;
+            --primary-orange: #f59e0b;
+            --primary-red: #ef4444;
+        }
+
+        [data-theme="light"] {
+            --bg-body: #eef2f6;
+            --bg-sidebar: #ffffff;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f8fafc;
+            --bg-detail: #f1f5f9;
+            --bg-modal: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --mouse-glow-color: rgba(139, 92, 246, 0.06);
+            --switch-bg: #cbd5e1;
+            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; outline: none; }
+        ::selection { background-color: rgba(124, 58, 237, 0.4); color: #fff; }
+
+        input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, textarea:-webkit-autofill, select:-webkit-autofill {
+            -webkit-text-fill-color: var(--text-main);
+            -webkit-box-shadow: 0 0 0px 1000px var(--bg-body) inset;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        
+        
+        
+        
+
+        body {
+            background-color: var(--bg-body); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; position: relative; transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        .mouse-glow { position: fixed; top: 0; left: 0; width: 700px; height: 700px; margin-left: -350px; margin-top: -350px; background: radial-gradient(circle, var(--mouse-glow-color) 0%, rgba(139, 92, 246, 0) 70%); border-radius: 50%; pointer-events: none; z-index: 0; opacity: 0; transition: opacity 0.5s ease, background 0.5s ease; will-change: transform; }
+
+        @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animated-item { opacity: 0; animation: slideUpFade 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        .delay-5 { animation-delay: 0.5s; }
+        .delay-6 { animation-delay: 0.6s; }
+        .delay-7 { animation-delay: 0.7s; }
+
+        /* --- Sidebar --- */
+        .sidebar { width: 86px; background-color: var(--bg-sidebar); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 20px; z-index: 5000; overflow-x: hidden; white-space: nowrap; transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), background-color 0.5s ease, border-color 0.5s ease, transform 0.3s ease; }
+        .sidebar:hover { width: 250px; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); z-index: 4000; opacity: 0; transition: opacity 0.3s ease; }
+        .logo { display: flex; align-items: center; gap: 16px; font-size: 18px; font-weight: 600; margin-bottom: 40px; padding-left: 2px; }
+        .logo i { color: var(--primary-purple); font-size: 24px; min-width: 24px; text-align: center; }
+        .logo-text { opacity: 0; transition: opacity 0.2s ease; }
+        .sidebar:hover .logo-text { opacity: 1; transition-delay: 0.1s; }
+        .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+        .nav-item { display: flex; align-items: center; gap: 16px; padding: 12px 14px; border-radius: 8px; color: var(--text-muted); text-decoration: none; font-size: 14px; transition: all 0.3s; cursor: pointer; }
+        .nav-item.active { background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%); color: #fff; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.25); }
+        .nav-item:hover:not(.active) { background-color: var(--border-color); color: var(--text-main); transform: translateX(6px); }
+        .nav-item i { font-size: 18px; min-width: 20px; text-align: center; }
+        .nav-text { opacity: 0; transition: opacity 0.2s ease; }
+        .sidebar:hover .nav-text { opacity: 1; transition-delay: 0.1s; }
+        .upgrade-card { background-color: var(--bg-body); border: 1px solid rgba(16, 185, 129, 0.2); padding: 16px; border-radius: 12px; margin-top: auto; opacity: 0; transform: translateY(10px); pointer-events: none; transition: all 0.4s ease; cursor: pointer; }
+        .sidebar:hover .upgrade-card { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        .upgrade-card h4 { font-size: 12px; color: var(--primary-green); margin-bottom: 4px; }
+        .upgrade-card p { font-size: 10px; color: var(--text-muted); }
+
+        /* --- Main Content --- */
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: scroll; position: relative; z-index: 2; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; border-bottom: 1px solid var(--border-color); background-color: var(--bg-body); transition: background-color 0.5s ease, border-color 0.5s ease; }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .menu-toggle { display: none; font-size: 20px; cursor: pointer; color: var(--text-main); transition: color 0.3s; }
+        .menu-toggle:hover { color: var(--primary-purple); }
+        .header-title { font-size: 16px; font-weight: 500; }
+        .header-right { display: flex; align-items: center; gap: 16px; }
+
+        .header-btn-group { display: flex; gap: 10px; align-items: center; }
+        .btn { padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; border: 1px solid transparent; }
+        .btn-primary { background-color: var(--bg-card); border-color: var(--border-color); color: var(--text-muted); box-shadow: var(--card-shadow); }
+        .btn-primary:hover { background-color: var(--border-color); color: var(--text-main); transform: translateY(-2px); }
+        .btn-green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
+        .btn-green:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4); }
+        .btn-outline { background: transparent; border-color: var(--primary-purple); color: var(--primary-purple); }
+        .btn-outline:hover { background: rgba(124, 58, 237, 0.1); transform: translateY(-2px); }
+        .btn-danger { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none; }
+        .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4); }
+
+        .theme-switch-wrapper { display: flex; align-items: center; margin-right: 10px; }
+        .theme-switch { position: relative; display: inline-block; width: 56px; height: 28px; }
+        .theme-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--switch-bg); transition: .4s; border-radius: 34px; display: flex; align-items: center; justify-content: space-between; padding: 0 6px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
+        .slider .fa-sun { color: #f59e0b; font-size: 12px; z-index: 1; }
+        .slider .fa-moon { color: #fbbf24; font-size: 12px; z-index: 1; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s cubic-bezier(0.68, -0.55, 0.265, 1.55); border-radius: 50%; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        input:checked + .slider { background-color: var(--switch-bg); }
+        input:checked + .slider:before { transform: translateX(28px); }
+
+        .user-profile { display: flex; align-items: center; gap: 12px; font-size: 14px; cursor: pointer; font-weight: 500; }
+        .avatar-img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-purple); transition: transform 0.3s; }
+        .user-profile:hover .avatar-img { transform: scale(1.1); }
+
+        .dashboard-body { padding: 40px; max-width: 1200px; margin: 0 auto; width: 100%; }
+
+        /* --- Info Banner --- */
+        .info-banner { background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 12px; padding: 15px 20px; display: flex; align-items: center; gap: 15px; margin-bottom: 25px; backdrop-filter: blur(5px); color: var(--text-main); font-size: 13px; line-height: 1.6; }
+        .info-banner i.fa-circle-info { color: var(--primary-blue); font-size: 20px; flex-shrink: 0; }
+
+        /* --- Domain Cards Grid --- */
+        .domains-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
+        .domain-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s ease, border-color 0.5s ease, background-color 0.5s ease;
+        }
+        .domain-card:hover { transform: translateY(-6px); border-color: var(--primary-purple); }
+
+        .domain-card-top {
+            height: 4px;
+            width: 100%;
+        }
+        .domain-card-top.mode-direct { background: linear-gradient(90deg, #10b981, #059669); }
+        .domain-card-top.mode-cdn { background: linear-gradient(90deg, #3b82f6, #2563eb); }
+        .domain-card-top.mode-autocdn { background: linear-gradient(90deg, #7c3aed, #6d28d9); }
+        .domain-card-top.mode-relay { background: linear-gradient(90deg, #f59e0b, #d97706); }
+        .domain-card-top.mode-fake { background: linear-gradient(90deg, #6b7280, #4b5563); }
+        .domain-card-top.mode-oldxtls { background: linear-gradient(90deg, #eab308, #ca8a04); }
+
+        .domain-card-body { padding: 20px; }
+
+        .domain-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .domain-name-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; }
+        .domain-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            word-break: break-all;
+        }
+        .copy-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+            padding: 4px;
+            border-radius: 6px;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .copy-btn:hover { color: var(--primary-purple); background: rgba(124, 58, 237, 0.08); }
+        .copy-btn .tooltip {
+            position: absolute;
+            bottom: calc(100% + 6px);
+            left: 50%;
+            transform: translateX(-50%) scale(0.8);
+            background: var(--primary-green);
+            color: #fff;
+            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-weight: 600;
+        }
+        .copy-btn .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 4px solid transparent;
+            border-top-color: var(--primary-green);
+        }
+        .copy-btn.copied .tooltip { opacity: 1; transform: translateX(-50%) scale(1); }
+
+        .domain-alias {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .domain-alias i { font-size: 10px; }
+
+        /* Mode Badge */
+        .mode-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .mode-badge.direct { background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.25); }
+        .mode-badge.cdn { background: rgba(59, 130, 246, 0.12); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.25); }
+        .mode-badge.autocdn { background: rgba(124, 58, 237, 0.12); color: #7c3aed; border: 1px solid rgba(124, 58, 237, 0.25); }
+        .mode-badge.relay { background: rgba(245, 158, 11, 0.12); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.25); }
+        .mode-badge.fake { background: rgba(107, 114, 128, 0.12); color: #9ca3af; border: 1px solid rgba(107, 114, 128, 0.25); }
+        .mode-badge.oldxtls { background: rgba(234, 179, 8, 0.12); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.25); }
+
+        /* Domain Details */
+        .domain-details { display: flex; flex-direction: column; gap: 12px; }
+
+        .domain-detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: var(--bg-detail);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .detail-row-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .detail-row-label i { font-size: 13px; width: 16px; text-align: center; }
+
+        .ip-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+        .ip-badge.match { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .ip-badge.mismatch { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .ip-badge.auto { background: rgba(124, 58, 237, 0.1); color: #7c3aed; border: 1px solid rgba(124, 58, 237, 0.2); }
+        .ip-badge.cloudflare { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); }
+        .ip-badge.neutral { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); }
+        .ip-badge i { font-size: 10px; }
+
+        /* DNS Status */
+        .dns-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .dns-status.ok { color: #10b981; }
+        .dns-status.warning { color: #f59e0b; }
+        .dns-status i { font-size: 12px; }
+
+        /* Toggle in card */
+        .toggle-switch-sm { position: relative; display: inline-block; width: 40px; height: 22px; }
+        .toggle-switch-sm input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider-sm { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--switch-bg); transition: .4s; border-radius: 34px; }
+        .toggle-slider-sm:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s cubic-bezier(0.68, -0.55, 0.265, 1.55); border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .toggle-switch-sm input:checked + .toggle-slider-sm { background-color: var(--primary-green); }
+        .toggle-switch-sm input:checked + .toggle-slider-sm:before { transform: translateX(18px); }
+
+        /* Card Actions */
+        .domain-card-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .card-act-btn {
+            flex: 1;
+            padding: 8px 0;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-detail);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-family: 'Inter', sans-serif;
+        }
+        .card-act-btn:hover { transform: translateY(-2px); }
+        .card-act-btn.edit:hover { color: var(--primary-blue); border-color: rgba(59, 130, 246, 0.3); background: rgba(59, 130, 246, 0.05); }
+        .card-act-btn.delete:hover { color: var(--primary-red); border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.08); }
+        .card-act-btn.test:hover { color: var(--primary-purple); border-color: rgba(124, 58, 237, 0.3); background: rgba(124, 58, 237, 0.05); }
+
+        /* --- Modal --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(5px); z-index: 6000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: opacity 0.3s ease, visibility 0.3s ease; }
+        .modal-overlay.show { visibility: visible; opacity: 1; }
+        .modal-box { background-color: var(--bg-modal); width: 90%; max-width: 600px; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); transform: scale(0.95) translateY(20px); opacity: 0; transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease; max-height: 90vh; display: flex; flex-direction: column; }
+        .modal-overlay.show .modal-box { transform: scale(1) translateY(0); opacity: 1; }
+        .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-size: 18px; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
+        .modal-close { background: transparent; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; transition: color 0.2s; }
+        .modal-close:hover { color: var(--primary-red); }
+        .modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+        .modal-body
+        .modal-body
+        .modal-body
+        .modal-footer { padding: 20px 24px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 12px; }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .full-width { grid-column: span 2; }
+        .form-label { font-size: 12px; color: var(--text-muted); font-weight: 600; display: flex; align-items: center; gap: 6px; }
+        .form-input { background-color: var(--bg-body); border: 1px solid var(--border-color); color: var(--text-main); padding: 10px 12px; border-radius: 8px; font-size: 13px; outline: none; transition: all 0.3s; width: 100%; font-family: 'Inter', sans-serif; }
+        .form-input:focus { border-color: var(--primary-purple); box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1); }
+        textarea.form-input { resize: vertical; min-height: 80px; }
+
+        /* Form Dropdown */
+        .dropdown-container { position: relative; user-select: none; }
+        .dropdown-trigger { display: flex; justify-content: space-between; align-items: center; gap: 10px; background: var(--bg-body); border: 1px solid var(--border-color); color: var(--text-main); padding: 10px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; transition: all 0.3s; width: 100%; }
+        .dropdown-trigger:hover, .dropdown-container.open .dropdown-trigger { border-color: var(--primary-purple); }
+        .dropdown-trigger i { font-size: 10px; color: var(--text-muted); transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .dropdown-container.open .dropdown-trigger i { transform: rotate(180deg); color: var(--primary-purple); }
+        .dropdown-menu { position: absolute; top: calc(100% + 8px); left: 0; min-width: 100%; background: var(--bg-card); border: 1px solid var(--primary-purple); border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); overflow: hidden; opacity: 0; visibility: hidden; transform: translateY(-10px) scale(0.95); transform-origin: top center; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 7000; }
+        .dropdown-container.open .dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
+        .dropdown-option { padding: 12px 15px; font-size: 13px; color: var(--text-main); cursor: pointer; transition: background 0.2s, color 0.2s, padding 0.2s; white-space: nowrap; }
+        .dropdown-option:not(:last-child) { border-bottom: 1px solid var(--border-color); }
+        .dropdown-option:hover { background: rgba(124, 58, 237, 0.08); color: var(--primary-purple); padding-left: 20px; }
+        .dropdown-option.selected { color: var(--primary-purple); font-weight: 600; background: rgba(124, 58, 237, 0.05); }
+
+        /* Toggle in modal */
+        .toggle-wrapper { display: flex; justify-content: space-between; align-items: center; background: var(--bg-body); padding: 12px; border-radius: 10px; border: 1px solid var(--border-color); }
+        .toggle-label { font-size: 13px; color: var(--text-main); font-weight: 500; }
+        .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--switch-bg); transition: .4s; border-radius: 34px; }
+        .toggle-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .toggle-slider { background-color: var(--primary-green); }
+        input:checked + .toggle-slider:before { transform: translateX(20px); }
+
+        /* CDN IP conditional field */
+        .cdn-ip-field { display: none; }
+        .cdn-ip-field.visible { display: flex; }
+
+        /* Delete Confirm Modal */
+        .confirm-modal .modal-box { max-width: 420px; }
+        .confirm-body { text-align: center; padding: 30px 24px; }
+        .confirm-icon { width: 64px; height: 64px; border-radius: 50%; background: rgba(239, 68, 68, 0.1); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+        .confirm-icon i { font-size: 28px; color: var(--primary-red); }
+        .confirm-title { font-size: 18px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; }
+        .confirm-text { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+        .confirm-text strong { color: var(--text-main); }
+
+        /* Domain count summary */
+        .domains-summary {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .summary-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-muted);
+            box-shadow: var(--card-shadow);
+        }
+        .summary-chip .chip-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .summary-chip .chip-count {
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 1024px) {
+            .domains-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 250px !important; position: fixed; left: 0; top: 0; bottom: 0; transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+            .overlay.active { display: block; opacity: 1; }
+            .logo-text, .nav-text, .upgrade-card { opacity: 1 !important; transform: translateY(0) !important; pointer-events: auto !important; }
+            .header { display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 15px; padding: 15px 20px; }
+            .header-left, .header-right { display: contents; }
+            .menu-toggle { grid-column: 1; grid-row: 1; display: block; margin-right: 10px; }
+            .header-title { display: none; }
+            .theme-switch-wrapper { grid-column: 3; grid-row: 1; margin: 0; }
+            .user-profile { grid-column: 4; grid-row: 1; font-size: 0; }
+            .header-btn-group { grid-column: 1 / -1; grid-row: 2; display: flex; width: 100%; justify-content: stretch; margin-top: 5px; }
+            .header-btn-group .btn { flex: 1; justify-content: center; }
+            .dashboard-body { padding: 15px; }
+            .domains-grid { grid-template-columns: 1fr; }
+            .domains-summary { gap: 8px; }
+            .summary-chip { padding: 6px 10px; font-size: 11px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+            .info-banner { flex-direction: column; align-items: flex-start; gap: 10px; }
+        }
+    
+        /* --- Premium Custom Scrollbar --- */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-body); border-left: 1px solid var(--border-color); }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--primary-purple) 0%, var(--primary-blue) 100%); border-radius: 10px; border: 2px solid var(--bg-body); }
+        ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, var(--primary-blue) 0%, var(--primary-purple) 100%); }
+
+        /* --- Premium Custom Cursor --- */
+        body {
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="rgba(124,58,237,0.2)" stroke="%237c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l7.07 16.97 2.51-7.39 7.39-2.51L4 4z"/></svg>') 2 2, auto;
+        }
+        a, button, .btn, .nav-item, input[type="checkbox"], .toggle-slider, .slider, .tab-btn, .custom-table tr, select {
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="rgba(16,185,129,0.2)" stroke="%2310b981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l7.07 16.97 2.51-7.39 7.39-2.51L4 4z"/></svg>') 2 2, pointer !important;
+        }
+        input[type="text"], input[type="password"], input[type="number"], textarea {
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%233b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16m-4-16h8m-8 16h8"/></svg>') 12 12, text !important;
+        }
+
+        /* --- Enhanced Modals --- */
+        .modal-box {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(124, 58, 237, 0.3) !important;
+            background: linear-gradient(145deg, var(--bg-modal), var(--bg-card)) !important;
+        }
+
+
+        .nav-category { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin: 16px 0 8px 16px; opacity: 0; transition: opacity 0.2s ease; }
+        .sidebar:hover .nav-category { opacity: 0.7; transition-delay: 0.1s; }
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        /* --- Accordion Sidebar CSS v17 (Fix Logo Text Color in Light Mode) --- */
+        .sidebar { width: 86px !important; overflow-x: hidden !important; padding: 20px 0 !important; transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; }
+        .sidebar:hover { width: 250px !important; } 
+        
+        /* Logo Perfect Alignment (Anchored to match panel icons) */
+        .logo { display: flex; align-items: center; justify-content: flex-start; margin-bottom: 40px; height: 50px; flex-shrink: 0; padding-left: 27px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
+        .sidebar:hover .logo { padding-left: 28px; }
+        
+        /* Alive Animated Icon (Reactor Core) */
+        .alive-icon { position: relative; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .alive-icon .core { width: 10px; height: 10px; background: var(--primary-purple); border-radius: 50%; box-shadow: 0 0 10px var(--primary-purple), 0 0 20px var(--primary-purple); animation: corePulse 1.5s infinite alternate; }
+        .alive-icon .ring { position: absolute; width: 22px; height: 22px; border: 2px solid transparent; border-top-color: var(--primary-green); border-bottom-color: var(--primary-green); border-radius: 50%; animation: ringSpin 3s linear infinite; }
+        .alive-icon .ring2 { width: 30px; height: 30px; border-top-color: transparent; border-bottom-color: transparent; border-left-color: var(--primary-purple); border-right-color: var(--primary-purple); animation: ringSpinReverse 4s linear infinite; }
+        
+        @keyframes corePulse { 0% { transform: scale(0.8); box-shadow: 0 0 5px var(--primary-purple); } 100% { transform: scale(1.3); box-shadow: 0 0 15px var(--primary-purple), 0 0 30px var(--primary-purple); } }
+        @keyframes ringSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes ringSpinReverse { 0% { transform: rotate(360deg); } 100% { transform: rotate(0deg); } }
+        
+        /* Logo Text - Uses var(--text-main) for Light/Dark mode support */
+        .logo-text { max-width: 0; opacity: 0; overflow: hidden; white-space: nowrap; margin-left: 0; transition: max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s, margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1); font-size: 16px; font-weight: 700; color: var(--text-main); }
+        .sidebar:hover .logo-text { max-width: 170px; opacity: 1; margin-left: 6px; transition: max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s 0.1s, margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .logo-text .highlight { color: var(--primary-purple); }
+        
+        .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 8px; flex: 1; align-items: stretch; padding: 0; width: 100%; overflow-y: auto; overflow-x: hidden; margin-bottom: 30px; }
+        .nav-menu::-webkit-scrollbar { width: 0; }
+        
+        .nav-item-group { display: flex; flex-direction: column; }
+        
+        .nav-item-header { display: flex; align-items: center; justify-content: flex-start; padding: 12px 15px; border-radius: 8px; color: var(--text-muted); cursor: pointer; transition: all 0.3s ease; margin: 0 16px; position: relative; z-index: 1; }
+        .sidebar:hover .nav-item-header { padding: 12px 16px; }
+        .nav-item-header:hover { background: var(--bg-card); color: var(--text-main); }
+        
+        .nav-item-header::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 0; height: 0; border-radius: 50%; background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%); opacity: 0; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: -1; }
+        .sidebar:not(:hover) .nav-item-header.active::before { width: 44px; height: 44px; opacity: 1; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.25); }
+        .sidebar:not(:hover) .nav-item-header.active i { color: #fff; transition: color 0.3s; }
+        .sidebar:hover .nav-item-header.active { color: var(--primary-purple); }
+        
+        .nav-header-left { display: flex; align-items: center; }
+        .nav-header-left i { font-size: 18px; width: 24px; text-align: center; flex-shrink: 0; }
+        
+        .nav-text { max-width: 0; opacity: 0; overflow: hidden; white-space: nowrap; margin-left: 0; transition: max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s, margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1); display: inline-block; vertical-align: middle; font-size: 14px; }
+        .sidebar:hover .nav-text { max-width: 150px; opacity: 1; margin-left: 16px; transition: max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s 0.1s, margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        .chevron { position: absolute; right: 16px; opacity: 0; font-size: 12px; transition: opacity 0.2s, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; }
+        .sidebar:hover .chevron { opacity: 1; transition: opacity 0.3s 0.1s, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .nav-item-group.open .chevron { transform: rotate(180deg); }
+        
+        .nav-accordion { max-height: 0; opacity: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), margin 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s; display: flex; flex-direction: column; gap: 4px; margin-top: 0; }
+        .sidebar:hover .nav-item-group.open .nav-accordion { max-height: 160px; opacity: 1; margin-top: 4px; margin-bottom: 8px; }
+        
+        .nav-item { display: flex; align-items: center; justify-content: flex-start; padding: 10px 15px; border-radius: 8px; color: var(--text-muted); text-decoration: none; font-size: 13px; font-weight: 500; transition: all 0.3s ease; margin: 0 16px; }
+        .sidebar:hover .nav-item { padding: 10px 16px 10px 40px; }
+        
+        .nav-item i { font-size: 14px; width: 24px; text-align: center; opacity: 0.6; transition: opacity 0.2s; flex-shrink: 0; }
+        .nav-item:hover { background: var(--bg-detail); color: var(--text-main); }
+        .sidebar:hover .nav-item:hover { transform: translateX(4px); }
+        .nav-item:hover i { opacity: 1; color: var(--primary-purple); }
+        .nav-item.active { background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%); color: #fff; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.25); }
+        .nav-item.active i { opacity: 1; color: #fff; }
+        
+        .upgrade-card { 
+            background-color: var(--bg-body) !important; 
+            border: 1px solid rgba(16, 185, 129, 0.2) !important; 
+            border-radius: 12px !important; 
+            margin: auto 16px 20px 16px !important; 
+            display: flex !important; 
+            align-items: center !important; 
+            justify-content: flex-start !important; 
+            padding: 12px 14px !important; 
+            cursor: pointer !important; 
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important; 
+            overflow: hidden !important; 
+            position: relative !important; 
+            flex-shrink: 0 !important; 
+            text-decoration: none !important; 
+            opacity: 1 !important;
+            pointer-events: auto !important;
+            transform: none !important;
+        }
+        .upgrade-card:hover { 
+            background-color: var(--bg-detail) !important; 
+            border-color: rgba(16, 185, 129, 0.5) !important; 
+            transform: translateY(-4px) !important; 
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.15) !important; 
+        }
+        
+        .sidebar:not(:hover) .upgrade-card {
+            background-color: transparent !important;
+            border-color: transparent !important;
+            box-shadow: none !important;
+        }
+        .sidebar:not(:hover) .upgrade-card:hover {
+            transform: scale(1.1) !important; 
+            background-color: transparent !important;
+            border-color: transparent !important;
+            box-shadow: none !important; 
+        }
+        
+        .upgrade-icon { font-size: 16px; color: var(--primary-green); width: 24px; text-align: center; flex-shrink: 0; transition: font-size 0.4s; }
+        .sidebar:hover .upgrade-icon { font-size: 18px; }
+        
+        .upgrade-content { max-width: 0; opacity: 0; overflow: hidden; white-space: nowrap; margin-left: 0; line-height: 1.4; transition: max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s, margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .sidebar:hover .upgrade-content { max-width: 150px; opacity: 1; margin-left: 12px; transition: max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s 0.1s, margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .upgrade-content h4 { font-size: 12px; color: var(--primary-green); margin: 0 0 2px 0; font-weight: 600; white-space: nowrap; }
+        .upgrade-content p { font-size: 10px; color: var(--text-muted); margin: 0; }
+
+</style>
+</head>
+<body>
+
+    <div class="mouse-glow" id="mouseGlow"></div>
+    <div class="overlay" id="overlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="logo">
+        <div class="alive-icon">
+            <div class="core"></div>
+            <div class="ring ring1"></div>
+            <div class="ring ring2"></div>
+        </div>
+        <span class="logo-text">Watashi <span class="highlight">Manager</span></span>
+    </div>
+    
+    <div class="nav-menu">
+        <div class="nav-item-group ">
+            <div class="nav-item-header " onclick="document.querySelectorAll('.nav-item-group').forEach(el => { if(el !== this.parentElement) el.classList.remove('open') }); this.parentElement.classList.toggle('open');">
+                <div class="nav-header-left">
+                    <i class="fa-solid fa-border-all"></i>
+                    <span class="nav-text">Overview</span>
+                </div>
+                <i class="fa-solid fa-chevron-down chevron"></i>
+            </div>
+            <div class="nav-accordion">
+                <a href="dashboard.html" class="nav-item "><i class="fa-solid fa-gauge"></i> <span class="nav-text">Dashboard</span></a>
+                <a href="monitoring.html" class="nav-item "><i class="fa-solid fa-binoculars"></i> <span class="nav-text">Monitoring</span></a>
+                <a href="#" class="nav-item "><i class="fa-solid fa-chart-line"></i> <span class="nav-text">Usage</span></a>
+            </div>
+        </div>
+
+        <div class="nav-item-group ">
+            <div class="nav-item-header " onclick="document.querySelectorAll('.nav-item-group').forEach(el => { if(el !== this.parentElement) el.classList.remove('open') }); this.parentElement.classList.toggle('open');">
+                <div class="nav-header-left">
+                    <i class="fa-solid fa-users"></i>
+                    <span class="nav-text">Access</span>
+                </div>
+                <i class="fa-solid fa-chevron-down chevron"></i>
+            </div>
+            <div class="nav-accordion">
+                <a href="users.html" class="nav-item "><i class="fa-solid fa-user-group"></i> <span class="nav-text">Users</span></a>
+                <a href="admins.html" class="nav-item "><i class="fa-solid fa-shield-halved"></i> <span class="nav-text">Admins</span></a>
+                <a href="account.html" class="nav-item "><i class="fa-regular fa-user"></i> <span class="nav-text">My Account</span></a>
+            </div>
+        </div>
+
+        <div class="nav-item-group open">
+            <div class="nav-item-header active" onclick="document.querySelectorAll('.nav-item-group').forEach(el => { if(el !== this.parentElement) el.classList.remove('open') }); this.parentElement.classList.toggle('open');">
+                <div class="nav-header-left">
+                    <i class="fa-solid fa-network-wired"></i>
+                    <span class="nav-text">Network</span>
+                </div>
+                <i class="fa-solid fa-chevron-down chevron"></i>
+            </div>
+            <div class="nav-accordion">
+                <a href="domains.html" class="nav-item active"><i class="fa-solid fa-globe"></i> <span class="nav-text">Domains</span></a>
+                <a href="proxies.html" class="nav-item "><i class="fa-solid fa-network-wired"></i> <span class="nav-text">Proxies</span></a>
+                <a href="tunnel.html" class="nav-item "><i class="fa-solid fa-route"></i> <span class="nav-text">Tunnel</span></a>
+            </div>
+        </div>
+
+        <div class="nav-item-group ">
+            <div class="nav-item-header " onclick="document.querySelectorAll('.nav-item-group').forEach(el => { if(el !== this.parentElement) el.classList.remove('open') }); this.parentElement.classList.toggle('open');">
+                <div class="nav-header-left">
+                    <i class="fa-solid fa-gear"></i>
+                    <span class="nav-text">System</span>
+                </div>
+                <i class="fa-solid fa-chevron-down chevron"></i>
+            </div>
+            <div class="nav-accordion">
+                <a href="settings.html" class="nav-item "><i class="fa-solid fa-gear"></i> <span class="nav-text">Settings</span></a>
+                <a href="actions.html" class="nav-item "><i class="fa-solid fa-terminal"></i> <span class="nav-text">Actions</span></a>
+                <a href="backup.html" class="nav-item "><i class="fa-solid fa-floppy-disk"></i> <span class="nav-text">Backup</span></a>
+            </div>
+        </div>
+    </div>
+    
+    <a href="#" class="upgrade-card">
+        <i class="fa-solid fa-bolt upgrade-icon"></i>
+        <div class="upgrade-content">
+            <h4>Upgrade Plan</h4>
+            <p>Get more power</p>
+        </div>
+    </a>
+</aside>
+
+    <main class="main-content">
+        <header class="header">
+            <div class="header-left">
+                <i class="fa-solid fa-bars menu-toggle" id="menuToggle"></i>
+                <div class="header-title">Domain Management</div>
+            </div>
+            <div class="header-right">
+                <div class="theme-switch-wrapper">
+                    <label class="theme-switch" for="checkbox">
+                        <input type="checkbox" id="checkbox" />
+                        <div class="slider round">
+                            <i class="fa-solid fa-moon moon-icon"></i>
+                            <i class="fa-solid fa-sun sun-icon"></i>
+                        </div>
+                    </label>
+                </div>
+                <div class="header-btn-group">
+                    <button class="btn btn-green" onclick="openModal('domainModal')"><i class="fa-solid fa-plus"></i> Add Domain</button>
+                </div>
+                <div class="user-profile">
+                    シングル
+                    <img src="https://s33.picofile.com/file/8485367300/ME.jpg" alt="Profile" class="avatar-img">
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-body">
+
+            <!-- Info Banner -->
+            <div class="info-banner animated-item delay-1">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>Domains are used to connect users to your server. You need at least one <strong>direct domain</strong> and one <strong>CDN domain</strong> for optimal performance.</span>
+            </div>
+
+            <!-- Summary Chips -->
+            <div class="domains-summary animated-item delay-2">
+                <div class="summary-chip">
+                    <span class="chip-dot" style="background: var(--primary-blue);"></span>
+                    Total: <span class="chip-count">5</span>
+                </div>
+                <div class="summary-chip">
+                    <span class="chip-dot" style="background: #10b981;"></span>
+                    Direct: <span class="chip-count">2</span>
+                </div>
+                <div class="summary-chip">
+                    <span class="chip-dot" style="background: #3b82f6;"></span>
+                    CDN: <span class="chip-count">1</span>
+                </div>
+                <div class="summary-chip">
+                    <span class="chip-dot" style="background: #7c3aed;"></span>
+                    Auto CDN: <span class="chip-count">1</span>
+                </div>
+                <div class="summary-chip">
+                    <span class="chip-dot" style="background: #f59e0b;"></span>
+                    Relay: <span class="chip-count">1</span>
+                </div>
+            </div>
+
+            <!-- Domain Cards Grid -->
+            <div class="domains-grid">
+
+                <!-- Card 1: panel.example.com — Direct -->
+                <div class="domain-card animated-item delay-3">
+                    <div class="domain-card-top mode-direct"></div>
+                    <div class="domain-card-body">
+                        <div class="domain-card-header">
+                            <div class="domain-name-group">
+                                <div class="domain-name">
+                                    panel.example.com
+                                    <button class="copy-btn" onclick="copyDomain(this, 'panel.example.com')">
+                                        <i class="fa-regular fa-copy"></i>
+                                        <span class="tooltip">Copied!</span>
+                                    </button>
+                                </div>
+                                <div class="domain-alias"><i class="fa-solid fa-tag"></i> Main Panel</div>
+                            </div>
+                            <span class="mode-badge direct">Direct</span>
+                        </div>
+                        <div class="domain-details">
+                            <div class="domain-detail-row">
+                                <span class="detail-row-label"><i class="fa-solid fa-server"></i> Domain IP</span>
+                                <span class="ip-badge match"><i class="fa-solid fa-circle-check"></i> 185.92.x.x</span>
+                            </div>
+                            <div class="domain-detail-row">
+                                <span class="detail-row-label"><i class="fa-solid fa-tower-broadcast"></i> DNS Status</span>
+                                <span class="dns-status ok"><i class="fa-solid fa-circle-check"></i> Resolved</span>
+                            </div>
+                            <div class="domain-detail-row">
+                                <span class="detail-row-label"><i class="fa-solid fa-eye"></i> Show Domains</span>
+                                <label class="toggle-switch-sm">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider-sm"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="domain-card-actions">
+                            <button class="card-act-btn edit" onclick="openEditModal('panel.example.com', 'Direct', 'Main Panel')"><i class="fa-solid fa-pen"></i> Edit</button>
+                            <button class="card-act-btn delete" onclick="openDeleteModal('panel.example.com')"><i class="fa-regular fa-trash-can"></i> Delete</button>
+                            <button class="card-act-btn test" onclick="testDNS(this)"><i class="fa-solid fa-flask-vial"></i> Test</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: cdn.example.com — CDN -->
+                <div class="domain-card animated-item delay-4">
+                    <div class="domain-card-top mode-cdn"></div>
+                    <div class="domain-card-body">
+                        <div class="domain-card-header">
+                            <div class="domain-name-group">
+                                <div class="domain-name">
+                                    cdn.example.com
+                                    <button class="copy-btn" onclick="copyDomain(this, 'cdn.example.com')">
+                                        <i class="fa-regular fa-copy"></i>
+                                        <span class="tooltip">Copied!</span>
+                                    </button>
+                                </div>
+                                <div class="domain-alias"><i class="fa-solid fa-tag"></i> CDN Entry</div>
+                            </div>
+                            <span class="mode-badge cdn">CDN</span>
+                        </div>
+                        <div class="domain-details">
+                            <div class="domain-detail-row">
+                                <span class="detail-row-label"><i class="fa-solid fa-server"></i> Domain IP</span>
+                                <span class="ip-badge cloudflare"><i class="fa-solid fa-cloud"></i> 104.16.x.x</span>
+                            </div>
+                            <div class="domain-detail-row">
+                                <span class="detail-row-label"><i class="fa-solid fa-tower-broadcast"></i> DNS Status</span>
+                                <span class="dns-status ok"><i class="fa-solid fa-circle-check"></i> Cloudflare</span>
+                            </div>
+                            <div class="domain-detail-row">
+                                <span class="detail-row-label"><i class="fa-solid fa-eye"></i> Show Domains</span>
+                                <label class="toggle-switch-sm">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider-sm"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="domain-card-actions">
+                            <button class="card-act-btn edit" onclick="openEditModal('cdn.example.com', 'CDN', 'CDN Entry')"><i class="fa-solid fa-pen"></i> Edit</button>
+                            <button class="card-act-btn delete" onclick="openDeleteModal('cdn.example.com')"><i class="fa-regular fa-trash-can"></i> Delete</button>
+                            <button class="card-act-btn test" onclick="testDNS(this)"><i class="fa-solid fa-flask-vial"></i> Test</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: auto.example.com — Auto CDN IP -->
+                <div class="domain-card animated-item delay-5">
+                    <div class="domain-card-top mode-autocdn"></div>
+                    <div class="domain-card-body">
+                        <div class="domain-card-header">
+                            <div class="domain-name-group">
+                                <div class="domain-name">
+                                    auto.example.com
+                                    <button class="copy-btn" onclick="copyDomain(this, 'auto.example.com')">
+                                        <i class="fa-regular fa-copy"></i>
+                                        <span class="tooltip">Copied!</span>
+                                    </button>
+                                </div>
+                                <div class="domain-alias"><i class="fa-solid fa-tag"></i> Auto CDN</div>
+                            </div>
+                            <span class="mode-badge autocdn">Auto CDN</span>
+                        </div>
+                        <div class="domain-details">
+                            <div class="domain-detail-row">
+                                <span class="detail-row-label"><i class="fa-solid fa-server"></i> Domain IP</span>
+                                <span class="ip-badge auto"><i class="fa-solid fa-wand-magic-sparkles"></i> Auto</span>
+                            </div>
+                            <div class="domain-detail-row">
+                                <span class="detail-row-label"><i class="fa-solid fa-tower-broadcast"></i> DNS Status</span>
+                                <span class="dns-status ok"><i class="fa-solid fa-circle-check"></i> Resolved</span>
+                            </div>
+                            <div class="domain-detail-row">
+                                <span class="detail-row-label"><i class="fa-solid fa-eye"></i> Show Domains</span>
+                                <label class="toggle-switch-sm">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider-sm"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="domain-card-actions">
+                            <button class="card-act-btn edit" onclick="openEditModal('auto.example.com', 'Auto CDN IP', 'Auto CDN')"><i class="fa-solid fa-pen"></i> Edit</button>
+                            <button class="card-act-btn delete" onclick="openDeleteModal('auto.example.com')"><i class="fa-regular fa-trash-can"></i> Delete</button>
+                            <button class="card-act-btn test" onclick="testDNS(this)"><i class="fa-solid fa-flask-vial"></i> Test</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4: relay.example.com — Relay -->
+                <div class="domain-card animated-item delay-6">
+                    <div class="domain-card-top mode-relay"></div>
+                    <div class="domain-card-body">
+                        <div class="domain-card-header">
+                            <div class="domain-name-group">
+                                <div class="domain-name">
+                                    relay.example.com
+                                    <button class="copy-btn" onclick="copyDomain(this, 'relay.example.com')">
+                                        <i class="fa-regular fa-copy"></i>
+                                        <span class="tooltip">Copied!</span>
+                                    </button>
+                                </div>
+                                <div class="domain-alias"><i class="fa-solid fa-tag"></i> Iran Relay</div>
+                            </div>
+                            <span class="mode-badge relay">Relay</span>
+                        </div>
+                        <div class="domain-details">
+                            <div class="domain-detail-row">
+                                <span class="detail-row-label"><i class="fa-solid fa-server"></i> Domain IP</span>
+                                <span class="ip-badge neutral"><i class="fa-solid fa-circle-exclamation"></i> 192.168.x.x</span>
+                            </div>
+                            <div class="domain-detail-row">
+                                <span class="detail-row-label"><i class="fa-solid fa-tower-broadcast"></i> DNS Status</span>
+                                <span class="dns-status warning"><i class="fa-solid fa-triangle-exclamation"></i> Check Relay</span>
+                            </div>
+                            <div class="domain-detail-row">
+                                <span class="detail-row-label"><i class="fa-solid fa-eye"></i> Show Domains</span>
+                                <label class="toggle-switch-sm">
+                                    <input type="checkbox">
+                                    <span class="toggle-slider-sm"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="domain-card-actions">
+                            <button class="card-act-btn edit" onclick="openEditModal('relay.example.com', 'Relay', 'Iran Relay')"><i class="fa-solid fa-pen"></i> Edit</button>
+                            <button class="card-act-btn delete" onclick="openDeleteModal('relay.example.com')"><i class="fa-regular fa-trash-can"></i> Delete</button>
+                            <button class="card-act-btn test" onclick="testDNS(this)"><i class="fa-solid fa-flask-vial"></i> Test</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 5: speed.example.com — Direct -->
+                <div class="domain-card animated-item delay-7">
+                    <div class="domain-card-top mode-direct"></div>
+                    <div class="domain-card-body">
+                        <div class="domain-card-header">
+                            <div class="domain-name-group">
+                                <div class="domain-name">
+                                    speed.example.com
+                                    <button class="copy-btn" onclick="copyDomain(this, 'speed.example.com')">
+                                        <i class="fa-regular fa-copy"></i>
+                                        <span class="tooltip">Copied!</span>
+                                    </button>
+                                </div>
+                                <div class="domain-alias"><i class="fa-solid fa-tag"></i> Speed Test</div>
+                            </div>
+                            <span class="mode-badge direct">Direct</span>
+                        </div>
+                        <div class="domain-details">
+                            <div class="domain-detail-row">
+                                <span class="detail-row-label"><i class="fa-solid fa-server"></i> Domain IP</span>
+                                <span class="ip-badge match"><i class="fa-solid fa-circle-check"></i> 185.92.x.x</span>
+                            </div>
+                            <div class="domain-detail-row">
+                                <span class="detail-row-label"><i class="fa-solid fa-tower-broadcast"></i> DNS Status</span>
+                                <span class="dns-status ok"><i class="fa-solid fa-circle-check"></i> Resolved</span>
+                            </div>
+                            <div class="domain-detail-row">
+                                <span class="detail-row-label"><i class="fa-solid fa-eye"></i> Show Domains</span>
+                                <label class="toggle-switch-sm">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider-sm"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="domain-card-actions">
+                            <button class="card-act-btn edit" onclick="openEditModal('speed.example.com', 'Direct', 'Speed Test')"><i class="fa-solid fa-pen"></i> Edit</button>
+                            <button class="card-act-btn delete" onclick="openDeleteModal('speed.example.com')"><i class="fa-regular fa-trash-can"></i> Delete</button>
+                            <button class="card-act-btn test" onclick="testDNS(this)"><i class="fa-solid fa-flask-vial"></i> Test</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Add / Edit Domain Modal -->
+    <div class="modal-overlay" id="domainModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span class="modal-title"><i class="fa-solid fa-globe" style="color: var(--primary-purple);"></i> <span id="domainModalTitle">Add New Domain</span></span>
+                <button class="modal-close" onclick="closeModal('domainModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label class="form-label"><i class="fa-solid fa-globe"></i> Domain</label>
+                        <input type="text" class="form-input" id="domainInput" placeholder="e.g., example.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label"><i class="fa-solid fa-layer-group"></i> Mode</label>
+                        <div class="dropdown-container" id="modeDropdown">
+                            <div class="dropdown-trigger">
+                                <span>Direct</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-option selected" data-value="direct">Direct</div>
+                                <div class="dropdown-option" data-value="cdn">CDN</div>
+                                <div class="dropdown-option" data-value="autocdn">Auto CDN IP</div>
+                                <div class="dropdown-option" data-value="relay">Relay</div>
+                                <div class="dropdown-option" data-value="fake">Fake</div>
+                                <div class="dropdown-option" data-value="oldxtls">Old XTLS Direct</div>
+                                <div class="dropdown-option" data-value="worker">Worker</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label"><i class="fa-solid fa-tag"></i> Alias</label>
+                        <input type="text" class="form-input" id="aliasInput" placeholder="e.g., My Server">
+                    </div>
+                    <div class="form-group cdn-ip-field" id="cdnIpField">
+                        <label class="form-label"><i class="fa-solid fa-cloud"></i> CDN IP</label>
+                        <input type="text" class="form-input" id="cdnIpInput" placeholder="e.g., 104.16.0.0">
+                    </div>
+                    <div class="form-group" id="showDomainsToggleGroup">
+                        <label class="form-label"><i class="fa-solid fa-eye"></i> Show Domains</label>
+                        <div class="toggle-wrapper">
+                            <span class="toggle-label">Visible to Users</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="form-label"><i class="fa-solid fa-server"></i> Server Names</label>
+                        <textarea class="form-input" id="serverNamesInput" placeholder="One server name per line&#10;e.g.,&#10;server1.example.com&#10;server2.example.com"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeModal('domainModal')">Cancel</button>
+                <button class="btn btn-green" onclick="closeModal('domainModal')"><i class="fa-solid fa-check"></i> Save Domain</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay confirm-modal" id="deleteModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span class="modal-title"><i class="fa-solid fa-triangle-exclamation" style="color: var(--primary-red);"></i> Confirm Delete</span>
+                <button class="modal-close" onclick="closeModal('deleteModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="confirm-body">
+                <div class="confirm-icon">
+                    <i class="fa-solid fa-trash-can"></i>
+                </div>
+                <div class="confirm-title">Delete Domain?</div>
+                <div class="confirm-text">Are you sure you want to delete <strong id="deleteDomainName">domain.com</strong>? This action cannot be undone and all associated configurations will be removed.</div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeModal('deleteModal')">Cancel</button>
+                <button class="btn btn-danger" onclick="closeModal('deleteModal')"><i class="fa-solid fa-trash-can"></i> Delete Domain</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Theme Switch
+        const checkbox = document.getElementById('checkbox');
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') { document.documentElement.setAttribute('data-theme', 'light'); checkbox.checked = true; }
+        checkbox.addEventListener('change', function () {
+            if (this.checked) { document.documentElement.setAttribute('data-theme', 'light'); localStorage.setItem('theme', 'light'); }
+            else { document.documentElement.removeAttribute('data-theme'); localStorage.setItem('theme', 'dark'); }
+        });
+
+        // Mobile Menu
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const menuToggle = document.getElementById('menuToggle');
+        function toggleMenu() {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+        menuToggle.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', toggleMenu);
+
+        // Mouse Glow
+        const mouseGlow = document.getElementById('mouseGlow');
+        let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+        document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; mouseGlow.style.opacity = '1'; });
+        document.addEventListener('mouseleave', () => { mouseGlow.style.opacity = '0'; });
+        function animateGlow() {
+            mouseGlow.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+            requestAnimationFrame(animateGlow);
+        }
+        animateGlow();
+
+        // Copy Domain
+        function copyDomain(btn, domain) {
+            navigator.clipboard.writeText(domain).then(() => {
+                btn.classList.add('copied');
+                setTimeout(() => btn.classList.remove('copied'), 1500);
+            });
+        }
+
+        // Modal Logic
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+        }
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                e.target.classList.remove('show');
+            }
+        });
+
+        // Edit Domain Modal
+        function openEditModal(domain, mode, alias) {
+            document.getElementById('domainModalTitle').textContent = 'Edit Domain';
+            document.getElementById('domainInput').value = domain;
+            document.getElementById('aliasInput').value = alias;
+
+            // Set mode dropdown
+            const modeDropdown = document.getElementById('modeDropdown');
+            const triggerText = modeDropdown.querySelector('.dropdown-trigger span');
+            const options = modeDropdown.querySelectorAll('.dropdown-option');
+            options.forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.textContent === mode) {
+                    opt.classList.add('selected');
+                    triggerText.textContent = mode;
+                }
+            });
+
+            updateCdnIpVisibility(mode);
+            openModal('domainModal');
+        }
+
+        // Delete Modal
+        function openDeleteModal(domain) {
+            document.getElementById('deleteDomainName').textContent = domain;
+            openModal('deleteModal');
+        }
+
+        // Test DNS - simulate
+        function testDNS(btn) {
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Testing...';
+            btn.style.pointerEvents = 'none';
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fa-solid fa-check" style="color: var(--primary-green);"></i> Passed';
+                btn.style.color = 'var(--primary-green)';
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.style.pointerEvents = '';
+                    btn.style.color = '';
+                }, 2000);
+            }, 1500);
+        }
+
+        // CDN IP Field Visibility
+        function updateCdnIpVisibility(mode) {
+            const cdnField = document.getElementById('cdnIpField');
+            if (mode === 'CDN' || mode === 'Auto CDN IP' || mode === 'cdn' || mode === 'autocdn') {
+                cdnField.classList.add('visible');
+            } else {
+                cdnField.classList.remove('visible');
+            }
+        }
+
+        // Custom Dropdown Logic
+        document.querySelectorAll('.dropdown-container').forEach(container => {
+            const trigger = container.querySelector('.dropdown-trigger');
+            const triggerText = trigger.querySelector('span');
+            const options = container.querySelectorAll('.dropdown-option');
+
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.querySelectorAll('.dropdown-container.open').forEach(other => {
+                    if (other !== container) other.classList.remove('open');
+                });
+                container.classList.toggle('open');
+            });
+
+            options.forEach(option => {
+                option.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    options.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                    triggerText.textContent = option.textContent;
+                    container.classList.remove('open');
+                    // Update CDN IP field visibility
+                    updateCdnIpVisibility(option.dataset.value || option.textContent);
+                });
+            });
+        });
+
+        window.addEventListener('click', () => {
+            document.querySelectorAll('.dropdown-container.open').forEach(container => {
+                container.classList.remove('open');
+            });
+        });
+
+        // Reset modal title when opening Add
+        document.querySelector('.btn-green[onclick*="domainModal"]').addEventListener('click', function() {
+            // Small delay to ensure the modal title resets for "Add" flow
+            setTimeout(() => {
+                const titleEl = document.getElementById('domainModalTitle');
+                if (titleEl.textContent === 'Edit Domain') {
+                    titleEl.textContent = 'Add New Domain';
+                    document.getElementById('domainInput').value = '';
+                    document.getElementById('aliasInput').value = '';
+                    document.getElementById('cdnIpInput').value = '';
+                    document.getElementById('serverNamesInput').value = '';
+                    updateCdnIpVisibility('direct');
+                    // Reset dropdown
+                    const modeDropdown = document.getElementById('modeDropdown');
+                    const triggerText = modeDropdown.querySelector('.dropdown-trigger span');
+                    const options = modeDropdown.querySelectorAll('.dropdown-option');
+                    options.forEach(opt => opt.classList.remove('selected'));
+                    options[0].classList.add('selected');
+                    triggerText.textContent = 'Direct';
+                }
+            }, 50);
+        });
+    </script>
+</body>
+</html>
