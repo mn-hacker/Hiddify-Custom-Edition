@@ -80,7 +80,7 @@
             "url":"https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/sing/geo/geosite/twitter.srs"
          },
          {% endif %}
-         {% if hconfigs['block_gambling_enable'] %}
+         {% if hconfigs['block_nsfw_enable'] %}
          {
             "tag":"geosite-category-gambling",
             "type":"remote",
@@ -88,8 +88,6 @@
             "update_interval":"1d",
             "url":"https://raw.githubusercontent.com/Chocolate4U/Iran-sing-box-rules/rule-set/geosite-category-gambling.srs"
          },
-         {% endif %}
-         {% if hconfigs['block_adult_enable'] %}
          {
             "tag":"geosite-nsfw",
             "type":"remote",
@@ -141,16 +139,10 @@
           "rule_set": ["geosite-facebook", "geosite-instagram", "geosite-twitter"]
         },
         {% endif %}
-        {% if hconfigs['block_gambling_enable'] %}
+        {% if hconfigs['block_nsfw_enable'] %}
         {
           "outbound": "blackhole",
-          "rule_set": ["geosite-category-gambling"]
-        },
-        {% endif %}
-        {% if hconfigs['block_adult_enable'] %}
-        {
-          "outbound": "blackhole",
-          "rule_set": ["geosite-nsfw"]
+          "rule_set": ["geosite-category-gambling", "geosite-nsfw"]
         },
         {% endif %}
         {
