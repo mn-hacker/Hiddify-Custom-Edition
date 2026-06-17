@@ -1,5 +1,5 @@
-xray|26.2.2|amd64|https://github.com/XTLS/Xray-core/releases/download/v26.2.2/Xray-linux-64.zip|e281a2628e5d5beeec5e31b804b3f269ee70cd7f5d56aa92cccd1f8cb6d36365
-xray|26.2.2|arm64|https://github.com/XTLS/Xray-core/releases/download/v26.2.2/Xray-linux-arm64-v8a.zip|4afed4f00b75452b565c692746a1b4e36b6cfa6142660588dd7934bd1d200577
+xray|26.3.27|amd64|https://github.com/XTLS/Xray-core/releases/download/v26.3.27/Xray-linux-64.zip|23cd9af937744d97776ee35ecad4972cf4b2109d1e0fe6be9930467608f7c8ae
+xray|26.3.27|arm64|https://github.com/XTLS/Xray-core/releases/download/v26.3.27/Xray-linux-arm64-v8a.zip|4d30283ae614e3057f730f67cd088a42be6fdf91f8639d82cb69e48cde80413c
 singbox|1.13.0.h9|arm64|https://github.com/mn-hacker/Hiddify-Custom-SingBox/releases/download/v1.13.0.h9/sing-box-1.13.0.h9-linux-arm64.tar.gz|424092db0a7ad7f5476ee439c819289cb043776a1b85505c402eee3729f94751
 singbox|1.13.0.h9|amd64|https://github.com/mn-hacker/Hiddify-Custom-SingBox/releases/download/v1.13.0.h9/sing-box-1.13.0.h9-linux-amd64.tar.gz|d0f50e0f7aaddccded0a0ca241b2cc69a21a6db8343128739547af512dca1f78
 mtproxygo|2.1.7|arm64|https://github.com/9seconds/mtg/releases/download/v2.1.7/mtg-2.1.7-linux-arm64.tar.gz|ca1897c13fbacb4a671b872ff7dad7bc5dc2b09a7d7ed8cac7034df74b5b195a
