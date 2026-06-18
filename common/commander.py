@@ -244,5 +244,71 @@ def truncate(file: str):
         print(f"Failed to chown {file_path}: {e}")
 
 
+# ============================================================
+# Connection-limit firewall enforcement
+# ============================================================
+# The hiddify-panel process is unprivileged and cannot touch the firewall, so it
+# writes the set of IPs that must be blocked to a handoff file and asks us (root,
+# via sudo) to reconcile a dedicated iptables/ip6tables chain with that list.
+# This is the step that actually drops traffic from over-limit clients (works
+# for every protocol: xray, singbox, wireguard, ...).
+CONNLIMIT_CHAIN = "HIDDIFY_CONNLIMIT"
+CONNLIMIT_FILE = os.path.join(HIDDIFY_DIR, 'log/connlimit_blocked_ips.txt')
+
+
+def _connlimit_sync_one(binary: str, desired: set):
+    """Idempotently reconcile a single firewall family (iptables or ip6tables)
+    so that exactly the IPs in ``desired`` are dropped via CONNLIMIT_CHAIN."""
+    # Skip silently if this firewall binary isn't available on the host.
+    if subprocess.run([binary, '-V'], capture_output=True).returncode != 0:
+        return
+
+    # 1. Ensure the chain exists.
+    if subprocess.run([binary, '-n', '-L', CONNLIMIT_CHAIN], capture_output=True).returncode != 0:
+        subprocess.run([binary, '-N', CONNLIMIT_CHAIN], check=False)
+
+    # 2. Ensure INPUT jumps to our chain (insert at the top, only once).
+    if subprocess.run([binary, '-C', 'INPUT', '-j', CONNLIMIT_CHAIN], capture_output=True).returncode != 0:
+        subprocess.run([binary, '-I', 'INPUT', '-j', CONNLIMIT_CHAIN], check=False)
+
+    # 3. Read the rules currently in the chain.
+    out = subprocess.run([binary, '-S', CONNLIMIT_CHAIN], capture_output=True, text=True).stdout or ""
+    current = set()
+    for line in out.splitlines():
+        m = re.match(r'-A\s+%s\s+-s\s+(\S+)\s+-j\s+DROP' % re.escape(CONNLIMIT_CHAIN), line.strip())
+        if m:
+            current.add(m.group(1).split('/')[0])  # strip /32 or /128 mask
+
+    # 4. Add the rules that should exist but don't.
+    for ip in desired - current:
+        subprocess.run([binary, '-A', CONNLIMIT_CHAIN, '-s', ip, '-j', 'DROP'], check=False)
+
+    # 5. Remove rules that should no longer exist (expired / unblocked).
+    for ip in current - desired:
+        subprocess.run([binary, '-D', CONNLIMIT_CHAIN, '-s', ip, '-j', 'DROP'], check=False)
+
+
+@cli.command('connlimit-sync')
+def connlimit_sync():
+    """Reconcile the firewall with the connection-limit blocked-IP list."""
+    import ipaddress
+    desired_v4, desired_v6 = set(), set()
+    if os.path.exists(CONNLIMIT_FILE):
+        with open(CONNLIMIT_FILE) as f:
+            for line in f:
+                ip = line.strip()
+                if not ip:
+                    continue
+                try:
+                    obj = ipaddress.ip_address(ip)  # injection-safe: only clean IPs pass
+                except ValueError:
+                    continue
+                (desired_v4 if obj.version == 4 else desired_v6).add(ip)
+
+    _connlimit_sync_one('iptables', desired_v4)
+    _connlimit_sync_one('ip6tables', desired_v6)
+    print(f"connlimit-sync: enforcing {len(desired_v4)} IPv4 + {len(desired_v6)} IPv6 block(s).")
+
+
 if __name__ == "__main__":
     cli()
