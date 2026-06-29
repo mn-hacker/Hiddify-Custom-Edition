@@ -258,7 +258,15 @@ CONNLIMIT_FILE = os.path.join(HIDDIFY_DIR, 'log/connlimit_blocked_ips.txt')
 
 def _connlimit_sync_one(binary: str, desired: set):
     """Idempotently reconcile a single firewall family (iptables or ip6tables)
-    so that exactly the IPs in ``desired`` are dropped via CONNLIMIT_CHAIN."""
+    so that exactly the IPs in ``desired`` are dropped via CONNLIMIT_CHAIN.
+
+    CRITICAL: the jump to our chain MUST sit at position 1 in INPUT.
+    common/run.sh uses ``iptables -I`` (insert at top) for ESTABLISHED,RELATED
+    accept rules every time apply_configs runs.  If those rules end up above our
+    chain, already-open TCP sessions from blocked IPs are accepted before they
+    reach our DROP rules and the block has no effect.  We therefore unconditionally
+    delete + re-insert our jump on every sync cycle.
+    """
     # Skip silently if this firewall binary isn't available on the host.
     if subprocess.run([binary, '-V'], capture_output=True).returncode != 0:
         return
@@ -267,9 +275,11 @@ def _connlimit_sync_one(binary: str, desired: set):
     if subprocess.run([binary, '-n', '-L', CONNLIMIT_CHAIN], capture_output=True).returncode != 0:
         subprocess.run([binary, '-N', CONNLIMIT_CHAIN], check=False)
 
-    # 2. Ensure INPUT jumps to our chain (insert at the top, only once).
-    if subprocess.run([binary, '-C', 'INPUT', '-j', CONNLIMIT_CHAIN], capture_output=True).returncode != 0:
-        subprocess.run([binary, '-I', 'INPUT', '-j', CONNLIMIT_CHAIN], check=False)
+    # 2. ALWAYS re-position the jump at INPUT position 1.
+    #    Delete first (ignore error if it doesn't exist), then insert at 1.
+    subprocess.run([binary, '-D', 'INPUT', '-j', CONNLIMIT_CHAIN],
+                   capture_output=True)  # may fail — fine
+    subprocess.run([binary, '-I', 'INPUT', '1', '-j', CONNLIMIT_CHAIN], check=False)
 
     # 3. Read the rules currently in the chain.
     out = subprocess.run([binary, '-S', CONNLIMIT_CHAIN], capture_output=True, text=True).stdout or ""
@@ -282,6 +292,9 @@ def _connlimit_sync_one(binary: str, desired: set):
     # 4. Add the rules that should exist but don't.
     for ip in desired - current:
         subprocess.run([binary, '-A', CONNLIMIT_CHAIN, '-s', ip, '-j', 'DROP'], check=False)
+        # Kill existing conntrack entries so ESTABLISHED sessions are broken
+        # immediately (even before the next packet triggers our DROP rule).
+        subprocess.run(['conntrack', '-D', '-s', ip], capture_output=True)
 
     # 5. Remove rules that should no longer exist (expired / unblocked).
     for ip in current - desired:
