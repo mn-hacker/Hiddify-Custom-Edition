@@ -34,4 +34,10 @@ systemctl disable clash >/dev/null 2>&1
 systemctl stop --now netdata >/dev/null 2>&1
 systemctl disable netdata >/dev/null 2>&1
 
+# IP-Limiter (replaced by HWID limit)
+systemctl stop --now hiddify-ip-limiter >/dev/null 2>&1
+systemctl disable hiddify-ip-limiter >/dev/null 2>&1
+rm -f /etc/systemd/system/hiddify-ip-limiter.service
+rm -rf /opt/hiddify-manager/other/hiddify-ip-limiter/
+
 echo "Deprecated components cleanup completed."
