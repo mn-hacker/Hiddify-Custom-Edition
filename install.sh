@@ -45,7 +45,7 @@ if [[ " $@ " == *" --check-only "* ]]; then
     systemctl start hiddify-warp 2>/dev/null || true
     systemctl start hiddify-ssh-liberty-bridge 2>/dev/null || true
     systemctl start hiddify-cli 2>/dev/null || true
-    systemctl start hiddify-ip-limiter 2>/dev/null || true
+
     
     # Start rathole if installed
     if [ -f /etc/systemd/system/rathole.service ]; then
@@ -144,11 +144,7 @@ function main() {
         install_run other/ssh $(hconfig "ssh_server_enable")
         install_run other/hiddify-cli $(hconfig "hiddifycli_enable" "true")
 
-        # IP Limiter (Connection Enforcement)
-        echo "Installing IP Limiter Service..."
-        cp hiddify-panel/hiddify-ip-limiter.service /etc/systemd/system/
-        systemctl enable hiddify-ip-limiter.service
-        systemctl restart hiddify-ip-limiter.service
+
 
         
         # WARP install (has apt, run sequentially first)
