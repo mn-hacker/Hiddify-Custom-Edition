@@ -2,6 +2,10 @@
 Description=Hiddify Redis
 After=network.target
 Documentation=http://redis.io/documentation, man:redis-server(1)
+# Never latch into the 'failed' state: with Restart=always, keep retrying forever so a
+# transient redis crash self-heals instead of dragging hiddify-panel (Requires=) and
+# hiddify-panel-background-tasks (BindsTo=) down with it.
+StartLimitIntervalSec=0
 
 [Service]
 Type=notify
