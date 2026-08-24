@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="96" height="96" role="img" aria-label="Watashi Manager living icon">
+<title>Watashi Manager</title>
+<style>
+.hx { fill: none; stroke-linecap: round; transform-origin: 50px 50px; }
+.hx.out { stroke: #7c3aed; stroke-width: 3.5; stroke-dasharray: 30 22; opacity: 0.9; animation: glTurn 9s linear infinite; }
+.hx.mid { stroke: #22d3ee; stroke-width: 2.5; stroke-dasharray: 9 15; opacity: 0.75; animation: glTurnBack 6s linear infinite; }
+.core { fill: #0b1020; stroke: #7c3aed; stroke-width: 2.5; animation: glBreath 3.2s ease-in-out infinite; }
+.wm path { fill: none; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; transform-origin: 50px 50px; }
+.wm .c { stroke: #22d3ee; opacity: 0.85; animation: glShiftA 5s infinite; }
+.wm .m { stroke: #f472b6; opacity: 0.85; animation: glShiftB 5s infinite; }
+.wm .w { stroke: #ffffff; animation: glFlick 5s infinite; }
+.bar { fill: #22d3ee; opacity: 0; transform-origin: 50px 50px; }
+.bar.b2 { fill: #f472b6; }
+.b1 { animation: glBar 5s infinite; }
+.b2 { animation: glBar 5s infinite 0.12s; }
+@media (prefers-reduced-motion: reduce) { .hx, .core, .wm path, .bar { animation: none; } .bar { opacity: 0; } }
+@keyframes glTurn { to { transform: rotate(360deg); } }
+@keyframes glTurnBack { to { transform: rotate(-360deg); } }
+@keyframes glBreath { 0%, 100% { filter: drop-shadow(0 0 1px #7c3aed); } 50% { filter: drop-shadow(0 0 5px #7c3aed); } }
+@keyframes glShiftA { 0%, 76%, 91%, 100% { transform: translate(0, 0); } 78% { transform: translate(-3px, 1.5px); } 82% { transform: translate(2px, -1.5px); } 86% { transform: translate(-1.5px, 0); } 89% { transform: translate(1px, 0.5px); } }
+@keyframes glShiftB { 0%, 76%, 91%, 100% { transform: translate(0, 0); } 78% { transform: translate(3px, -1.5px); } 82% { transform: translate(-2px, 1.5px); } 86% { transform: translate(1.5px, 0); } 89% { transform: translate(-1px, -0.5px); } }
+@keyframes glFlick { 0%, 76%, 100% { opacity: 1; } 78% { opacity: 0.35; } 80% { opacity: 1; } 84% { opacity: 0.6; } 87% { opacity: 1; } 89% { opacity: 0.8; } }
+@keyframes glBar { 0%, 74%, 90%, 100% { opacity: 0; } 77% { opacity: 0.9; transform: translateY(-7px); } 81% { opacity: 0.25; transform: translateY(5px); } 85% { opacity: 0.75; transform: translateY(-2px); } 88% { opacity: 0; transform: translateY(0); } }
+</style>
+<polygon class="hx out" points="50,6 88,28 88,72 50,94 12,72 12,28"/>
+<polygon class="hx mid" points="50,16 79,33 79,67 50,84 21,67 21,33"/>
+<polygon class="core" points="50,24 72,37 72,63 50,76 28,63 28,37"/>
+<g class="wm">
+<path class="c" d="M38 44 L44 58 L50 49 L56 58 L62 44"/>
+<path class="m" d="M38 44 L44 58 L50 49 L56 58 L62 44"/>
+<path class="w" d="M38 44 L44 58 L50 49 L56 58 L62 44"/>
+</g>
+<rect class="bar b1" x="30" y="42" width="40" height="3"/>
+<rect class="bar b2" x="30" y="57" width="40" height="3"/>
+</svg>

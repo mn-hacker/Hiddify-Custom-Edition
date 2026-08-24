@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 200" width="880" height="200" role="img" aria-label="Watashi Manager">
+<title>Watashi Manager</title>
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0a0f1d"/><stop offset="0.55" stop-color="#0d1428"/><stop offset="1" stop-color="#140f2b"/></linearGradient>
+<linearGradient id="sw" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22d3ee" stop-opacity="0"/><stop offset="0.5" stop-color="#22d3ee" stop-opacity="0.75"/><stop offset="1" stop-color="#7c3aed" stop-opacity="0"/></linearGradient>
+<linearGradient id="rule" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7c3aed"/><stop offset="0.5" stop-color="#22d3ee"/><stop offset="1" stop-color="#7c3aed" stop-opacity="0"/></linearGradient>
+<pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0 L0 0 L0 32" fill="none" stroke="#3b82f6" stroke-opacity="0.09" stroke-width="1"/></pattern>
+<clipPath id="frame"><rect x="2" y="2" width="876" height="196" rx="22"/></clipPath>
+</defs>
+<style>.hx { fill: none; stroke-linecap: round; transform-origin: 50px 50px; }
+.hx.out { stroke: #7c3aed; stroke-width: 3.5; stroke-dasharray: 30 22; opacity: 0.9; animation: glTurn 9s linear infinite; }
+.hx.mid { stroke: #22d3ee; stroke-width: 2.5; stroke-dasharray: 9 15; opacity: 0.75; animation: glTurnBack 6s linear infinite; }
+.core { fill: #0b1020; stroke: #7c3aed; stroke-width: 2.5; animation: glBreath 3.2s ease-in-out infinite; }
+.wm path { fill: none; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; transform-origin: 50px 50px; }
+.wm .c { stroke: #22d3ee; opacity: 0.85; animation: glShiftA 5s infinite; }
+.wm .m { stroke: #f472b6; opacity: 0.85; animation: glShiftB 5s infinite; }
+.wm .w { stroke: #ffffff; animation: glFlick 5s infinite; }
+.bar { fill: #22d3ee; opacity: 0; transform-origin: 50px 50px; }
+.bar.b2 { fill: #f472b6; }
+.b1 { animation: glBar 5s infinite; }
+.b2 { animation: glBar 5s infinite 0.12s; }
+@media (prefers-reduced-motion: reduce) { .hx, .core, .wm path, .bar { animation: none; } .bar { opacity: 0; } }
+.sweep { animation: bnSweep 6s ease-in-out infinite; }
+.tick { animation: bnTick 2.4s steps(1) infinite; }
+.name { font-family: ui-sans-serif, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-weight: 800; letter-spacing: 6px; }
+.sub { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; letter-spacing: 2.4px; }
+@keyframes bnSweep { 0% { transform: translateX(-260px); opacity: 0; } 12% { opacity: 0.55; } 60% { opacity: 0.2; } 100% { transform: translateX(980px); opacity: 0; } }
+@keyframes bnTick { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0.15; } }
+@media (prefers-reduced-motion: reduce) { .sweep, .tick { animation: none; } .sweep { opacity: 0; } }
+</style>
+<g clip-path="url(#frame)">
+<rect x="2" y="2" width="876" height="196" fill="url(#bg)"/>
+<rect x="2" y="2" width="876" height="196" fill="url(#grid)"/>
+<rect class="sweep" x="-260" y="2" width="200" height="196" fill="url(#sw)"/>
+<circle cx="742" cy="56" r="120" fill="#7c3aed" fill-opacity="0.10"/>
+<circle cx="110" cy="178" r="96" fill="#22d3ee" fill-opacity="0.07"/>
+</g>
+<rect x="2" y="2" width="876" height="196" rx="22" fill="none" stroke="#7c3aed" stroke-opacity="0.45" stroke-width="1.5"/>
+<g transform="translate(54, 52)"><polygon class="hx out" points="50,6 88,28 88,72 50,94 12,72 12,28"/>
+<polygon class="hx mid" points="50,16 79,33 79,67 50,84 21,67 21,33"/>
+<polygon class="core" points="50,24 72,37 72,63 50,76 28,63 28,37"/>
+<g class="wm">
+<path class="c" d="M38 44 L44 58 L50 49 L56 58 L62 44"/>
+<path class="m" d="M38 44 L44 58 L50 49 L56 58 L62 44"/>
+<path class="w" d="M38 44 L44 58 L50 49 L56 58 L62 44"/>
+</g>
+<rect class="bar b1" x="30" y="42" width="40" height="3"/>
+<rect class="bar b2" x="30" y="57" width="40" height="3"/></g>
+<text class="name" x="196" y="92" font-size="42" fill="#ffffff">WATASHI <tspan fill="#a78bfa">MANAGER</tspan></text>
+<rect x="198" y="108" width="430" height="2" fill="url(#rule)"/>
+<text class="sub" x="198" y="140" font-size="15" fill="#8b93ab">ADVANCED  EDITION  OF  HIDDIFY  MANAGER</text>
+<g class="tick"><circle cx="206" cy="162" r="4" fill="#10b981"/></g>
+<text class="sub" x="220" y="167" font-size="12.5" fill="#10b981">XRAY  ·  SING-BOX  ·  HAPROXY  ·  SELF-HEALING</text>
+</svg>
