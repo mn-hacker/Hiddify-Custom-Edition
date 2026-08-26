@@ -1,4 +1,5 @@
 #!/bin/bash
+# Watashi v12.2.37 : only the words on screen changed here
 cd $(dirname -- "$0")
 source ./common/utils.sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
@@ -18,7 +19,7 @@ function cleanup() {
 trap cleanup SIGINT
 
 function main() {
-    update_progress "Hiddify Updater" "Checking for update" 1
+    update_progress "Watashi Updater" "Checking for update" 1
     echo "Checking for update..."
     local force=false
     local manager_update=0
@@ -39,7 +40,7 @@ function main() {
     # fi
 
     rm -rf sniproxy caddy
-    update_progress "Hiddify Updater" "Creating a backup" 5
+    update_progress "Watashi Updater" "Creating a backup" 5
     echo "Creating a backup ..."
     ./hiddify-panel/backup.sh
 

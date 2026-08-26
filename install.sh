@@ -1,4 +1,5 @@
 #!/bin/bash
+# Watashi v12.2.37 : only the words on screen changed here
 cd $(dirname -- "$0")
 source ./common/utils.sh
 NAME="0-install"
@@ -57,7 +58,7 @@ if [[ " $@ " == *" --check-only "* ]]; then
 fi
 
 function main() {
-    update_progress "Please wait..." "We are going to install Hiddify..." 0
+    update_progress "Please wait..." "We are going to install the Watashi panel..." 0
     export ERROR=0
     
     export PROGRESS_ACTION="Installing..."
@@ -96,12 +97,12 @@ function main() {
             install_run other/mysql  # No & - sequential
         fi
         
-        update_progress "${PROGRESS_ACTION}" "Hiddify Panel" 12
+        update_progress "${PROGRESS_ACTION}" "Watashi Panel" 12
         install_run hiddify-panel  # No & - sequential
     fi
     
     if [ "$DO_NOT_RUN" != "true" ];then
-        update_progress "HiddifyPanel" "Reading Configs from Panel..." 15
+        update_progress "Watashi Panel" "Reading Configs from Panel..." 15
         set_config_from_hpanel
 
         update_progress "Applying Configs" "..." 18
@@ -194,7 +195,7 @@ trap cleanup SIGINT
 function set_config_from_hpanel() {
     reload_all_configs >/dev/null
     if [[ $? != 0 ]]; then
-        error "Exception in Hiddify Panel. Please send the log to hiddify@gmail.com"
+        error "The Watashi panel raised an exception. Please keep the log, it is the only thing that can explain this."
         exit 4
     fi
     

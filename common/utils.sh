@@ -1,3 +1,12 @@
+
+# --- Watashi v12.2.37 : one skin for every box the terminal draws ---
+WS_TUI_FILE="/opt/hiddify-manager/common/watashi_tui.sh"
+if [ ! -f "$WS_TUI_FILE" ]; then
+    WS_TUI_FILE="$(dirname "${BASH_SOURCE[0]}")/watashi_tui.sh"
+fi
+if [ -f "$WS_TUI_FILE" ]; then
+    source "$WS_TUI_FILE"
+fi
 export venv_path="/opt/hiddify-manager/.venv313"
 
 function get_commit_version() {
@@ -303,20 +312,15 @@ function is_installed() {
 }
 
 function msg_with_hiddify() {
-    text=$(
-        cat <<END
-                                  ▓▓▓
-                                ▓▓▓▓▓
-                           ▓▓▓       
-                         ▓▓▓▓▓  ▓▓▓▓▓
-                    ▓▓▓  ▓▓▓▓▓  ▓▓▓▓▓
-                 ▓▓▓▓▓▓  ▓▓▓▓▓  ▓▓▓▓▓
-                 ▓▓▓▓▓▓▓▓▓▓▓▓▓  ▓▓▓▓▓
-                 ▓▓▓▓▓▓  ▓▓▓▓▓  ▓▓▓▓▓
-END
-    )
-    msg "$text \n\n$1"
-
+    # the name stays on purpose, six places in the tree call it
+    if declare -F ws_sign >/dev/null 2>&1; then
+        case "$1" in
+        *ail* | *rror*) ws_sign "$1" bad ;;
+        *) ws_sign "$1" ;;
+        esac
+        return 0
+    fi
+    msg "$1"
 }
 function center_text() {
     local text="$1"
@@ -330,7 +334,11 @@ function center_text() {
 
 function msg() {
     install_package whiptail
-    NEWT_COLORS='title=blue, textbox=blue, border=blue, button=black,blue' whiptail --title Hiddify --msgbox "$1" 0 60
+    if declare -F ws_box >/dev/null 2>&1; then
+        ws_box "$WS_BRAND" "$1"
+        return 0
+    fi
+    whiptail --title "Watashi Manager" --msgbox "$1" 0 60
     disable_ansii_modes
 }
 
@@ -428,7 +436,7 @@ function check_hiddify_panel() {
         reload_all_configs >/dev/null
         
         if [[ $? != 0 ]]; then
-            error "Exception in Hiddify Panel. Please send the log to hiddify@gmail.com"
+            error "The Watashi panel raised an exception. Please keep the log, it is the only thing that can explain this."
             echo "4" >log/error.lock
             exit 4
         fi
@@ -440,7 +448,7 @@ function check_hiddify_panel() {
         install_package qrencode
         center_text "$(qrencode -t utf8 -m 2 $(cat /opt/hiddify-manager/current.json | jq -r '.panel_links[]' | tail -n 1))"
         echo ""
-        center_text $'\t\033[92mFinished! Thank you for helping to skip filternet.\033[0m'
+        center_text $'\t\033[92mFinished! Watashi Manager is up and breathing.\033[0m'
         
         echo -e "\n"
         echo "Please open the following link in the browser for client setup:"
@@ -544,11 +552,21 @@ function save_firewall() {
 }
 
 function show_progress_window() {
+    if [ -z "$WS_VERSION_LINE" ]; then
+        export WS_VERSION_LINE="Config=v$(get_installed_config_version) Panel=v$(get_installed_panel_version)"
+    fi
     disable_ansii_modes
-    activate_python_venv
-    install_pypi_package cli-progress
-    python3 -m cli_progress --title "Hiddify Manager" "$@"
-    exit_code=$?
+    local exit_code=0
+    if declare -F ws_progress_window >/dev/null 2>&1; then
+        ws_progress_window "$@"
+        exit_code=$?
+    else
+        # the old road, kept as a safety net
+        activate_python_venv
+        install_pypi_package cli-progress
+        python3 -m cli_progress --title "Watashi Manager" "$@"
+        exit_code=$?
+    fi
     disable_ansii_modes
     return $exit_code
 }

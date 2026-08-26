@@ -1,26 +1,16 @@
-center_text() {
-  local text="$1"
-  local screen_width="$(tput cols)"
-  local longest_line_length="$(echo "$text" | awk '{ print length }' | sort -rn | head -1)"
-  local padding_width="$(((screen_width - longest_line_length) / 2))"
-  while IFS= read -r line; do
-    printf "%*s\033[0;34m%s\n" $padding_width "" "$line"
-  done <<< "$text"
-}
-
-
-text=$(cat << END
-                 ▓▓▓
-               ▓▓▓▓▓
-          ▓▓▓       
-        ▓▓▓▓▓  ▓▓▓▓▓
-   ▓▓▓  ▓▓▓▓▓  ▓▓▓▓▓
-▓▓▓▓▓▓  ▓▓▓▓▓  ▓▓▓▓▓
-▓▓▓▓▓▓▓▓▓▓▓▓▓  ▓▓▓▓▓
-▓▓▓▓▓▓  ▓▓▓▓▓  ▓▓▓▓▓
-END
-)
-
-center_text  "$text"
-echo -e "\033[39m\\033[49m"
-#echo -e "\033[0;34m $text"
+#!/bin/bash
+# Watashi v12.2.37 - the mark we print when a run ends well
+WS_TUI_FILE="/opt/hiddify-manager/common/watashi_tui.sh"
+if [ ! -f "$WS_TUI_FILE" ]; then
+    WS_TUI_FILE="$(dirname "$0")/watashi_tui.sh"
+fi
+if [ -f "$WS_TUI_FILE" ]; then
+    source "$WS_TUI_FILE"
+    echo
+    ws_banner
+    ws_brand_line
+    ws_tag_line
+    echo
+else
+    echo "WATASHI MANAGER"
+fi

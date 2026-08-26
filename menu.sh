@@ -33,6 +33,18 @@ fi
 
 export CURRENT_CONFIG_VERSION=$(get_installed_config_version)
 export CURRENT_PANEL_VERSION=$(get_installed_panel_version)
+export WS_VERSION_LINE="Config=v$CURRENT_CONFIG_VERSION Panel=v$CURRENT_PANEL_VERSION"
+
+# --- Watashi v12.2.37 : the old whiptail home screen, kept as the safety net ---
+function menu_classic() {
+    whiptail --clear \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
+        --menu "$MENU" \
+        $HEIGHT $WIDTH $CHOICE_HEIGHT \
+        "${OPTIONS[@]}" \
+        3>&1 1>&2 2>&3
+}
 
 function menu() {
     
@@ -40,13 +52,14 @@ function menu() {
     HEIGHT=20
     WIDTH=70
     CHOICE_HEIGHT=12
-    BACKTITLE="Hiddify Custom Edition - シングル (Config=v$CURRENT_CONFIG_VERSION Panel=v$CURRENT_PANEL_VERSION)   $UPDATE_NEED  "
-    TITLE="Hiddify Custom Edition - シングル"
+    BACKTITLE="Watashi Manager - シングル (Config=v$CURRENT_CONFIG_VERSION Panel=v$CURRENT_PANEL_VERSION)   $UPDATE_NEED  "
+    TITLE="Watashi Manager - シングル"
+    WS_SUB="$WS_TAG   $UPDATE_NEED"
     MENU="Choose one of the following options:"
 
     OPTIONS=(status "View status of system"
         admin "Show admin link"
-        log "view system logs"
+        log "Read the system logs"
         restart "Restart Services without changing the configs"
         install "Reinstall the server"
         update "Update $UPDATE_NEED"
@@ -54,20 +67,36 @@ function menu() {
         Quit ""
     )
 
-    CHOICE=$(whiptail --clear \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --menu "$MENU" \
-        $HEIGHT $WIDTH $CHOICE_HEIGHT \
-        "${OPTIONS[@]}" \
-        3>&1 1>&2 2>&3)
-
-    if [[ $? != 0 ]]; then
-        clear
-        exit 1
+    # our own home screen first, the classic box if it cannot run
+    CHOICE=""
+    if declare -F ws_menu >/dev/null 2>&1; then
+        ws_menu "$WS_SUB" \
+            status "View the state of the system" \
+            admin "Show the admin link" \
+            log "Read the system logs" \
+            restart "Restart the services, configs untouched" \
+            install "Reinstall the server" \
+            update "Update $UPDATE_NEED" \
+            advanced "Uninstall, remote assistant, downgrade, ..." \
+            Quit "Leave the menu"
+        WS_CODE=$?
+        if [[ $WS_CODE == 1 ]]; then
+            clear
+            exit 1
+        fi
+        if [[ $WS_CODE == 0 ]]; then
+            CHOICE="$WS_MENU_CHOICE"
+        fi
+    fi
+    if [[ -z "$CHOICE" ]]; then
+        CHOICE=$(menu_classic)
+        if [[ $? != 0 ]]; then
+            clear
+            exit 1
+        fi
     fi
     clear
-    echo "Hiddify: Command $CHOICE"
+    echo "Watashi: Command $CHOICE"
     echo "=========================================="
     NEED_KEY=1
     case $CHOICE in
@@ -100,7 +129,7 @@ function menu() {
             remove_remote "Remove remote assistant access to this server"
             enable "show this menu on start up"
             disable "disable this menu"
-            uninstall "Uninstall hiddify :("
+            uninstall "Uninstall the panel :("
             purge "Uninstall completely and remove database :("
             Back ""
         )
@@ -160,6 +189,7 @@ function menu() {
         esac
         export CURRENT_CONFIG_VERSION=$(get_installed_config_version)
         export CURRENT_PANEL_VERSION=$(get_installed_panel_version)
+        export WS_VERSION_LINE="Config=v$CURRENT_CONFIG_VERSION Panel=v$CURRENT_PANEL_VERSION"
 
         ;;
     "admin")

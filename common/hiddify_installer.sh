@@ -1,4 +1,5 @@
 #!/bin/bash
+# Watashi v12.2.37 : only the words on screen changed here
 cd $(dirname -- "$0")
 source ./utils.sh
 if [ "$(id -u)" -ne 0 ]; then
@@ -76,7 +77,7 @@ function install_panel() {
 }
 
 function update_panel() {
-    update_progress "Checking for Update..." "Hiddify Panel" 5
+    update_progress "Checking for Update..." "Watashi Panel" 5
     local package_mode=$1
     local force=$2
     local current_panel_version=$(get_installed_panel_version)
@@ -92,7 +93,7 @@ function update_panel() {
             # pip install -U hiddifypanel
         ;;
         v*)
-            update_progress "Updating..." "Hiddify Panel from $current_panel_version to $latest" 10
+            update_progress "Updating..." "Watashi Panel from $current_panel_version to $latest" 10
             panel_path=$(hiddifypanel_path)
             disable_panel_services
             if [ ! -z "$USE_VENV" ]; then
@@ -110,19 +111,19 @@ function update_panel() {
                pip3 install -U --no-deps --force-reinstall git+https://github.com/hiddify/HiddifyPanel@${package_mode}
                pip3 install git+https://github.com/hiddify/HiddifyPanel@${package_mode}
             fi
-            update_progress "Updated..." "Hiddify Panel to ${package_mode}" 50
+            update_progress "Updated..." "Watashi Panel to ${package_mode}" 50
             return 0
         ;;
         develop|dev)
             # Use the latest commit from GitHub
             latest=$(get_commit_version Hiddify-Panel)
             activate_python_venv
-            warning "DEVLEOP: hiddify panel version current=$current_panel_version latest=$latest"
+            warning "DEVELOP: watashi panel version current=$current_panel_version latest=$latest"
             if [[ "$current_panel_version" != "$latest" ]]; then
                 error "The current develop version is outdated! Updating..."
             fi
             if [[ $force == "true" || "$latest" != "$current_panel_version" ]]; then
-                update_progress "Updating..." "Hiddify Panel from $current_panel_version to $latest" 10
+                update_progress "Updating..." "Watashi Panel from $current_panel_version to $latest" 10
                
                 disable_panel_services
                 
@@ -132,24 +133,24 @@ function update_panel() {
                 echo "setting $latest in $panel_path/VERSION"
                 echo $latest > $panel_path/VERSION
                 sed -i "s/__version__='[^']*'/__version__='$latest'/" $panel_path/VERSION.py
-                update_progress "Updated..." "Hiddify Panel to $latest" 50
+                update_progress "Updated..." "Watashi Panel to $latest" 50
                 return 0
             fi
         ;;
         beta)
             activate_python_venv
             latest=$(get_pre_release_version Hiddify-Custom-Edition)
-            warning "BETA: hiddify panel version current=$current_panel_version latest=$latest"
+            warning "BETA: watashi panel version current=$current_panel_version latest=$latest"
             if [[ "$current_panel_version" != "$latest" ]]; then
                 error "The current beta version is outdated! Updating..."
             fi
             if [[ $force == "true" || "$current_panel_version" != "$latest" ]]; then
-                update_progress "Updating..." "Hiddify Panel from $current_panel_version to $latest" 10
+                update_progress "Updating..." "Watashi Panel from $current_panel_version to $latest" 10
                 # pip install -U --pre hiddifypanel==$latest
                 disable_panel_services
                 uv pip install -U --pre --force-reinstall --no-deps hiddifypanel
                 uv pip install --pre hiddifypanel
-                update_progress "Updated..." "Hiddify Panel to $latest" 50
+                update_progress "Updated..." "Watashi Panel to $latest" 50
                 return 0
             fi
         ;;
@@ -162,14 +163,14 @@ function update_panel() {
             if [[ "$current_panel_version" != "$latest" ]]; then
                 error "The current beta version is outdated! Updating..."
             fi
-            warning "hiddify panel version current=$current_panel_version latest=$latest"
+            warning "watashi panel version current=$current_panel_version latest=$latest"
             if [[ $force == "true" || "$current_panel_version" != "$latest" ]]; then
-                update_progress "Updating..." "Hiddify Panel from $current_panel_version to $latest" 10
+                update_progress "Updating..." "Watashi Panel from $current_panel_version to $latest" 10
                 # pip3 install -U hiddifypanel==$latest
                 disable_panel_services
                 uv pip install -U --force-reinstall --no-deps hiddifypanel
                 uv pip install hiddifypanel
-                update_progress "Updated..." "Hiddify Panel to $latest" 50
+                update_progress "Updated..." "Watashi Panel to $latest" 50
                 return 0
             fi
         ;;
@@ -183,7 +184,7 @@ function update_panel() {
 }
 
 function update_config() {
-    update_progress "Checking for Update..." "Hiddify Config" 55
+    update_progress "Checking for Update..." "Watashi Config" 55
     local package_mode=$1
     local force=$2
     local current_config_version=$(get_installed_config_version)
@@ -195,21 +196,21 @@ function update_config() {
             echo "installing in docker mode finishs"
         ;;
         v*)
-            update_progress "Updating..." "Hiddify Config from $current_config_version to $latest" 60
+            update_progress "Updating..." "Watashi Config from $current_config_version to $latest" 60
             export HIDDIFY_DISABLE_UPDATE=true
             #update_from_github "hiddify-manager.tar.gz" "https://github.com/mn-hacker/Hiddify-Custom-Edition/archive/refs/tags/${package_mode}.tar.gz" $latest
             update_from_github "hiddify-manager.zip" "https://github.com/mn-hacker/Hiddify-Custom-Edition/releases/download/${package_mode}/hiddify-manager.zip" $latest
-            update_progress "Updated..." "Hiddify Config to $latest" 100
+            update_progress "Updated..." "Watashi Config to $latest" 100
             return 0
         ;;
         develop|dev)
             local latest=$(get_commit_version hiddify-manager)
             echo "DEVELOP: Current Config Version=$current_config_version -- Latest=$latest"
             if [[ "$force" == "true" || "$latest" != "$current_config_version" ]]; then
-                update_progress "Updating..." "Hiddify Config from $current_config_version to $latest" 60
+                update_progress "Updating..." "Watashi Config from $current_config_version to $latest" 60
                 update_from_github "hiddify-manager.tar.gz" "https://github.com/mn-hacker/Hiddify-Custom-Edition/archive/refs/heads/dev.tar.gz" $latest
                 
-                update_progress "Updated..." "Hiddify Config to $latest" 100
+                update_progress "Updated..." "Watashi Config to $latest" 100
                 return 0
             fi
         ;;
@@ -217,9 +218,9 @@ function update_config() {
             local latest=$(get_pre_release_version Hiddify-Manager)
             echo "BETA: Current Config Version=$current_config_version -- Latest=$latest"
             if [[ "$force" == "true" || "$latest" != "$current_config_version" ]]; then
-                update_progress "Updating..." "Hiddify Config from $current_config_version to $latest" 60
+                update_progress "Updating..." "Watashi Config from $current_config_version to $latest" 60
                 update_from_github "hiddify-manager.zip" "https://github.com/mn-hacker/Hiddify-Custom-Edition/releases/download/v$latest/hiddify-manager.zip"
-                update_progress "Updated..." "Hiddify Config to $latest" 100
+                update_progress "Updated..." "Watashi Config to $latest" 100
                 return 0
             fi
         ;;
@@ -229,9 +230,9 @@ function update_config() {
             local latest=$(get_release_version hiddify-manager)
             echo "RELEASE: Current Config Version=$current_config_version -- Latest=$latest"
             if [[ "$force" == "true" || "$latest" != "$current_config_version" ]]; then
-                update_progress "Updating..." "Hiddify Config from $current_config_version to $latest" 60
+                update_progress "Updating..." "Watashi Config from $current_config_version to $latest" 60
                 update_from_github "hiddify-manager.zip" "https://github.com/mn-hacker/Hiddify-Custom-Edition/releases/latest/download/hiddify-manager.zip"
-                update_progress "Updated..." "Hiddify Config to $latest" 100
+                update_progress "Updated..." "Watashi Config to $latest" 100
                 return 0
             fi
             
@@ -341,7 +342,7 @@ function custom_version_installer(){
         fi
     done
     TAG_LIST=$(printf "%s " "${FILTERED_TAGS[@]}")
-    SELECTED_TAG=$(whiptail --title "Custom version Installer" --menu "Choose a version! Note: Downgrade is not supported!" 20 70 12 "${FILTERED_TAGS[@]}" 3>&1 1>&2 2>&3)
+    SELECTED_TAG=$(whiptail --title "Watashi version picker" --menu "Choose a version! Note: Downgrade is not supported!" 20 70 12 "${FILTERED_TAGS[@]}" 3>&1 1>&2 2>&3)
     if [ $? -eq 0 ]; then
         echo "You selected: $SELECTED_TAG"
         $0 $SELECTED_TAG
