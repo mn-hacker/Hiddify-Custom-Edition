@@ -195,6 +195,7 @@ function menu() {
     "admin")
         source common/utils.sh
         check_hiddify_panel
+        declare -F ws_flush_keys >/dev/null 2>&1 && ws_flush_keys
         read -p "Press 'r' to reset admin password or press any other key to return to the main menu: " -n 1 key
         echo  # This adds a newline for better output readability
         if [[ "$key" == 'r' ]]; then
@@ -213,9 +214,18 @@ function menu() {
     esac
 
     if [[ $NEED_KEY == 1 ]]; then
+        declare -F ws_flush_keys >/dev/null 2>&1 && ws_flush_keys
         read -p "Press any key to return to menu" -n 1 key
     fi
 
-    menu
+    return 0
 }
-menu
+
+# One turn of the menu per round. The old code called itself, so every
+# visit left another frame on the stack. The loop keeps that flat and,
+# more importantly, keys typed during a long job are dropped before the
+# next screen is drawn, so the panel never opens an option on its own.
+while true; do
+    declare -F ws_flush_keys >/dev/null 2>&1 && ws_flush_keys
+    menu
+done

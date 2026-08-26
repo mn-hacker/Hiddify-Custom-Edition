@@ -3,6 +3,9 @@
 
 It runs a command, listens for the ####percent####title####text#### lines the
 installer already prints, and paints them in the colours of the panel.
+The log fills the whole screen and can be read with the arrow keys, so an
+error never hides behind the newest line. When the command fails, the window
+waits so the log can be read before it disappears.
 Nothing here is required for the install to work: if anything at all goes
 wrong, the command is handed straight to the terminal instead.
 Only the python standard library is used, so no package is ever fetched.
@@ -10,20 +13,30 @@ Only the python standard library is used, so no package is ever fetched.
 
 import os
 import re
+import select
 import shutil
 import signal
 import subprocess
 import sys
 import time
-from collections import deque
+
+try:
+    import termios
+    import tty
+except Exception:
+    termios = None
+    tty = None
 
 STEP = re.compile(r"^####(.*?)####(.*?)####(.*?)####\s*$")
+PAINTED = re.compile(r"\x1b\[[0-9;?]*[a-zA-Z]|\x1b[()][AB0]|\x1b[=>]|[\r\x07]")
 
 VIOLET = (124, 58, 237)
 LILAC = (167, 139, 250)
 CYAN = (34, 211, 238)
 MUTED = (139, 146, 165)
 MINT = (16, 185, 129)
+AMBER = (245, 158, 11)
+ROSE = (239, 68, 68)
 GRAD = [
     (124, 58, 237),
     (137, 71, 240),
@@ -37,6 +50,8 @@ GRAD = [
 ]
 
 WORD = "WATASHI MANAGER"
+KEEP = 6000
+HOLD = 120.0
 
 
 def spaced(word):
@@ -150,6 +165,101 @@ def split_args(argv):
     return title, subtitle, log, rest
 
 
+class Keys(object):
+    """The keyboard, borrowed politely and always given back."""
+
+    NAMES = {
+        "j": "down",
+        "k": "up",
+        " ": "pgdn",
+        "b": "pgup",
+        "g": "home",
+        "G": "end",
+        "f": "follow",
+        "q": "quit",
+        "Q": "quit",
+        "\r": "quit",
+        "\n": "quit",
+    }
+    MOVES = {
+        "A": "up",
+        "B": "down",
+        "5": "pgup",
+        "6": "pgdn",
+        "H": "home",
+        "F": "end",
+    }
+
+    def __init__(self):
+        self.fd = None
+        self.saved = None
+
+    def take(self):
+        if termios is None or tty is None:
+            return False
+        try:
+            if not sys.stdin.isatty():
+                return False
+            self.fd = sys.stdin.fileno()
+            self.saved = termios.tcgetattr(self.fd)
+            tty.setcbreak(self.fd)
+            self.drop()
+            return True
+        except Exception:
+            self.fd = None
+            self.saved = None
+            return False
+
+    def drop(self):
+        """Throw away whatever was typed while nobody was listening."""
+        if self.fd is None or termios is None:
+            return
+        try:
+            termios.tcflush(self.fd, termios.TCIFLUSH)
+        except Exception:
+            pass
+
+    def give_back(self):
+        self.drop()
+        if self.fd is not None and self.saved is not None and termios is not None:
+            try:
+                termios.tcsetattr(self.fd, termios.TCSADRAIN, self.saved)
+            except Exception:
+                pass
+        self.fd = None
+        self.saved = None
+
+    def read(self):
+        if self.fd is None:
+            return []
+        try:
+            data = os.read(self.fd, 1024).decode("utf-8", "replace")
+        except Exception:
+            return []
+        out = []
+        i = 0
+        while i < len(data):
+            ch = data[i]
+            if ch == "\033":
+                chunk = data[i : i + 5]
+                hit = ""
+                for mark, name in self.MOVES.items():
+                    if chunk.startswith("\033[" + mark) or chunk.startswith("\033O" + mark):
+                        hit = name
+                        break
+                if hit:
+                    out.append(hit)
+                    i += 4 if "~" in chunk[:4] else 3
+                    continue
+                i += 1
+                continue
+            name = self.NAMES.get(ch, "")
+            if name:
+                out.append(name)
+            i += 1
+        return out
+
+
 class Window(object):
     def __init__(self, title, subtitle):
         self.ink = Ink(colour_mode())
@@ -158,10 +268,15 @@ class Window(object):
         self.step = "Please wait"
         self.text = ""
         self.pct = 0
-        self.tail = deque(maxlen=5)
+        self.lines = []
+        self.anchor = 0
+        self.follow = True
+        self.log_h = 10
+        self.note = ""
         self.beat = 0
         self.painted = 0.0
         self.opened = False
+        self.keys_live = False
 
     def open(self):
         sys.stdout.write("\033[?1049h\033[?25l")
@@ -178,76 +293,189 @@ class Window(object):
         pad = (width - w) // 2
         return " " * max(pad, 0)
 
+    def feed(self, row, handle=None):
+        row = row.rstrip("\n")
+        if handle:
+            handle.write(row + "\n")
+        found = STEP.match(row.strip())
+        if found:
+            pct, step, text = found.group(1), found.group(2), found.group(3)
+            try:
+                self.pct = max(0, min(100, int(float(pct))))
+            except Exception:
+                pass
+            if step:
+                self.step = step
+            self.text = text
+            return True
+        clean = PAINTED.sub("", row).rstrip()
+        if clean.strip():
+            self.lines.append(clean)
+            if len(self.lines) > KEEP:
+                del self.lines[: len(self.lines) - KEEP]
+                self.anchor = max(0, self.anchor - 1)
+        return False
+
+    def tint(self, row):
+        low = row.lower()
+        for bad in ("error", "failed", "failure", "fatal", "cannot", "traceback"):
+            if bad in low:
+                return ROSE
+        if "warn" in low:
+            return AMBER
+        return MUTED
+
+    def wrap(self, rows, w):
+        out = []
+        for row in rows:
+            tint = self.tint(row)
+            if not row:
+                out.append(("", tint))
+                continue
+            while len(row) > w:
+                out.append((row[:w], tint))
+                row = row[w:]
+            out.append((row, tint))
+        return out
+
+    def key(self, name):
+        total = len(self.lines)
+        page = max(self.log_h - 1, 1)
+        floor = max(0, total - self.log_h)
+        if name in ("up", "pgup", "home") and self.follow:
+            self.follow = False
+            self.anchor = floor
+        if name == "up":
+            self.anchor = max(0, self.anchor - 1)
+        elif name == "down":
+            self.anchor += 1
+        elif name == "pgup":
+            self.anchor = max(0, self.anchor - page)
+        elif name == "pgdn":
+            self.anchor += page
+        elif name == "home":
+            self.anchor = 0
+        elif name == "end":
+            self.follow = True
+        elif name == "follow":
+            self.follow = not self.follow
+            if not self.follow:
+                self.anchor = floor
+        if not self.follow and self.anchor >= floor:
+            self.anchor = floor
+            if name in ("down", "pgdn", "end"):
+                self.follow = True
+        self.paint(True)
+
     def paint(self, force=False):
         now = time.time()
-        if not force and now - self.painted < 0.09:
+        if not force and now - self.painted < 0.08:
             return
         self.painted = now
         self.beat += 1
         ink = self.ink
         size = shutil.get_terminal_size((80, 24))
         width = max(size.columns, 40)
-        out = ["\033[H\033[2J", "\n"]
+        rows = max(size.lines, 14)
+        frame = width - 4
+        if frame < 36:
+            frame = width
+        side = self.middle(width, frame)
+        head = []
+        head.append("")
         mark = spaced(WORD)
         letters = []
         for i, ch in enumerate(mark):
             tint = GRAD[min(int(i * len(GRAD) / max(len(mark), 1)), len(GRAD) - 1)]
             letters.append("%s%s%s" % (ink.bold(), ink.fg(tint), ch))
-        out.append(
-            "%s%s%s\n" % (self.middle(width, len(mark)), "".join(letters), ink.off())
-        )
+        head.append("%s%s%s" % (self.middle(width, len(mark)), "".join(letters), ink.off()))
         name = self.title.split(" ")
-        head = "%s%s%s%s" % (ink.bold(), ink.fg(LILAC), name[0], ink.off())
+        crown = "%s%s%s%s" % (ink.bold(), ink.fg(LILAC), name[0], ink.off())
         if len(name) > 1:
-            head += " %s%s%s%s" % (ink.bold(), ink.fg(CYAN), " ".join(name[1:]), ink.off())
-        out.append("%s%s\n" % (self.middle(width, len(self.title)), head))
+            crown += " %s%s%s%s" % (ink.bold(), ink.fg(CYAN), " ".join(name[1:]), ink.off())
+        head.append("%s%s" % (self.middle(width, len(self.title)), crown))
         if self.subtitle:
-            out.append(
-                "%s%s%s%s\n"
+            head.append(
+                "%s%s%s%s"
                 % (self.middle(width, len(self.subtitle)), ink.fg(MUTED), self.subtitle, ink.off())
             )
         stamp = os.environ.get("WS_VERSION_LINE", "").strip()
         if stamp:
-            out.append(
-                "%s%s%s%s\n"
-                % (self.middle(width, len(stamp)), ink.fg(MINT), stamp, ink.off())
+            head.append(
+                "%s%s%s%s" % (self.middle(width, len(stamp)), ink.fg(MINT), stamp, ink.off())
             )
-        out.append("\n")
-        bar_w = min(width - 12, 52)
-        if bar_w < 10:
-            bar_w = 10
+        head.append("")
+        bar_w = max(frame - 8, 12)
         filled = int(bar_w * self.pct / 100.0)
         bar = []
         for i in range(bar_w):
             tint = GRAD[int(i * (len(GRAD) - 1) / max(bar_w - 1, 1))]
-            if i < filled:
-                bar.append("%s\u2588" % ink.fg(tint))
-            else:
-                bar.append("%s\u2591" % ink.fg(MUTED))
-        out.append(
-            "%s%s%s %s%3d%%%s\n"
-            % (
-                self.middle(width, bar_w + 5),
-                "".join(bar),
-                ink.off(),
-                ink.fg(CYAN),
-                self.pct,
-                ink.off(),
-            )
+            bar.append("%s%s" % (ink.fg(tint), "\u2588" if i < filled else "\u2591"))
+        head.append(
+            "%s%s%s %s%s%3d%%%s"
+            % (side, "".join(bar), ink.off(), ink.bold(), ink.fg(CYAN), self.pct, ink.off())
         )
-        out.append("\n")
+        head.append("")
         line = self.step
         if self.text:
             line = "%s   %s" % (self.step, self.text)
-        line = line[: width - 4]
-        out.append(
-            "%s%s%s%s%s\n"
-            % (self.middle(width, len(line)), ink.bold(), ink.fg(LILAC), line, ink.off())
+        line = line[: frame - 2]
+        head.append(
+            "%s%s%s%s%s" % (self.middle(width, len(line)), ink.bold(), ink.fg(LILAC), line, ink.off())
         )
-        out.append("\n")
-        for row in self.tail:
-            row = row[: width - 6]
-            out.append("   %s%s%s%s\n" % (ink.faint(), ink.fg(MUTED), row, ink.off()))
+        head.append("")
+
+        log_h = rows - len(head) - 4
+        if log_h < 3:
+            log_h = 3
+        self.log_h = log_h
+        inner = max(frame - 4, 20)
+        total = len(self.lines)
+        if self.follow:
+            source = self.lines[-(log_h + 60) :]
+            shown = self.wrap(source, inner)[-log_h:]
+            where = "live   %d lines" % total
+        else:
+            source = self.lines[self.anchor : self.anchor + log_h + 60]
+            shown = self.wrap(source, inner)[:log_h]
+            where = "paused   line %d of %d" % (min(self.anchor + 1, max(total, 1)), total)
+        while len(shown) < log_h:
+            shown.append(("", MUTED))
+
+        label = " LOG "
+        top = "\u256d\u2500" + label + "\u2500" * max(frame - 4 - len(label), 0) + "\u2500\u256e"
+        foot = "\u2570" + "\u2500" * max(frame - 2, 0) + "\u256f"
+        out = ["\033[H\033[2J"]
+        for row in head:
+            out.append(row + "\n")
+        out.append("%s%s%s%s\n" % (side, ink.fg(VIOLET), top, ink.off()))
+        for row, tint in shown:
+            out.append(
+                "%s%s\u2502%s %s%-*s%s %s\u2502%s\n"
+                % (
+                    side,
+                    ink.fg(VIOLET),
+                    ink.off(),
+                    ink.fg(tint),
+                    inner,
+                    row[:inner],
+                    ink.off(),
+                    ink.fg(VIOLET),
+                    ink.off(),
+                )
+            )
+        out.append("%s%s%s%s\n" % (side, ink.fg(VIOLET), foot, ink.off()))
+        if self.note:
+            hint = self.note
+        elif self.keys_live:
+            hint = "up down scroll   space page   g top   G bottom   f %s   %s" % (
+                "pause" if self.follow else "follow",
+                where,
+            )
+        else:
+            hint = where
+        hint = hint[: frame - 2]
+        out.append("%s%s%s%s%s" % (side, ink.faint(), ink.fg(MUTED), hint, ink.off()))
         sys.stdout.write("".join(out))
         sys.stdout.flush()
 
@@ -290,32 +518,50 @@ def run(title, subtitle, log, cmd):
             handle = open(log, "a", buffering=1, errors="replace")
         except Exception:
             handle = None
-    child = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    keys = Keys()
+    win.keys_live = keys.take()
+    try:
+        signal.signal(signal.SIGWINCH, lambda *_: win.paint(True))
+    except Exception:
+        pass
+    child = subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        stdin=subprocess.DEVNULL if win.keys_live else None,
+    )
     win.open()
     win.paint(True)
+    out_fd = child.stdout.fileno()
+    rest = b""
     try:
         while True:
-            raw = child.stdout.readline()
-            if not raw:
-                break
-            row = raw.decode("utf-8", "replace").rstrip("\n").rstrip("\r")
-            if handle:
-                handle.write(row + "\n")
-            found = STEP.match(row)
-            if found:
-                pct, step, text = found.group(1), found.group(2), found.group(3)
+            watch = [out_fd]
+            if win.keys_live:
+                watch.append(keys.fd)
+            try:
+                ready, _, _ = select.select(watch, [], [], 0.2)
+            except Exception:
+                ready = [out_fd]
+            if win.keys_live and keys.fd in ready:
+                for name in keys.read():
+                    if name != "quit":
+                        win.key(name)
+            if out_fd in ready:
                 try:
-                    win.pct = max(0, min(100, int(float(pct))))
-                except Exception:
-                    pass
-                if step:
-                    win.step = step
-                win.text = text
-                win.paint(True)
-            else:
-                if row.strip():
-                    win.tail.append(row.strip())
-                win.paint()
+                    chunk = os.read(out_fd, 65536)
+                except OSError:
+                    chunk = b""
+                if not chunk:
+                    break
+                rest += chunk
+                while b"\n" in rest:
+                    raw, rest = rest.split(b"\n", 1)
+                    if win.feed(raw.decode("utf-8", "replace"), handle):
+                        win.paint(True)
+            win.paint()
+        if rest.strip():
+            win.feed(rest.decode("utf-8", "replace"), handle)
     except KeyboardInterrupt:
         try:
             child.send_signal(signal.SIGINT)
@@ -327,6 +573,25 @@ def run(title, subtitle, log, cmd):
         except Exception:
             pass
         code = child.wait()
+        hold = os.environ.get("WATASHI_LOG_HOLD", "")
+        if win.keys_live and code != 0 and hold not in ("0", "off", "no"):
+            win.note = "the run ended with code %d   -   up down to read the log, q to leave" % code
+            keys.drop()
+            win.paint(True)
+            end = time.time() + HOLD
+            while time.time() < end:
+                try:
+                    ready, _, _ = select.select([keys.fd], [], [], 0.4)
+                except Exception:
+                    break
+                if ready:
+                    names = keys.read()
+                    if "quit" in names:
+                        break
+                    for name in names:
+                        win.key(name)
+                    win.paint(True)
+        keys.give_back()
         win.close()
         if handle:
             handle.close()

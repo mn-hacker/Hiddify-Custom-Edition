@@ -326,6 +326,30 @@ if ws_skin_on; then
     export NEWT_COLORS="$WS_NEWT"
 fi
 
+# ---------- how wide a page may be ----------
+# The frame follows the window: it fills the terminal and keeps only a small
+# margin, so nothing looks cramped in a wide window any more.
+function ws_frame() {
+    local cols=""
+    cols="$(ws_cols)"
+    local w=$((cols - 6))
+    [ "$w" -gt 118 ] && w=118
+    [ "$w" -lt 40 ] && w=40
+    printf '%s' "$w"
+}
+
+# Throws away keys that were typed while nobody was listening. Without this a
+# key pressed during an install is read later by the menu and opens something
+# on its own.
+function ws_flush_keys() {
+    ws_tty || return 0
+    local junk=""
+    while IFS= read -rsn1 -t 0.002 junk 2>/dev/null; do
+        :
+    done
+    return 0
+}
+
 # ---------- small words ----------
 function ws_ok() {
     printf '%s\xe2\x9c\x93 %s%s\n' "$(ws_fg $WS_MINT)" "$1" "$(ws_off)"
@@ -364,7 +388,7 @@ function ws_sign() {
         return 0
     fi
     ws_head "$WS_TAG"
-    ws_rule 46
+    ws_rule "$(ws_frame)"
     echo
     local tint="$WS_CYAN"
     local sign="\xe2\x9c\x93"
@@ -375,7 +399,7 @@ function ws_sign() {
     printf '%s%s%s ' "$(ws_pad $((${#text} + 2)))" "$(ws_fg $tint)" "$(printf "$sign")"
     printf '%s%s%s\n' "$(ws_bold)" "$text" "$(ws_off)"
     echo
-    ws_rule 46
+    ws_rule "$(ws_frame)"
     echo
     ws_reset_term
 }
@@ -394,13 +418,16 @@ function ws_menu_rows() {
     local sel="$1"
     local n="$2"
     local pad=""
-    pad="$(ws_pad 46)"
+    local w="${WS_MENU_W:-46}"
+    local lab=$((w - 8))
+    [ "$lab" -lt 20 ] && lab=20
+    pad="$(ws_pad "$w")"
     local i=0
     while [ "$i" -lt "$n" ]; do
         if [ "$i" -eq "$sel" ]; then
-            printf '\r\033[K%s%s%s\xe2\x96\xb8 %-2s %-36s%s\n' "$pad" "$(ws_bold)" "$(ws_fg $WS_CYAN)" "$((i + 1))" "${WS_MENU_LABELS[$i]}" "$(ws_off)"
+            printf '\r\033[K%s%s%s\xe2\x96\xb8 %-2s %-*s%s\n' "$pad" "$(ws_bold)" "$(ws_fg $WS_CYAN)" "$((i + 1))" "$lab" "${WS_MENU_LABELS[$i]}" "$(ws_off)"
         else
-            printf '\r\033[K%s%s  %-2s %-36s%s\n' "$pad" "$(ws_fg $WS_MUTED)" "$((i + 1))" "${WS_MENU_LABELS[$i]}" "$(ws_off)"
+            printf '\r\033[K%s%s  %-2s %-*s%s\n' "$pad" "$(ws_fg $WS_MUTED)" "$((i + 1))" "$lab" "${WS_MENU_LABELS[$i]}" "$(ws_off)"
         fi
         i=$((i + 1))
     done
@@ -421,19 +448,21 @@ function ws_menu() {
     done
     local n=${#keys[@]}
     [ "$n" -eq 0 ] && return 2
+    WS_MENU_W="$(ws_frame)"
+    ws_flush_keys
     local sel=0
     local k=""
     local rest=""
     WS_MENU_CHOICE=""
     printf '\033[?25l'
     ws_head "$sub"
-    ws_rule 46
+    ws_rule "$(ws_frame)"
     echo
     ws_menu_rows "$sel" "$n"
     printf '\033[%dB' "$n"
     echo
-    ws_rule 46
-    printf '%s%s%s%s\n' "$(ws_pad 46)" "$(ws_faint)" "  up down move    enter open    1-9 jump    q quit" "$(ws_off)"
+    ws_rule "$(ws_frame)"
+    printf '%s%s%s%s\n' "$(ws_pad "$WS_MENU_W")" "$(ws_faint)" "  up down move    enter open    1-9 jump    q quit" "$(ws_off)"
     printf '\033[%dA' "$((n + 3))"
     while true; do
         IFS= read -rsn1 k 2>/dev/null || {
