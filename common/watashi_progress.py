@@ -393,7 +393,9 @@ class Window(object):
         crown = "%s%s%s%s" % (ink.bold(), ink.fg(LILAC), name[0], ink.off())
         if len(name) > 1:
             crown += " %s%s%s%s" % (ink.bold(), ink.fg(CYAN), " ".join(name[1:]), ink.off())
-        head.append("%s%s" % (self.middle(width, len(self.title)), crown))
+        bare = re.sub(r"[^a-z]", "", self.title.lower())
+        if self.title and "watashi" not in bare:
+            head.append("%s%s" % (self.middle(width, len(self.title)), crown))
         if self.subtitle:
             head.append(
                 "%s%s%s%s"

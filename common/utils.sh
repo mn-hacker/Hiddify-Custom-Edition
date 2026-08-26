@@ -338,7 +338,7 @@ function msg() {
         ws_box "$WS_BRAND" "$1"
         return 0
     fi
-    whiptail --title "Watashi Manager" --msgbox "$1" 0 60
+    whiptail --title "W A T A S H I   M A N A G E R" --msgbox "$1" 0 60
     disable_ansii_modes
 }
 
@@ -566,7 +566,7 @@ function show_progress_window() {
         # the old road, kept as a safety net
         activate_python_venv
         install_pypi_package cli-progress
-        python3 -m cli_progress --title "Watashi Manager" "$@"
+        python3 -m cli_progress --title "W A T A S H I   M A N A G E R" "$@"
         exit_code=$?
     fi
     disable_ansii_modes

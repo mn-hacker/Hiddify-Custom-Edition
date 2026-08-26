@@ -52,8 +52,8 @@ function menu() {
     HEIGHT=20
     WIDTH=70
     CHOICE_HEIGHT=12
-    BACKTITLE="Watashi Manager - シングル (Config=v$CURRENT_CONFIG_VERSION Panel=v$CURRENT_PANEL_VERSION)   $UPDATE_NEED  "
-    TITLE="Watashi Manager - シングル"
+    BACKTITLE="W A T A S H I   M A N A G E R  (Config=v$CURRENT_CONFIG_VERSION Panel=v$CURRENT_PANEL_VERSION)   $UPDATE_NEED  "
+    TITLE="W A T A S H I   M A N A G E R"
     WS_SUB="$WS_TAG   $UPDATE_NEED"
     MENU="Choose one of the following options:"
 
