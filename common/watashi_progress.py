@@ -277,6 +277,8 @@ class Window(object):
         self.painted = 0.0
         self.opened = False
         self.keys_live = False
+        self.last = ""
+        self.wipe = True
 
     def open(self):
         sys.stdout.write("\033[?1049h\033[?25l")
@@ -447,7 +449,7 @@ class Window(object):
         label = " LOG "
         top = "\u256d\u2500" + label + "\u2500" * max(frame - 4 - len(label), 0) + "\u2500\u256e"
         foot = "\u2570" + "\u2500" * max(frame - 2, 0) + "\u256f"
-        out = ["\033[H\033[2J"]
+        out = []
         for row in head:
             out.append(row + "\n")
         out.append("%s%s%s%s\n" % (side, ink.fg(VIOLET), top, ink.off()))
@@ -478,7 +480,15 @@ class Window(object):
             hint = where
         hint = hint[: frame - 2]
         out.append("%s%s%s%s%s" % (side, ink.faint(), ink.fg(MUTED), hint, ink.off()))
-        sys.stdout.write("".join(out))
+        body = "".join(out).replace("\n", "\033[0m\033[K\n")
+        if body == self.last and not self.wipe:
+            return
+        self.last = body
+        home = "\033[H\033[2J" if self.wipe else "\033[H"
+        self.wipe = False
+        sys.stdout.write(
+            "\033[?2026h" + home + body + "\033[0m\033[K\033[J\033[?2026l"
+        )
         sys.stdout.flush()
 
 
@@ -523,7 +533,9 @@ def run(title, subtitle, log, cmd):
     keys = Keys()
     win.keys_live = keys.take()
     try:
-        signal.signal(signal.SIGWINCH, lambda *_: win.paint(True))
+        signal.signal(
+            signal.SIGWINCH, lambda *_: (setattr(win, "wipe", True), win.paint(True))
+        )
     except Exception:
         pass
     child = subprocess.Popen(
