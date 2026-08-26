@@ -446,6 +446,8 @@ function check_hiddify_panel() {
         bash /opt/hiddify-manager/common/logo.ico
 
         install_package qrencode
+        # watashi: clean slate for the QR
+        printf '\033[0m'
         center_text "$(qrencode -t utf8 -m 2 $(cat /opt/hiddify-manager/current.json | jq -r '.panel_links[]' | tail -n 1))"
         echo ""
         center_text $'\t\033[92mFinished! Watashi Manager is up and breathing.\033[0m'

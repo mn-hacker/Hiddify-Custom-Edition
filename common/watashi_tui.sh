@@ -41,18 +41,46 @@ function ws_cols() {
     echo "$c"
 }
 
-function ws_deep() {
-    ws_skin_on || return 1
+function ws_colour_mode() {
+    ws_skin_on || {
+        printf 'none'
+        return 0
+    }
+    if [ -n "$WS_COLOUR_MODE" ]; then
+        printf '%s' "$WS_COLOUR_MODE"
+        return 0
+    fi
     case "$COLORTERM" in
-    truecolor | 24bit) return 0 ;;
+    truecolor | 24bit)
+        printf 'deep'
+        return 0
+        ;;
     esac
     local n=""
     n=$(tput colors 2>/dev/null)
     case "$n" in
-    '' | *[!0-9]*) return 1 ;;
+    '' | *[!0-9]*) n=0 ;;
     esac
-    [ "$n" -ge 256 ] && return 0
-    return 1
+    if [ "$n" -ge 256 ]; then
+        printf 'cube'
+        return 0
+    fi
+    if [ "$n" -ge 8 ]; then
+        printf 'basic'
+        return 0
+    fi
+    case "$TERM" in
+    *color* | xterm* | screen* | tmux* | rxvt* | putty* | linux | ansi | vt100)
+        printf 'basic'
+        return 0
+        ;;
+    esac
+    printf 'none'
+}
+
+function ws_deep() {
+    [ "$(ws_colour_mode)" = "none" ] && return 1
+    return 0
 }
 
 # ---------- ink ----------
@@ -66,10 +94,61 @@ WS_ROSE="239 68 68"
 WS_MUTED="139 146 165"
 WS_GRAD=("124 58 237" "137 71 240" "112 94 243" "86 118 245" "62 142 243" "46 168 241" "36 190 239" "34 205 238" "58 216 240")
 
-function ws_fg() {
-    ws_deep || return 0
-    printf '\033[38;2;%s;%s;%sm' "$1" "$2" "$3"
+function ws_basic_code() {
+    case "$1 $2 $3" in
+    "124 58 237" | "167 139 250") printf '95' ; return 0 ;;
+    "59 130 246") printf '94' ; return 0 ;;
+    "34 211 238") printf '96' ; return 0 ;;
+    "16 185 129") printf '92' ; return 0 ;;
+    "245 158 11") printf '93' ; return 0 ;;
+    "239 68 68") printf '91' ; return 0 ;;
+    "139 146 165") printf '37' ; return 0 ;;
+    esac
+    local m="$1"
+    [ "$2" -gt "$m" ] && m="$2"
+    [ "$3" -gt "$m" ] && m="$3"
+    [ "$m" -lt 1 ] && m=1
+    local t=$((m * 7 / 10))
+    local hi=0
+    [ "$1" -ge "$t" ] && hi=$((hi + 1))
+    [ "$2" -ge "$t" ] && hi=$((hi + 2))
+    [ "$3" -ge "$t" ] && hi=$((hi + 4))
+    case "$hi" in
+    1) printf '91' ;;
+    2) printf '92' ;;
+    3) printf '93' ;;
+    4) printf '94' ;;
+    5) printf '95' ;;
+    6) printf '96' ;;
+    *) printf '97' ;;
+    esac
 }
+
+# Every colour is written in the deepest language the terminal admits to.
+# Bitvise, PuTTY and plain xterm never announce truecolor, so the old
+# 38;2;r;g;b was thrown away by them and the panel looked black and white.
+function ws_fg() {
+    local mode=""
+    mode=$(ws_colour_mode)
+    local r="${1:-0}"
+    local g="${2:-0}"
+    local b="${3:-0}"
+    case "$mode" in
+    deep) printf '\033[38;2;%s;%s;%sm' "$r" "$g" "$b" ;;
+    cube) printf '\033[38;5;%sm' "$((16 + 36 * ((r * 5 + 127) / 255) + 6 * ((g * 5 + 127) / 255) + ((b * 5 + 127) / 255)))" ;;
+    basic) printf '\033[%sm' "$(ws_basic_code "$r" "$g" "$b")" ;;
+    esac
+    return 0
+}
+
+if [ -z "$WS_COLOUR_MODE" ]; then
+    WS_MODE_SEEN="$(ws_colour_mode)"
+    case "$WS_MODE_SEEN" in
+    none) : ;;
+    *) WS_COLOUR_MODE="$WS_MODE_SEEN" ;;
+    esac
+    unset WS_MODE_SEEN
+fi
 
 function ws_off() {
     ws_skin_on || return 0
@@ -302,16 +381,42 @@ function ws_sign() {
 }
 
 # ---------- our own home screen, keys and all ----------
+function ws_menu_close() {
+    printf '\033[%dB' "$((${1:-0} + 4))"
+    printf '\033[?25h'
+    ws_reset_term
+}
+
+# Repaints only the option rows and then walks the cursor back up to the
+# first one. Nothing else on the screen is touched, so moving between the
+# options no longer blinks the whole page.
+function ws_menu_rows() {
+    local sel="$1"
+    local n="$2"
+    local pad=""
+    pad="$(ws_pad 46)"
+    local i=0
+    while [ "$i" -lt "$n" ]; do
+        if [ "$i" -eq "$sel" ]; then
+            printf '\r\033[K%s%s%s\xe2\x96\xb8 %-2s %-36s%s\n' "$pad" "$(ws_bold)" "$(ws_fg $WS_CYAN)" "$((i + 1))" "${WS_MENU_LABELS[$i]}" "$(ws_off)"
+        else
+            printf '\r\033[K%s%s  %-2s %-36s%s\n' "$pad" "$(ws_fg $WS_MUTED)" "$((i + 1))" "${WS_MENU_LABELS[$i]}" "$(ws_off)"
+        fi
+        i=$((i + 1))
+    done
+    printf '\033[%dA' "$n"
+}
+
 function ws_menu() {
     ws_skin_on || return 2
     ws_tty || return 2
     local sub="$1"
     shift
     local keys=()
-    local labels=()
+    WS_MENU_LABELS=()
     while [ "$#" -ge 2 ]; do
         keys+=("$1")
-        labels+=("$2")
+        WS_MENU_LABELS+=("$2")
         shift 2
     done
     local n=${#keys[@]}
@@ -319,30 +424,22 @@ function ws_menu() {
     local sel=0
     local k=""
     local rest=""
-    local i=0
     WS_MENU_CHOICE=""
     printf '\033[?25l'
+    ws_head "$sub"
+    ws_rule 46
+    echo
+    ws_menu_rows "$sel" "$n"
+    printf '\033[%dB' "$n"
+    echo
+    ws_rule 46
+    printf '%s%s%s%s\n' "$(ws_pad 46)" "$(ws_faint)" "  up down move    enter open    1-9 jump    q quit" "$(ws_off)"
+    printf '\033[%dA' "$((n + 3))"
     while true; do
-        ws_head "$sub"
-        ws_rule 46
-        echo
-        i=0
-        while [ "$i" -lt "$n" ]; do
-            if [ "$i" -eq "$sel" ]; then
-                printf '%s%s%s\xe2\x96\xb8 %-2s %-36s%s\n' "$(ws_pad 46)" "$(ws_bold)" "$(ws_fg $WS_CYAN)" "$((i + 1))" "${labels[$i]}" "$(ws_off)"
-            else
-                printf '%s%s  %-2s %-36s%s\n' "$(ws_pad 46)" "$(ws_fg $WS_MUTED)" "$((i + 1))" "${labels[$i]}" "$(ws_off)"
-            fi
-            i=$((i + 1))
-        done
-        echo
-        ws_rule 46
-        printf '%s%s%s%s\n' "$(ws_pad 46)" "$(ws_faint)" "  up down move    enter open    1-9 jump    q quit" "$(ws_off)"
-        IFS= read -rsn1 k 2>/dev/null
-        if [ "$?" -ne 0 ]; then
-            printf '\033[?25h'
+        IFS= read -rsn1 k 2>/dev/null || {
+            ws_menu_close "$n"
             return 2
-        fi
+        }
         case "$k" in
         $'\033')
             IFS= read -rsn2 -t 0.06 rest 2>/dev/null
@@ -355,27 +452,25 @@ function ws_menu() {
         j | J) sel=$((sel + 1)) ;;
         '')
             WS_MENU_CHOICE="${keys[$sel]}"
-            printf '\033[?25h'
-            ws_reset_term
+            ws_menu_close "$n"
             return 0
             ;;
         q | Q)
             WS_MENU_CHOICE=""
-            printf '\033[?25h'
-            ws_reset_term
+            ws_menu_close "$n"
             return 1
             ;;
         [1-9])
             if [ "$k" -le "$n" ]; then
                 WS_MENU_CHOICE="${keys[$((k - 1))]}"
-                printf '\033[?25h'
-                ws_reset_term
+                ws_menu_close "$n"
                 return 0
             fi
             ;;
         esac
         [ "$sel" -lt 0 ] && sel=$((n - 1))
         [ "$sel" -ge "$n" ] && sel=0
+        ws_menu_rows "$sel" "$n"
     done
 }
 

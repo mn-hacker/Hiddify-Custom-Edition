@@ -8,7 +8,6 @@ if [ -f "$WS_TUI_FILE" ]; then
     source "$WS_TUI_FILE"
     echo
     ws_banner
-    ws_brand_line
     ws_tag_line
     echo
 else

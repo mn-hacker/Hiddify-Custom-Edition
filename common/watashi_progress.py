@@ -47,21 +47,66 @@ def spaced(word):
     return out.rstrip()
 
 
-def deep_colour():
-    if os.environ.get("COLORTERM", "") in ("truecolor", "24bit"):
-        return True
+def colour_mode():
+    if os.environ.get("WATASHI_TUI", "") in ("0", "off", "no", "false"):
+        return "none"
     term = os.environ.get("TERM", "")
-    return "256" in term or term.startswith("xterm") or term.startswith("screen")
+    if term in ("", "dumb"):
+        return "none"
+    if os.environ.get("COLORTERM", "") in ("truecolor", "24bit"):
+        return "deep"
+    if "256" in term:
+        return "cube"
+    return "basic"
+
+
+def deep_colour():
+    return colour_mode() != "none"
+
+
+BASIC = {
+    (124, 58, 237): 95,
+    (167, 139, 250): 95,
+    (59, 130, 246): 94,
+    (34, 211, 238): 96,
+    (16, 185, 129): 92,
+    (245, 158, 11): 93,
+    (239, 68, 68): 91,
+    (139, 146, 165): 37,
+}
+
+
+def basic_code(rgb):
+    key = tuple(rgb)
+    if key in BASIC:
+        return BASIC[key]
+    r, g, b = key
+    top = max(r, g, b, 1)
+    t = top * 7 // 10
+    hi = (1 if r >= t else 0) + (2 if g >= t else 0) + (4 if b >= t else 0)
+    return {1: 91, 2: 92, 3: 93, 4: 94, 5: 95, 6: 96}.get(hi, 97)
 
 
 class Ink(object):
-    def __init__(self, deep):
-        self.deep = deep
+    def __init__(self, mode):
+        if mode is True:
+            mode = "deep"
+        elif mode is False:
+            mode = "none"
+        self.mode = mode
+        self.deep = mode != "none"
 
     def fg(self, rgb):
-        if not self.deep:
-            return ""
-        return "\033[38;2;%d;%d;%dm" % rgb
+        if self.mode == "deep":
+            return "\033[38;2;%d;%d;%dm" % tuple(rgb)
+        if self.mode == "cube":
+            r, g, b = tuple(rgb)
+            idx = 16 + 36 * ((r * 5 + 127) // 255) + 6 * ((g * 5 + 127) // 255)
+            idx += (b * 5 + 127) // 255
+            return "\033[38;5;%dm" % idx
+        if self.mode == "basic":
+            return "\033[%dm" % basic_code(rgb)
+        return ""
 
     def off(self):
         return "\033[0m"
@@ -74,6 +119,7 @@ class Ink(object):
 
 
 def skin_wanted():
+
     if os.environ.get("WATASHI_TUI", "") in ("0", "off", "no", "false"):
         return False
     if os.environ.get("TERM", "") in ("", "dumb"):
@@ -106,7 +152,7 @@ def split_args(argv):
 
 class Window(object):
     def __init__(self, title, subtitle):
-        self.ink = Ink(deep_colour())
+        self.ink = Ink(colour_mode())
         self.title = title
         self.subtitle = subtitle
         self.step = "Please wait"
