@@ -338,7 +338,7 @@ function msg() {
         ws_box "$WS_BRAND" "$1"
         return 0
     fi
-    whiptail --title "W A T A S H I   M A N A G E R" --msgbox "$1" 0 60
+    whiptail --title "Watashi Manager" --msgbox "$1" 0 60
     disable_ansii_modes
 }
 
@@ -498,12 +498,20 @@ function add2iptables46(){
     add2ip6tables "$1"
 }
 
+# watashi: v12.2.46 - `A || B && C` ran the insert every time, so each
+# install piled up another copy of the same rule. The rule spec stays
+# unquoted on purpose: it has to be split into words.
 function add2iptables() {
-    iptables -C $1 >/dev/null 2>&1 || echo "adding rule $1" && iptables -I $1
-
+    if ! iptables -C $1 >/dev/null 2>&1; then
+        echo "adding rule $1"
+        iptables -I $1
+    fi
 }
 function add2ip6tables() {
-    ip6tables -C $1 >/dev/null 2>&1 || echo "adding rule $1" && ip6tables -I $1
+    if ! ip6tables -C $1 >/dev/null 2>&1; then
+        echo "adding rule $1"
+        ip6tables -I $1
+    fi
 }
 function allow_port() { #allow_port "tcp" "80"
     add2iptables46 "INPUT -p $1 --dport $2 -j ACCEPT"
@@ -517,9 +525,16 @@ function block_port() { #allow_port "tcp" "80"
     add2iptables46 "INPUT -p $1 --dport $2 -j DROP"
 }
 
-function remove_port() { #allow_port "tcp" "80"
-    iptables -D INPUT -p "$1" --dport "$2" -j ACCEPT
-    ip6tables -D INPUT -p "$1" --dport "$2" -j ACCEPT
+# watashi: v12.2.46 - a bare -D printed "Bad rule (does a matching rule
+# exist in that chain?)" on every install. Ask first, stay quiet, and
+# clear the duplicates the old add2iptables left behind.
+function remove_port() { #remove_port "tcp" "80"
+    while iptables -C INPUT -p "$1" --dport "$2" -j ACCEPT >/dev/null 2>&1; do
+        iptables -D INPUT -p "$1" --dport "$2" -j ACCEPT >/dev/null 2>&1 || break
+    done
+    while ip6tables -C INPUT -p "$1" --dport "$2" -j ACCEPT >/dev/null 2>&1; do
+        ip6tables -D INPUT -p "$1" --dport "$2" -j ACCEPT >/dev/null 2>&1 || break
+    done
 }
 
 function allow_apps_ports() {
@@ -566,7 +581,7 @@ function show_progress_window() {
         # the old road, kept as a safety net
         activate_python_venv
         install_pypi_package cli-progress
-        python3 -m cli_progress --title "W A T A S H I   M A N A G E R" "$@"
+        python3 -m cli_progress --title "Watashi Manager" "$@"
         exit_code=$?
     fi
     disable_ansii_modes

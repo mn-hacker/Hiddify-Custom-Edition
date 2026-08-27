@@ -1,0 +1,123 @@
+-- 1. what the files say
+OK   the restricted list has three separate entries                 
+OK   nothing is comma glued any more                                
+OK   buypass is in the ladder                                       
+OK   google is in the ladder                                        
+OK   the dead has_valid_cert helper is gone                         
+OK   the staging server is not used                                 
+OK   the placeholder email is not in the engine                     
+OK   a key length is pinned                                         
+OK   there is a domain guard                                        
+OK   the ecc store is handled                                       
+-- 2. is_ok_domain_zerossl
+OK   zerossl decision for a.ir is NO                                NO
+OK   zerossl decision for a.by is NO                                NO
+OK   zerossl decision for x.amazonaws.com is NO                     NO
+OK   zerossl decision for x.cloudapp.net is NO                      NO
+OK   zerossl decision for a.com is YES                              YES
+-- 3. a script name is not a domain
+OK   cert_utils.sh is refused                                       
+OK   and no certificate authority was contacted                     0
+OK   the self signed helper refuses a wildcard                      
+OK   no junk file was created in ssl/                               []
+-- 4. the happy path
+OK   an account is registered with let's encrypt first              
+OK   with an email built from the real domain                       
+OK   then the certificate is ordered                                
+OK   and installed                                                  
+OK   the account is remembered so we never register twice           
+OK   the success line is printed once                               1
+OK   the certificate file is in place                               
+-- 5. let's encrypt fails, zerossl takes over
+OK   an account is registered with zerossl                          
+OK   and the order goes to zerossl                                  
+OK   zerossl wins the ladder                                        
+OK   the success line is printed once here too                      
+OK   nothing claims a total failure                                 
+-- 6. the whole ladder, then google with eab
+OK   three CAs were really asked                                    ['buypass', 'letsencrypt', 'zerossl']
+OK   google is skipped with a clear reason                          
+OK   and the fallback is honest about itself                        
+OK   the failure is reported                                        
+OK   a self signed certificate exists so the panel still serves tls 
+OK   with google_eab.conf the eab credentials are used              
+OK   and google is really asked                                     
+-- 7. cloudflare dns versus the webroot
+OK   the first order uses the cloudflare dns challenge              --issue -d a.example.com --server letsencrypt --keylength 20
+OK   the saved token is handed to acme.sh                           
+OK   a domain that does not resolve is not fatal any more           
+OK   and it succeeds over dns                                       
+OK   without a token the webroot challenge is used                  --issue -d a.example.com --server letsencrypt --keylength 20
+OK   nginx is reloaded, not restarted                               
+OK   no restart of nginx during a certificate run                   
+OK   the challenge location is removed afterwards                   
+-- 8. rate limits
+OK   a first order never uses --force                               --issue -d a.example.com --server letsencrypt --keylength 2048 --log /
+OK   rsa 2048 is requested explicitly                               
+OK   acme.sh logs into the panel log directory                      
+OK   an existing order is renewed against the same CA               ['--renew -d a.example.com --server letsencrypt --force --log /opt/hiddify-manager/log/system/acme.log']
+OK   --force is used only where it belongs, on a renewal            
+OK   the order itself stays clean                                   
+FAILURES: 0 []
+-- 9. the ecc store, the bug that broke ssl in the first place
+OK   when the rsa store is empty we look in the ecc store           
+OK   and the certificate is installed                               
+OK   no false total failure                                         
+OK   the file is really there                                       
+OK   the backup copy is cleaned up                                  
+-- 10. the six hour cooldown
+OK   a failing domain walks the whole ladder once                   6
+OK   the failure is remembered                                      
+OK   the next apply_configs does not ask again                      0
+OK   and it says why                                                
+OK   a deliberate request still tries at once                       
+OK   the button in the panel goes through get_cert.sh and is never blocked 
+OK   a success clears the cooldown                                  
+-- 11. a healthy certificate is left alone
+OK   an 89 day certificate is not renewed                           
+OK   and no CA is contacted at all                                  0
+-- 12. run.sh over a realistic domain list
+OK   without a token only the reachable modes are asked             ['a.example.com', 'r.example.com', 's.example.com']
+OK   a.example.com ends up with a certificate file                  
+OK   r.example.com ends up with a certificate file                  
+OK   s.example.com ends up with a certificate file                  
+OK   c.example.com ends up with a certificate file                  
+OK   w.example.com ends up with a certificate file                  
+OK   f.example.com ends up with a certificate file                  
+OK   the cdn domain gets a self signed certificate                  
+OK   no wildcard named junk file                                    
+OK   no certificate named after a script                            
+OK   with a token the cdn and worker domains are asked too          ['a.example.com', 'c.example.com', 'r.example.com', 's.example.com', 'w.example.com']
+OK   and run.sh says so                                             
+OK   every order uses the dns challenge                             
+-- 12b. a real cdn certificate survives a renewal run
+OK   the real certificate is byte identical afterwards              
+-- 13. install.sh and the renewal timer
+OK   the retry comparison is numeric now                            
+OK   the old string comparison is gone                              
+OK   the placeholder account email is gone                          
+OK   the account is registered against a named server               
+OK   the timer is enabled at install time                           
+OK   the service runs the certificate script                        
+OK   it is a one shot with a timeout                                
+OK   from the right directory                                       
+OK   the timer runs nightly and catches up after downtime           
+OK   with a random delay so every panel does not hit the CA at once 
+OK   and it is installable                                          
+OK   the service has its [Unit] section                             
+OK   the service has its [Service] section                          
+OK   the service has its [Install] section                          
+OK   the timer has its [Unit] section                               
+OK   the timer has its [Timer] section                              
+OK   the timer has its [Install] section                            
+-- 14. contrast with the file we replaced
+OK   the old list really was comma glued                            
+OK   the old engine really never registered an account              
+OK   and had no dns challenge                                       
+OK   and forced every order while ignoring the ecc store            
+OK   the old string comparison was real                             
+OK   the placeholder email was real                                 
+OK   and there was no renewal timer at all                          
+OK   the old run.sh looped over whatever was in ssl/                
+OK   without nullglob, so an empty directory produced a literal star 
+FAILURES: 0 []

@@ -12,6 +12,16 @@ CURRENT_PACKAGES="$SCRIPT_DIR/packages.db"
 touch $CURRENT_PACKAGES
 
 # Function to calculate file hash
+# watashi v12.2.50: one place that knows the architecture name, so no
+# caller has to guess it or leave it empty.
+detect_arch() {
+    case "$(uname -m)" in
+    x86_64 | amd64) echo "amd64" ;;
+    aarch64 | arm64) echo "arm64" ;;
+    *) echo "" ;;
+    esac
+}
+
 generate_hash() {
     local file=$1
     sha256sum "$file" | awk '{print $1}'
@@ -95,7 +105,10 @@ download_package() {
         requested_version=$(get_latest_version $package_name $arch)
     fi
     
-    entry=$(grep "^$package_name|$requested_version" "$PACKAGES_LOCK" | grep "$arch")
+    # watashi v12.2.50: name, version and arch are whole columns, and only
+    # one line may come out. the old grep matched 1.13.0 against 1.13.0.h10
+    # and could hand two lines to the read below, which parsed neither.
+    entry=$(awk -F'|' -v n="$package_name" -v v="$requested_version" -v a="$arch" '$1==n && $2==v && $3==a {print; exit}' "$PACKAGES_LOCK")
     
     if [[ $force == 0 && "$requested_version" == "$existing_version" ]]; then
         return 1
@@ -118,15 +131,21 @@ download_package() {
         rm "$tmp_file"
         return 3
     fi
-    mv "$tmp_file" "$output_file"
-
-    # Verify the hash
-    local downloaded_hash=$(generate_hash "$output_file")
+    # watashi v12.2.50: verify first, move second. the old order copied an
+    # unverified download over the live binary and then deleted it when the
+    # hash did not match, which left the service with no binary at all.
+    local downloaded_hash=$(generate_hash "$tmp_file")
     if [[ "$downloaded_hash" != "$stored_hash" ]]; then
-        error "Hash mismatch for $output_file. Expected $stored_hash, got $downloaded_hash."
-        rm "$output_file"
+        error "Hash mismatch for $url. Expected $stored_hash, got $downloaded_hash. $output_file was left untouched."
+        rm -f "$tmp_file"
         return 4
     fi
+
+    # keep the file that works, so there is always something to go back to
+    if [[ -f "$output_file" ]]; then
+        cp -f "$output_file" "$output_file.previous" 2>/dev/null || true
+    fi
+    mv "$tmp_file" "$output_file"
 
     echo "Package $package_name version $version downloaded successfully to $output_file."
 }
@@ -134,7 +153,12 @@ get_latest_version() {
         local package_name=$1
         local arch=$2
         local entry
-        entry=$(grep "^$package_name" "$PACKAGES_LOCK" | grep "$arch" | sort -t'|' -k2.1V | tail -n 1)
+        if [[ -z "$arch" ]]; then
+            arch=$(detect_arch)
+        fi
+        # watashi v12.2.50: whole column match, so xray never picks up a
+        # sing-box line and the arch is a column instead of a substring.
+        entry=$(awk -F'|' -v n="$package_name" -v a="$arch" '$1==n && $3==a {print}' "$PACKAGES_LOCK" | sort -t'|' -k2.1V | tail -n 1)
         local version
         version=${entry#*$package_name|} # remove package name
         version=${version%%|*} # remove the rest
@@ -144,8 +168,11 @@ get_latest_version() {
 set_installed_version() {
     local package_name=$1
     local version=$2
+    # watashi v12.2.50: $arch used to be unset in this function, so the
+    # message lied and the fallback asked for an arch-blind latest version.
+    local arch=${3:-$(detect_arch)}
     if [[ -z "$version" ]]; then
-        version=$(get_latest_version $package_name)
+        version=$(get_latest_version "$package_name" "$arch")
     fi
     if [[ -z "$package_name" || -z "$version"  ]]; then
         error "Usage: $0 set-installed <package_name> <version>"
@@ -175,7 +202,7 @@ case "$1" in
         download_package "$2" "$3" "$4"
         ;;
     set-installed)
-        set_installed_version "$2" "$3"
+        set_installed_version "$2" "$3" "$4"
         ;;
     get-latest-version)
         get_latest_version "$2" "$3"

@@ -22,6 +22,8 @@ class Command(StrEnum):
         HIDDIFY_DIR, 'hiddify-panel/temporary_access.sh')
     update_usage = os.path.join(HIDDIFY_DIR, 'hiddify-panel/update_usage.sh')
     get_cert = os.path.join(HIDDIFY_DIR, 'acme.sh/get_cert.sh')
+    # watashi v12.2.51: the core page needs one root path, and this is it
+    core = os.path.join(HIDDIFY_DIR, 'common/core_manager.sh')
     # apply-users command is actually "install.sh apply_users"
     apply_users = os.path.join(HIDDIFY_DIR, 'install.sh')
     install_rathole = os.path.join(HIDDIFY_DIR, 'other/rathole/install_rathole.sh')
@@ -213,6 +215,34 @@ def delete_tunnel(type, tunnel_port):
 @click.option('--tunnel-port', '-p', type=str, help='Tunnel port', required=True)
 def control_tunnel(action, type, tunnel_port):
     cmd = [Command.control_tunnel.value, action, type, tunnel_port]
+    run(cmd)
+
+
+# watashi v12.2.51: the only root door the core page has. Everything that
+# arrives here is checked again, so a broken form in the panel cannot turn into
+# a shell command.
+WS_CORE_ACTIONS = ('install', 'upgrade', 'downgrade', 'rollback', 'prune')
+
+
+def is_core_name_valid(name: str) -> bool:
+    return bool(re.match(r'^[a-z0-9][a-z0-9._-]{0,39}$', name or ''))
+
+
+def is_core_version_valid(version: str) -> bool:
+    return bool(re.match(r'^[0-9][0-9A-Za-z.+_-]{0,39}$', version or ''))
+
+
+@cli.command('core')
+@click.option('--action', '-a', type=str, help='install, upgrade, downgrade, rollback or prune', required=True)
+@click.option('--name', '-n', type=str, help='The core to work on', required=True)
+@click.option('--version', '-v', type=str, help='The version to install', default='')
+def core(action: str, name: str, version: str):
+    assert action in WS_CORE_ACTIONS, f"Error: {action} is not a core action"
+    assert is_core_name_valid(name), f"Error: Invalid core name passed to the core command: {name}"
+    assert not version or is_core_version_valid(version), f"Error: Invalid version passed to the core command: {version}"
+    cmd = ['bash', Command.core.value, action, name]
+    if version:
+        cmd.append(version)
     run(cmd)
 
 

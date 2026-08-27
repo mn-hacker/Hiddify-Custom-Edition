@@ -12,10 +12,22 @@ if [ "$?" == "0"  ] || ! is_installed ./sing-box; then
     # Extract archive
     tar -xzf sb.tar.gz > /dev/null 2>&1 || { echo "ERROR: Failed to extract singbox"; exit 1; }
     
-    # Find and copy binary - handle both directory format and flat format
-    if [ -d "sing-box-"* ]; then
-        # Directory format (e.g., sing-box-1.8.8-linux-amd64/)
-        cp -f sing-box-*/sing-box . 2>/dev/null || { echo "ERROR: Failed to copy singbox binary from directory"; exit 2; }
+    # watashi v12.2.50: find the binary by name. `[ -d "sing-box-"* ]` is a
+    # bash error the moment that glob matches more than one directory, and
+    # the old copy landed on the live binary with no check that it runs.
+    SB_NEW=$(find . -maxdepth 3 -type f -name sing-box ! -path ./sing-box -print -quit 2>/dev/null)
+    if [ -n "$SB_NEW" ]; then
+        cp -f "$SB_NEW" ./sing-box.new || { echo "ERROR: Failed to copy singbox binary"; exit 2; }
+        chmod +x ./sing-box.new
+        if ! ./sing-box.new version >/dev/null 2>&1; then
+            echo "ERROR: the new sing-box binary does not run here, keeping the current one"
+            rm -f ./sing-box.new
+            exit 5
+        fi
+        if [ -f ./sing-box ]; then
+            cp -f ./sing-box ./sing-box.previous 2>/dev/null || true
+        fi
+        mv -f ./sing-box.new ./sing-box
     elif [ -f "sing-box" ]; then
         # Already extracted flat
         echo "Singbox binary already in place"
@@ -29,7 +41,7 @@ if [ "$?" == "0"  ] || ! is_installed ./sing-box; then
     chmod +x sing-box || exit 4
     ln -sf /opt/hiddify-manager/singbox/sing-box /usr/bin/sing-box
     rm geosite.db 2>/dev/null || true
-    set_installed_version singbox $version
+    set_installed_version singbox "$version" "$(detect_arch)"
 fi
 
 # Enable service

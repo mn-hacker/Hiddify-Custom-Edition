@@ -2,7 +2,13 @@
 Description=hiddify panel
 After=network-online.target mariadb.service hiddify-redis.service
 Wants=network-online.target
-Requires=mariadb.service hiddify-redis.service
+# watashi: panel resilience v12.2.46 - a hard Requires took the panel down
+# with mariadb or redis and left it down, and a unit stopped that way is
+# not restarted by Restart=. After= above still keeps the boot order.
+Wants=mariadb.service hiddify-redis.service
+# never let the default start limit (5 starts / 10 s) park the panel in failed
+StartLimitIntervalSec=0
+StartLimitBurst=0
 
 [Service]
 Type=simple
@@ -11,7 +17,8 @@ WorkingDirectory=/opt/hiddify-manager/hiddify-panel/
 Environment="LANG=C.UTF-8"
 ExecStart=/opt/hiddify-manager/.venv313/bin/python /opt/hiddify-manager/hiddify-panel/app.py
 ExecReload=/bin/bash -c 'test -n "$MAINPID" && kill -HUP $MAINPID || true'
-#RestartSec=1
+RestartSec=5
+TimeoutStopSec=20
 #ExecStop=/bin/bash -c "/bin/kill -INT $(/usr/bin/pgrep -f 'hiddifypanel')||echo 'nothing to kill'"
 ExecStop=/bin/bash -c 'test -n "$MAINPID" && kill -INT $MAINPID || true'
 Restart=always

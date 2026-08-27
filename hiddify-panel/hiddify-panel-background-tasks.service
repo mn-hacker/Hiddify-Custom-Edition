@@ -2,7 +2,10 @@
 Description=hiddify panel background tasks
 After=network-online.target hiddify-redis.service
 Wants=network-online.target hiddify-redis.service
-BindsTo=hiddify-redis.service
+# watashi: v12.2.46 - BindsTo stopped the worker for good whenever redis
+# blinked, and usage counting stops with it. Wants= above is enough.
+StartLimitIntervalSec=0
+StartLimitBurst=0
 
 [Service]
 Type=simple

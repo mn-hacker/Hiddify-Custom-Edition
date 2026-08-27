@@ -1,0 +1,138 @@
+OK   CoreAdmin.py written
+OK   the template closes every block once
+OK   no native dialogs on the page
+OK   commander knows the core manager (already there)
+OK   commander has a core command (already there)
+OK   run_commander knows the core command (already there)
+OK   run_commander builds the core command (already there)
+OK   __init__ imports CoreAdmin (already there)
+OK   __init__ registers CoreAdmin anchor
+OK   the menu has a cores entry (already there)
+OK   python syntax: common/commander.py
+OK   python syntax: hiddify-panel/src/hiddifypanel/panel/run_commander.py
+OK   python syntax: hiddify-panel/src/hiddifypanel/panel/admin/__init__.py
+OK   python syntax: hiddify-panel/src/hiddifypanel/panel/admin/CoreAdmin.py
+OK   bash syntax: common/bump_cores.sh 
+OK   line endings kept: common/commander.py
+OK   line endings kept: hiddify-panel/src/hiddifypanel/panel/run_commander.py
+OK   line endings kept: hiddify-panel/src/hiddifypanel/panel/admin/__init__.py
+OK   line endings kept: hiddify-panel/src/hiddifypanel/templates/admin-layout.html
+FAILURES: 0 []
+-- 1. the bumper can say what is old
+OK   check prints a table                                           CORE                 PINNED         INSTALLED      NEWEST   
+OK   it shows what is pinned today                                  
+OK   and what the vendor has now                                    ['xray                 26.3.27                       26.7.28       ']
+OK   a bare call explains itself                                    usage: common/bump_cores.sh {check|pin <core> [version]|pin-
+-- 2. pinning a new release writes a real hash
+OK   the pin ends well                                              ha256 aad657318aa062fabd59e40d1783ea96be01d31ca4995e172c4053285d6a11da
+OK   the amd64 line is written                                      
+OK   the arm64 line is written                                      
+OK   the hash in the lock is the hash of the file                   e4c0e0ee29ff946a
+OK   the url points at the real asset                               
+OK   pinning twice does nothing                                     4 is already pinned
+    newest pinned version is now 26.7.28
+OK   and it does not write the line again                           
+-- 3. a 404 page is never pinned
+OK   the pin fails                                                  d/v26.9.99/Xray-linux-64.zip gave only 37 bytes, that is not a release
+OK   and it says what came back instead                             
+OK   nothing was pinned                                             
+OK   a four byte answer is refused too                              8/Xray-linux-64.zip gave only 4 bytes, that is not a release
+OK   still nothing pinned                                           
+OK   a dead download is reported                                    /XTLS/Xray-core/releases/download/v26.9.97/Xray-linux-64.zip
+-- 4. tested is a deliberate mark, not a guess
+OK   an unpinned version cannot be called tested                    xray 26.9.96 is not pinned yet, pin it first
+OK   the mark goes through                                          xray is now marked as tested up to 26.7.28
+OK   the registry now says tested up to 26.7.28                     26.7.28
+OK   and the row still has all of its fields                        10
+OK   the core manager reads the same thing                          26.7.28
+OK   no row was lost                                                
+-- 5. the root door only opens for real cores
+OK   a real request goes through                                    Xray-linux-64.zip
+sha256 verified for xray 26.7.28
+xray is now 26.7.28
+OK   and the core is installed by it                                
+OK   the version the vendor has is the one installed                Xray version 26.7.28
+OK   a made up action is refused                                    AssertionError: Error: delete is not a core action
+OK   a name with a shell command in it is refused                   AssertionError: Error: Invalid core name passed to the core 
+OK   a version with a shell command in it is refused                AssertionError: Error: Invalid version passed to the core co
+OK   a name that walks out of the tree is refused                   AssertionError: Error: Invalid core name passed to the core 
+-- 6. the panel asks through the commander, never the shell
+OK   the page uses the commander for changes                        
+OK   no shell is ever asked to parse a string                       
+OK   run_commander knows the command                                
+OK   and passes it as separate words                                
+OK   the root side validates on its own                             
+OK   and calls the manager as a list of words                       
+FAILURES: 0 []
+-- 7. the page reads the real state of the server
+OK   the state is read without an error                             
+OK   every registered core is there                                 6
+OK   the vendor of each core is shown                               XTLS/Xray-core
+OK   the installed version is read                                  26.7.28
+OK   a version outside the tested range is flagged                  26.3.27
+OK   a core that is not installed is not flagged                    
+OK   a server without the core manager gets a sentence, not a crash The core manager is not installed on this server yet.
+-- 8. nothing dangerous reaches the commander
+OK   a made up action is refused                                    That is not something this page can do.
+OK   a name with a shell command in it is refused                   That core name does not look like a core name.
+OK   a version with a shell command in it is refused                That version does not look like a version.
+OK   a name that walks out of the tree is refused                   That core name does not look like a core name.
+OK   an empty request is refused                                    That is not something this page can do.
+OK   and none of them reached the commander                         0
+OK   a real request goes through and the answer comes back          xray is now 26.7.28
+OK   the commander is given separate words                          {'action': 'upgrade', 'name': 'xray', 'version': ''}
+OK   the page waits for the answer                                  
+OK   a commander that is not reachable is reported                  the commander is not reachable
+OK   and written to the panel log                                   the core change failed: the commander is
+-- 9. the view answers the page
+OK   only a super admin can open the page                           {'super_admin'}
+OK   the page is the cores page                                     cores.html
+OK   the counters add up                                            {'total': 6, 'installed': 1, 'missing': 5, 'off_tested': 1}
+OK   and the total is the number of rows                            6
+OK   a silly core name gets a plain no                              400
+OK   the newest release is fetched on demand                        {"ok": true, "name": "xray", "latest": "26.7.28"}
+OK   a change comes back with its log                               200
+OK   and with fresh rows for the table                              
+OK   a bad change is answered with 400                              400
+OK   changes are only accepted as post                              {'methods': ['POST']}
+-- 10. the page itself renders
+OK   the page renders                                               
+OK   one row per core                                               6
+OK   the core off the tested range is painted amber                 
+OK   the page knows all three addresses                             
+OK   the upgrade button is there                                    
+OK   the pick a version button is there                             
+OK   the roll back button is there                                  
+OK   the check for new releases button is there                     
+OK   no native dialog is used                                       
+OK   no native select is used                                       
+OK   the version box is our own modal                               
+OK   css uses border-block-end                                      
+OK   css uses margin-block-end                                      
+OK   css uses text-align: start                                     
+OK   css uses inset: 0                                              
+OK   and no left or right css is left behind                        
+-- 11. the menu and the registration
+OK   the sidebar has a cores entry                                  
+OK   it sits next to the tunnel entry                               
+OK   and only a super admin sees it                                 
+OK   it has its own icon                                            
+OK   the view is imported                                           
+OK   and registered under /cores                                    
+-- 12. what the round changed, next to what was there before
+OK   changed: commander.py                                          
+OK   marked as v12.2.51: commander.py                               
+OK   line endings kept: commander.py                                
+OK   changed: run_commander.py                                      
+OK   marked as v12.2.51: run_commander.py                           
+OK   line endings kept: run_commander.py                            
+OK   changed: __init__.py                                           
+OK   marked as v12.2.51: __init__.py                                
+OK   line endings kept: __init__.py                                 
+OK   changed: admin-layout.html                                     
+OK   marked as v12.2.51: admin-layout.html                          
+OK   line endings kept: admin-layout.html                           
+OK   a windows file like the rest of the panel: CoreAdmin.py        
+OK   a windows file like the rest of the panel: cores.html          
+OK   the bumper is executable                                       
+FAILURES: 0 []

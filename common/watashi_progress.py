@@ -37,6 +37,7 @@ MUTED = (139, 146, 165)
 MINT = (16, 185, 129)
 AMBER = (245, 158, 11)
 ROSE = (239, 68, 68)
+WHITE = (255, 255, 255)
 GRAD = [
     (124, 58, 237),
     (137, 71, 240),
@@ -88,6 +89,7 @@ BASIC = {
     (245, 158, 11): 93,
     (239, 68, 68): 91,
     (139, 146, 165): 37,
+    (255, 255, 255): 97,
 }
 
 
@@ -100,6 +102,40 @@ def basic_code(rgb):
     t = top * 7 // 10
     hi = (1 if r >= t else 0) + (2 if g >= t else 0) + (4 if b >= t else 0)
     return {1: 91, 2: 92, 3: 93, 4: 94, 5: 95, 6: 96}.get(hi, 97)
+
+
+# ---------- how a log line is read ----------
+# watashi: log colours v12.2.42
+# Four classes, tested in this order. The bad list comes first on purpose: a
+# line that says both "failed" and "done" is a failure. Every word carries a
+# word boundary, so "token" is not "ok", "already" is not "ready", "invalid"
+# is not "valid", and "inactive" is caught here instead of matching "active"
+# further down.
+BAD_WORDS = re.compile(
+    r"\b(?:error|errors|failed|failure|failures|fatal|cannot|can't|traceback|"
+    r"exception|critical|panic|abort|aborted|refused|denied|invalid|inactive|"
+    r"dead|unreachable|timeout|timed out|not found|no such|unable to|"
+    r"not running|does not exist|permission denied)\b",
+    re.I,
+)
+WARN_WORDS = re.compile(
+    r"\b(?:warn|warns|warning|warnings|deprecated|deprecation|skipping|"
+    r"skipped|retry|retrying|notice|ignoring|ignored|obsolete|"
+    r"already exists|not enabled)\b",
+    re.I,
+)
+GOOD_WORDS = re.compile(
+    # A negated success is not a success: "is not installed" and
+    # "0 not upgraded" must stay white rather than turn green.
+    r"(?<!not )(?<!n't )(?<!no )"
+    r"\b(?:ok|success|successful|successfully|done|complete|completed|"
+    r"finished|installed|created|enabled|started|running|active|ready|"
+    r"passed|valid|added|saved|updated|upgraded|reloaded|restarted|"
+    r"listening|up to date|up-to-date)\b",
+    re.I,
+)
+GOOD_MARK = chr(0x2713)
+BAD_MARK = chr(0x2717)
 
 
 class Ink(object):
@@ -277,8 +313,6 @@ class Window(object):
         self.painted = 0.0
         self.opened = False
         self.keys_live = False
-        self.last = ""
-        self.wipe = True
 
     def open(self):
         sys.stdout.write("\033[?1049h\033[?25l")
@@ -319,13 +353,18 @@ class Window(object):
         return False
 
     def tint(self, row):
-        low = row.lower()
-        for bad in ("error", "failed", "failure", "fatal", "cannot", "traceback"):
-            if bad in low:
-                return ROSE
-        if "warn" in low:
+        """White by default, mint when it went well, amber for a warning,
+        rose when it broke. On the 8 colour terminal the owner uses these
+        four land on 97, 92, 93 and 91, so they stay apart."""
+        if not row.strip():
+            return WHITE
+        if BAD_MARK in row or BAD_WORDS.search(row):
+            return ROSE
+        if WARN_WORDS.search(row):
             return AMBER
-        return MUTED
+        if GOOD_MARK in row or GOOD_WORDS.search(row):
+            return MINT
+        return WHITE
 
     def wrap(self, rows, w):
         out = []
@@ -395,9 +434,7 @@ class Window(object):
         crown = "%s%s%s%s" % (ink.bold(), ink.fg(LILAC), name[0], ink.off())
         if len(name) > 1:
             crown += " %s%s%s%s" % (ink.bold(), ink.fg(CYAN), " ".join(name[1:]), ink.off())
-        bare = re.sub(r"[^a-z]", "", self.title.lower())
-        if self.title and "watashi" not in bare:
-            head.append("%s%s" % (self.middle(width, len(self.title)), crown))
+        head.append("%s%s" % (self.middle(width, len(self.title)), crown))
         if self.subtitle:
             head.append(
                 "%s%s%s%s"
@@ -449,7 +486,7 @@ class Window(object):
         label = " LOG "
         top = "\u256d\u2500" + label + "\u2500" * max(frame - 4 - len(label), 0) + "\u2500\u256e"
         foot = "\u2570" + "\u2500" * max(frame - 2, 0) + "\u256f"
-        out = []
+        out = ["\033[H\033[2J"]
         for row in head:
             out.append(row + "\n")
         out.append("%s%s%s%s\n" % (side, ink.fg(VIOLET), top, ink.off()))
@@ -480,15 +517,7 @@ class Window(object):
             hint = where
         hint = hint[: frame - 2]
         out.append("%s%s%s%s%s" % (side, ink.faint(), ink.fg(MUTED), hint, ink.off()))
-        body = "".join(out).replace("\n", "\033[0m\033[K\n")
-        if body == self.last and not self.wipe:
-            return
-        self.last = body
-        home = "\033[H\033[2J" if self.wipe else "\033[H"
-        self.wipe = False
-        sys.stdout.write(
-            "\033[?2026h" + home + body + "\033[0m\033[K\033[J\033[?2026l"
-        )
+        sys.stdout.write("".join(out))
         sys.stdout.flush()
 
 
@@ -533,9 +562,7 @@ def run(title, subtitle, log, cmd):
     keys = Keys()
     win.keys_live = keys.take()
     try:
-        signal.signal(
-            signal.SIGWINCH, lambda *_: (setattr(win, "wipe", True), win.paint(True))
-        )
+        signal.signal(signal.SIGWINCH, lambda *_: win.paint(True))
     except Exception:
         pass
     child = subprocess.Popen(

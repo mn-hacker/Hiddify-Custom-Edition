@@ -1,5 +1,6 @@
 #!/bin/bash
 # Watashi v12.2.37 : only the words on screen changed here
+# watashi: install pass v12.2.44
 cd $(dirname -- "$0")
 source ./common/utils.sh
 NAME="0-install"
@@ -134,11 +135,12 @@ function main() {
         install_run singbox  # No & - sequential (has apt unzip)
         
         # ============================================================
-        # PHASE 3: Non-apt operations can run in parallel
+        # PHASE 3: the optional extras, one after the other as well
         # ============================================================
         update_progress "${PROGRESS_ACTION}" "Additional Services" 75
         
-        # These don't have apt in run.sh, safe to parallelize
+        # None of these carries an ampersand any more, so they run one after
+        # the other like everything above.
         install_run other/speedtest $(hconfig "speed_test")
         install_run other/telegram $(hconfig "telegram_enable")
         install_run other/ssfaketls $(hconfig "ssfaketls_enable")
@@ -148,12 +150,14 @@ function main() {
 
 
         
-        # WARP install (has apt, run sequentially first)
+        # WARP. install_run already runs other/warp/install.sh and then
+        # run.sh, so the "pushd other/warp; bash install.sh; popd" that used
+        # to sit here installed warp a second time - and it did so even when
+        # warp is disabled, moments before disable.sh switched it back off.
         update_progress "${PROGRESS_ACTION}" "Warp" 85
-        pushd other/warp > /dev/null && bash install.sh && popd > /dev/null
         if [[ $(hconfig "warp_mode") != "disable" ]];then
             install_run other/warp 1
-        else   
+        else
             install_run other/warp 0
         fi
     fi
@@ -162,14 +166,18 @@ function main() {
     install_run other/wireguard $(hconfig "wireguard_enable")
     
     update_progress "${PROGRESS_ACTION}" "Almost Finished" 95
-    # wait  # Wait for all parallel operations
     
     echo "---------------------Finished!------------------------"
     remove_lock $NAME
+    # A SIGTERM followed by "start" is not a restart: systemd can bring the
+    # unit back on its own policy, and start on a unit it still believes is
+    # active does nothing, so the panel could carry on with the configuration
+    # it read before this install.
     if [ "$MODE" != "apply_users" ]; then
-        systemctl kill -s SIGTERM hiddify-panel 2>/dev/null || true
+        systemctl restart hiddify-panel
+    else
+        systemctl start hiddify-panel
     fi
-    systemctl start hiddify-panel
     update_progress "${PROGRESS_ACTION}" "Done" 100
     
 }
@@ -179,7 +187,7 @@ function clean_files() {
     rm -rf /opt/hiddify-manager/xray/configs/*.json
     rm -rf /opt/hiddify-manager/singbox/configs/*.json
     rm -rf /opt/hiddify-manager/haproxy/*.cfg
-    find ./ -type f -name "*.template" -exec rm -f {} \;
+    find ./ -type f -name "*.template" -delete
 }
 
 function cleanup() {
@@ -222,11 +230,11 @@ function runsh() {
     if [[ $3 == "false" || $3 == "0" ]]; then
         command=disable.sh
     fi
-    pushd $2 >>/dev/null
-    # if [[ $? != 0]];then
-    #         echo "$2 not found"
-    # fi
-    if [[ $? == 0 && -f $command ]]; then
+    if ! pushd $2 >>/dev/null; then
+        echo "$2 not found, skipping"
+        return 1
+    fi
+    if [[ -f $command ]]; then
         
         echo "===$command $2"
         bash $command
@@ -241,13 +249,17 @@ if [[ " $@ " == *" --no-gui "* ]]; then
     if [[ " $@ " == *" --no-log "* ]]; then
         set -- "${@/--no-log/}"
         main
+        error_code=$?
     else
-        main |& tee $LOG_FILE
+        # "main |& tee" hands back tee's exit code, which is practically
+        # always zero, so a failed installation used to end with a success
+        # message. PIPESTATUS keeps main's own answer.
+        main |& tee "$LOG_FILE"
+        error_code=${PIPESTATUS[0]}
     fi
-    error_code=$?
     remove_lock $NAME
 else
-    show_progress_window --subtitle $(get_installed_config_version) --log $LOG_FILE ./install.sh $@ --no-gui --no-log
+    show_progress_window --subtitle "$(get_installed_config_version)" --log "$LOG_FILE" ./install.sh $@ --no-gui --no-log
     error_code=$?
     if [[ $error_code != "0" ]]; then
         # echo less -r -P"Installation Failed! Press q to exit" +G "$log_file"

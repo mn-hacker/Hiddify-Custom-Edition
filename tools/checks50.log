@@ -1,0 +1,128 @@
+-- 1. the registry describes every core we ship
+OK   the manager lists the cores                                    ['xray', 'singbox', 'mtproxygo', 'wgcf', 'ssh-liberty-bridge', 'v2ray-plugin']
+OK   xray is registered                                             
+OK   singbox is registered                                          
+OK   mtproxygo is registered                                        
+OK   wgcf is registered                                             
+OK   ssh-liberty-bridge is registered                               
+OK   v2ray-plugin is registered                                     
+OK   the real install paths are used                                
+OK   mtg points at the tgo folder                                   
+OK   wgcf points at the warp folder                                 
+OK   the version and binary placeholders are there                  
+-- 2. a fresh install of a pinned core
+OK   install singbox ends well                                      .0.h10-linux-amd64.tar.gz
+sha256 verified for singbox 1.13.0.h10
+singbox is now 1.13.0.h10
+OK   the sha256 is checked before anything moves                    
+OK   the binary is in place                                         
+OK   and it is the version we asked for                             sing-box version 1.13.0.h10
+OK   the service is restarted                                       
+OK   the installed version is written down                          singbox|1.13.0.h10|1787831592
+OK   the panel json is usable                                       {'name': 'singbox', 'installed': '1.13.0.h10', 'tested': '1.13.0.h10', 'unit': 'hiddify-singbox', 'path': '/opt/hiddify-manager/singbox/sing-box', 'active': True, 'uptodate': True}
+OK   latest asks the vendor and drops the v                         26.7.28
+-- 3. a tampered download never reaches the live binary
+OK   the install stops on a hash mismatch                           rc=3
+OK   and it says why                                                
+OK   the working binary is still there, byte for byte               
+OK   and it still runs                                              
+-- 4. an unpinned version needs a deliberate yes
+OK   an unpinned version is refused                                 rc=4
+OK   and the message explains the way out                           
+OK   the live core did not move                                     
+OK   with CM_ALLOW_UNPINNED=1 it goes through                       256 472a8b8140b1539c5540c41ac819fa50b2716e7e4302e32299ed444db05f9cc9
+singbox is now 1.13.1
+OK   and the new version is pinned for next time                    
+OK   the new version is live                                        sing-box version 1.13.1
+-- 5. a binary that cannot run is not installed at all
+OK   a binary that does not answer is rejected                      rc=2
+OK   and it says so plainly                                         
+OK   the previous core is untouched                                 sing-box version 1.13.1
+OK   the service was never restarted for it                         
+-- 6. a service that does not come up rolls itself back
+OK   the install reports the failure                                rc=3
+OK   and names the service                                          
+OK   and rolls back on its own                                      
+OK   the core in place is the one that worked                       sing-box version 1.13.1
+OK   and the record says the same                                   singbox|1.13.1|1787831592
+-- 7. rollback on request
+OK   a downgrade to an older pinned version works                   sing-box version 1.13.0.h10
+OK   rollback ends well                                             rolling singbox back from 1.13.0.h10 to 1.13.1
+singbox is now 1.13.1
+OK   and the core before it is back                                 sing-box version 1.13.1
+-- 8. the store does not grow for ever
+OK   prune keeps the current version and one spare                  ['1.13.0.h10', '1.13.1']
+OK   the version in use is never pruned                             ['1.13.0.h10', '1.13.1']
+OK   verify says the live core is healthy                           ok       singbox  1.13.1
+OK   status prints a readable table                                 
+FAILURES: 0 []
+-- 9. a failed download no longer destroys the file it was replacing
+OK   a hash mismatch is still an error                              608667e764d7d6c5b538c2f07dd9bde370599d. out.tar.gz was left untouched.
+OK   and the message says the old file was kept                     
+OK   the file that worked is still there                            
+OK   a good download still succeeds                                 singbox version 1.13.0.h10 downloaded successfully to out.tar.gz.
+RC=0
+OK   and the file it replaced is kept as .previous                  
+-- 10. the lock is read column by column
+OK   1.13.0 is not treated as 1.13.0.h10                            RC=2
+ERROR: Package singbox version 1.13.0 for amd64 not found.
+OK   and nothing was downloaded for it                              
+OK   no half file was left behind                                   
+OK   the latest version is found without being told the arch        1.13.0.h10
+OK   detect_arch names this machine                                 amd64
+OK   the set-installed message no longer has an empty arch in it    Set installed version of singbox to 1.13.0.h10.
+OK   the installed version is recorded                              
+-- 11. the sing-box installer survives leftovers from older versions
+OK   install.sh ends well with two stale folders around             oaded successfully to sb.tar.gz.
+Set installed version of singbox to 1.13.0.h10.
+OK   the binary is in place                                         
+OK   and it is the pinned version                                   sing-box version 1.13.0.h10
+OK   the expression the old script used really does break here      RC=0
+bash: line 1: [: too many arguments
+OK   the way we look for the binary now does not                    []
+-- 12. a broken sing-box release cannot take the service down
+OK   the installer notices the binary cannot run                    .
+ERROR: the new sing-box binary does not run here, keeping the current one
+RC=5
+OK   and the working binary is still in place                       
+OK   a previous copy is kept when a swap happens                    
+-- 13. xray keeps its geo files and its binary
+OK   install.sh installs xray                                        version of xray to 26.3.27.
+geosite.dat is recent, keeping it
+geoip.dat updated
+OK   and it is the pinned version                                   Xray version 26.3.27
+OK   the geo files are downloaded once                              
+OK   and the run says it fetched them                               
+OK   a second install does not re-download 20 MB of geo files       
+OK   the geo urls were not touched                                  
+OK   a broken xray release is refused                               .zip.
+ERROR: the new xray binary does not run here, keeping the current one
+RC=1
+OK   the working xray is still in place                             
+OK   and the geo files were not wiped                               
+-- 14. pinning a new version asks for a file that exists
+OK   the amd64 line is pinned                                       essfully.
+Package singbox version 1.13.9 for amd64 added successfully.
+OK   the arm64 line is pinned                                       
+OK   with the real asset name of the release                        
+OK   nothing 404ed while pinning                                    
+OK   an empty version is refused                                    usage: add_version.sh <version>   e.g. add_version.sh 1.13.0
+OK   the xray script has the same guard                             usage: add_version.sh <version>   e.g. add_version.sh 26.7.2
+-- 15. the difference with the files we started from
+OK   the old order really was move then verify                      
+OK   deleting the live file on a mismatch is gone                   
+OK   the loose lock grep is gone                                    
+OK   the arch helper is new                                         
+OK   the broken glob test is gone from the code                     
+OK   the installer now keeps the previous binary                    
+OK   the blind rm -rf bin/* is gone                                 
+OK   the geo files are cached now                                   
+OK   the asset names that never existed are gone                    
+OK   the manager has cm_download                                    
+OK   the manager has cm_stage                                       
+OK   the manager has cm_probe                                       
+OK   the manager has cm_activate                                    
+OK   the manager has cm_rollback                                    
+OK   the manager has cm_prune                                       
+OK   the manager has cm_json                                        
+FAILURES: 0 []

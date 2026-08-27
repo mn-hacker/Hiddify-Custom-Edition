@@ -6,9 +6,15 @@
 				"enabled": true,
 				"inbounds": [],
 				"outbounds": ["WARP","freedom","blackhole"],
+				// watashi v12.2.47: sing-box counts traffic against the user *name* the
+				// inbound authenticated. vless/vmess/trojan/hysteria/tuic/ss use
+				// "<uuid>@hiddify.com", but naive and mieru authenticate with the bare
+				// uuid, so their traffic was never counted and those users never ran
+				// out of quota. Both spellings are listed; the panel splits on "@".
 				"users": [
 					{% for u in users %}
 						"{{ u['uuid'] }}@hiddify.com",
+						"{{ u['uuid'] }}",
 					{% endfor%}
 				]
 			}

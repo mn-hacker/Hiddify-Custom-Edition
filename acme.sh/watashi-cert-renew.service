@@ -1,0 +1,14 @@
+[Unit]
+Description=Watashi certificate renewal
+After=network-online.target hiddify-nginx.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/hiddify-manager/acme.sh
+ExecStart=/bin/bash /opt/hiddify-manager/acme.sh/run.sh
+TimeoutStartSec=1800
+Nice=10
+
+[Install]
+WantedBy=multi-user.target
