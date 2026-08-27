@@ -1,0 +1,25 @@
+[Unit]
+Description=telemt - Telegram MTProto proxy (watashi v12.2.53)
+Documentation=https://github.com/telemt/telemt
+After=network-online.target
+Wants=network-online.target
+StartLimitBurst=5
+StartLimitIntervalSec=300
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/hiddify-manager/other/telegram/telemt
+ExecStartPre=/bin/bash -c 'test -x /opt/hiddify-manager/other/telegram/telemt/telemt || { echo "telemt binary is missing"; exit 1; }'
+ExecStartPre=/bin/bash -c 'test -f /opt/hiddify-manager/other/telegram/telemt/telemt.toml || { echo "telemt.toml is missing"; exit 1; }'
+ExecStart=/opt/hiddify-manager/other/telegram/telemt/telemt /opt/hiddify-manager/other/telegram/telemt/telemt.toml
+Restart=on-failure
+RestartSec=10
+LimitNOFILE=65536
+DynamicUser=true
+StateDirectory=telemt
+NoNewPrivileges=true
+StandardOutput=file:/opt/hiddify-manager/log/system/telegram.out.log
+StandardError=file:/opt/hiddify-manager/log/system/telegram.err.log
+
+[Install]
+WantedBy=multi-user.target

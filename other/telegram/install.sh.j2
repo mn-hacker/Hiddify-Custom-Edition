@@ -1,3 +1,11 @@
+# watashi v12.2.53: install whichever engine the panel asked for.
 bash disable.sh
 
+{% if hconfigs['telegram_lib'] == 'tgo' %}
+{% if hconfigs['telegram_adtag'] %}
+echo "watashi: mtg cannot carry an ad tag - its v2 dropped the feature - so the tag is ignored. Pick telemt as the telegram engine in the panel." >&2
+{% endif %}
 cd tgo && bash install.sh
+{% else %}
+cd telemt && bash install.sh
+{% endif %}

@@ -1,0 +1,5 @@
+
+bash disable.sh
+bash disable.sh
+cd tgo && bash run.sh
+

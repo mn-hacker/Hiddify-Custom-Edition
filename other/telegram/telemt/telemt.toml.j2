@@ -1,0 +1,46 @@
+# telemt.toml - generated from telemt.toml.j2. Do not edit by hand.
+# watashi v12.2.53: the telegram proxy engine that can carry an ad tag.
+
+[general]
+{% if hconfigs['telegram_adtag']|length == 32 %}
+# An ad tag only works through telegram's middle proxies, so it has to be on.
+use_middle_proxy = true
+ad_tag = "{{hconfigs['telegram_adtag']}}"
+{% else %}
+# No ad tag: talk to the data centres directly. Fewer moving parts, faster.
+use_middle_proxy = false
+{% endif %}
+log_level = "normal"
+
+[general.modes]
+# haproxy hands us the fake TLS stream, so that is the only mode we serve.
+classic = false
+secure = false
+tls = true
+
+[general.links]
+show = "*"
+public_port = 443
+
+[server]
+port = 1001
+proxy_protocol = false
+
+[server.api]
+enabled = true
+listen = "127.0.0.1:9091"
+whitelist = ["127.0.0.1/32", "::1/128"]
+
+[[server.listeners]]
+ip = "127.0.0.1"
+
+[censorship]
+tls_domain = "{{hconfigs['telegram_fakedomain']}}"
+mask = true
+tls_emulation = true
+# systemd gives us this directory (StateDirectory=telemt) and it is writable.
+tls_front_dir = "/var/lib/telemt/tlsfront"
+
+[access.users]
+# One shared secret, exactly the one the panel puts in every tg:// link.
+watashi = "{{hconfigs['shared_secret'].replace("-","")}}"

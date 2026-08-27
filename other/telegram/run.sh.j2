@@ -1,5 +1,9 @@
+# watashi v12.2.53: start whichever engine the panel asked for.
+# apply can call run.sh without install.sh, so the others are stopped here too.
+bash disable.sh
 
-bash disable.sh
-bash disable.sh
+{% if hconfigs['telegram_lib'] == 'tgo' %}
 cd tgo && bash run.sh
-
+{% else %}
+cd telemt && bash run.sh
+{% endif %}
