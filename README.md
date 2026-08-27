@@ -2,10 +2,6 @@
 
 <img src="assets/watashi-banner.svg?v=3" alt="Watashi Manager" width="880">
 
-<img src="assets/watashi-icon.svg?v=3" alt="Watashi living core" width="96" height="96">
-
-### The proxy panel with a pulse
-
 [![Release](https://img.shields.io/github/v/release/mn-hacker/Hiddify-Custom-Edition?style=for-the-badge&color=7c3aed&label=RELEASE)](https://github.com/mn-hacker/Hiddify-Custom-Edition/releases)
 [![Last commit](https://img.shields.io/github/last-commit/mn-hacker/Hiddify-Custom-Edition?style=for-the-badge&color=f59e0b&label=LAST%20COMMIT)](https://github.com/mn-hacker/Hiddify-Custom-Edition/commits)
 [![Stars](https://img.shields.io/github/stars/mn-hacker/Hiddify-Custom-Edition?style=for-the-badge&color=22d3ee)](https://github.com/mn-hacker/Hiddify-Custom-Edition/stargazers)
