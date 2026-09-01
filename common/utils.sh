@@ -1,4 +1,13 @@
 
+# --- Watashi v12.2.70 : a brand new box very often starts with no TERM at
+# all, and the skin switched itself off in that case, so the very first
+# install on a raw server looked like the plain old installer. A real
+# terminal is given a real name here, before anything is drawn. ---
+if [ -t 1 ]; then
+    case "${TERM:-}" in
+    "" | dumb | unknown) export TERM=xterm-256color ;;
+    esac
+fi
 # --- Watashi v12.2.37 : one skin for every box the terminal draws ---
 WS_TUI_FILE="/opt/hiddify-manager/common/watashi_tui.sh"
 if [ ! -f "$WS_TUI_FILE" ]; then
@@ -134,12 +143,17 @@ function add_DNS_if_failed() {
 }
 
 function disable_ansii_modes() {
-    echo -e "\033[?25l"
-    echo -e "\e[?1003l"
-    #echo -e '\033c'
-    echo -e '\e[?25h'
-    tput sgr0
-    pkill -9 dialog
+    # watashi v12.2.70: this hid the cursor and then showed it again on
+    # every call, and it runs around every box and every progress window,
+    # so the screen blinked the whole way through an install. The mouse
+    # reporting is still switched off, the cursor is left where it is, and
+    # dialog is only touched when it is really running.
+    printf '\033[?1003l'
+    printf '\033[?25h'
+    tput sgr0 2>/dev/null || true
+    if pgrep -x dialog >/dev/null 2>&1; then
+        pkill -9 -x dialog
+    fi
 }
 
 function update_progress() {
@@ -324,9 +338,20 @@ function msg_with_hiddify() {
 }
 function center_text() {
     local text="$1"
-    local screen_width="$(tput cols)"
+    # watashi v12.2.70: tput prints nothing when the terminal has no name,
+    # and the empty width then made the padding a negative number.
+    local screen_width=""
+    if declare -F ws_cols >/dev/null 2>&1; then
+        screen_width="$(ws_cols)"
+    else
+        screen_width="$(tput cols 2>/dev/null)"
+    fi
+    case "$screen_width" in
+    '' | *[!0-9]*) screen_width=80 ;;
+    esac
     local longest_line_length="$(echo "$text" | awk '{ print length }' | sort -rn | head -1)"
     local padding_width="$(((screen_width - longest_line_length) / 2))"
+    [ "$padding_width" -lt 0 ] && padding_width=0  # watashi v12.2.70
     while IFS= read -r line; do
         printf "%*s%s\n" $padding_width "" "$line"
     done <<<"$text"
@@ -535,6 +560,104 @@ function remove_port() { #remove_port "tcp" "80"
     while ip6tables -C INPUT -p "$1" --dport "$2" -j ACCEPT >/dev/null 2>&1; do
         ip6tables -D INPUT -p "$1" --dport "$2" -j ACCEPT >/dev/null 2>&1 || break
     done
+}
+
+# watashi: v12.2.63 - udp port hopping
+#
+# A censor that has learned to hate one udp port only has to drown that one
+# port. Hopping lets the client spray across a whole range while the kernel
+# folds every one of those ports back onto the single port hysteria2 answers
+# on. The spraying is free for the client and expensive for the censor.
+#
+# REDIRECT is used rather than DNAT on purpose: REDIRECT needs no address, so
+# one identical rule spec serves both iptables and ip6tables.
+function add2natiptables() {
+    if ! iptables -t nat -C $1 >/dev/null 2>&1; then
+        echo "adding nat rule $1"
+        iptables -t nat -I $1
+    fi
+}
+function add2natip6tables() {
+    if ! ip6tables -t nat -C $1 >/dev/null 2>&1; then
+        echo "adding nat rule $1"
+        ip6tables -t nat -I $1
+    fi
+}
+
+# Refuse a range that is not a range, is out of bounds, or would swallow a
+# port this server already answers on. A swallowed port would be redirected
+# away silently and whatever listens behind it would just stop replying.
+function ws_hop_range_ok() {
+    local lo=$1
+    local hi=$2
+    shift 2
+    case "$lo$hi" in
+    '' | *[!0-9]*)
+        echo "port hopping refused: '$lo-$hi' is not a range"
+        return 1
+        ;;
+    esac
+    if [[ $lo -lt 1024 || $hi -gt 65535 || $lo -ge $hi ]]; then
+        echo "port hopping refused: $lo-$hi is out of bounds"
+        return 1
+    fi
+    local p
+    for p in "$@"; do
+        case "$p" in
+        '' | *[!0-9]*) continue ;;
+        esac
+        if [[ $p -ge $lo && $p -le $hi ]]; then
+            echo "port hopping refused: the range $lo-$hi swallows port $p, which this server already answers on"
+            return 1
+        fi
+    done
+    return 0
+}
+
+# Delete every hop redirect we ever wrote, in both families. Line numbers
+# shift after each delete, so the table is re-read on every pass.
+function ws_hop_clear() {
+    local line
+    while :; do
+        line=$(iptables -t nat -L PREROUTING --line-numbers -n 2>/dev/null | awk '$2=="REDIRECT" && /udp/ && /dpts:/ {print $1; exit}')
+        [[ -z $line ]] && break
+        iptables -t nat -D PREROUTING $line
+    done
+    while :; do
+        line=$(ip6tables -t nat -L PREROUTING --line-numbers -n 2>/dev/null | awk '$2=="REDIRECT" && /udp/ && /dpts:/ {print $1; exit}')
+        [[ -z $line ]] && break
+        ip6tables -t nat -D PREROUTING $line
+    done
+}
+
+function ws_hop_udp_range_to() {
+    local lo=$1
+    local hi=$2
+    local target=$3
+    add2iptables46 "INPUT -p udp --dport $lo:$hi -j ACCEPT"
+    add2natiptables "PREROUTING -p udp --dport $lo:$hi -j REDIRECT --to-ports $target"
+    add2natip6tables "PREROUTING -p udp --dport $lo:$hi -j REDIRECT --to-ports $target"
+    echo "udp $lo-$hi now lands on $target"
+}
+
+# Reads WS_HOP_LO WS_HOP_HI WS_HOP_TARGETS WS_OUR_PORTS from the environment.
+function ws_hop_apply() {
+    # Always clear first, so running apply twice cannot pile up rules.
+    ws_hop_clear
+    local targets
+    local count
+    targets="$(echo $WS_HOP_TARGETS | tr ' ' '\n' | grep -E '^[0-9]+$' | sort -u)"
+    count="$(echo "$targets" | grep -c '[0-9]')"
+    if [[ $count -eq 0 ]]; then
+        echo "port hopping skipped: hysteria2 has no port to hop onto"
+        return 0
+    fi
+    if [[ $count -gt 1 ]]; then
+        echo "port hopping skipped: hysteria2 listens on $count different ports ($(echo $targets | tr '\n' ' ')) and one range cannot fold onto more than one"
+        return 0
+    fi
+    ws_hop_range_ok "$WS_HOP_LO" "$WS_HOP_HI" $WS_OUR_PORTS || return 0
+    ws_hop_udp_range_to "$WS_HOP_LO" "$WS_HOP_HI" "$targets"
 }
 
 function allow_apps_ports() {

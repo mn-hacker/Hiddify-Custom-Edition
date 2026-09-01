@@ -122,6 +122,37 @@ ip6tables -P FORWARD ACCEPT
 ip6tables -P INPUT ACCEPT
 {%endif%}
 
+{# watashi v12.2.63: udp port hopping. Only hysteria2 hops, because mport is
+   a hysteria2 client convention. The very same range is written into the
+   subscription link by hutils/proxy/port_hop.py, so the firewall and the link
+   either agree or hopping stays off on both sides. #}
+{% if hconfigs.get('port_hop_enable') and hconfigs.get('port_hop_range') %}
+WS_HOP="{{ hconfigs['port_hop_range'] }}"
+WS_HOP_LO="${WS_HOP%%-*}"
+WS_HOP_HI="${WS_HOP##*-}"
+WS_OUR_PORTS="22 53 80 443 9000 {{hconfigs.get('wireguard_port','')}} {{hconfigs.get('ssh_server_port','')}} {{hconfigs.get('shadowsocks2022_port','')}} {{hconfigs.get('amnezia_port','')}} {{hconfigs.get('naive_port','')}} {{hconfigs.get('shadowtls_port','')}} {{hconfigs.get('special_port','')}} {{hconfigs.get('mieru_port','')}} {{hconfigs.get('reality_port','')}}"
+{% for port in (hconfigs['tls_ports']+","+hconfigs['http_ports']).split(',') if port %}
+WS_OUR_PORTS="$WS_OUR_PORTS {{port}}"
+{% endfor %}
+WS_HOP_TARGETS=""
+{% for d in domains %}
+{% if d['internal_port_hysteria2'] and d['internal_port_hysteria2']>0 %}
+WS_OUR_PORTS="$WS_OUR_PORTS {{d['internal_port_hysteria2']}}"
+WS_HOP_TARGETS="$WS_HOP_TARGETS {{d['internal_port_hysteria2']}}"
+{% endif %}
+{% if d['internal_port_tuic'] and d['internal_port_tuic']>0 %}
+WS_OUR_PORTS="$WS_OUR_PORTS {{d['internal_port_tuic']}}"
+{% endif %}
+{% if d['internal_port_amnezia'] and d['internal_port_amnezia']>0 %}
+WS_OUR_PORTS="$WS_OUR_PORTS {{d['internal_port_amnezia']}}"
+{% endif %}
+{% endfor %}
+export WS_HOP_LO WS_HOP_HI WS_HOP_TARGETS WS_OUR_PORTS
+ws_hop_apply
+{%else%}
+ws_hop_clear
+{%endif%}
+
 save_firewall
 
 #add2iptables "INPUT -p tcp --dport 9000 -j DROP"

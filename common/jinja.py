@@ -112,8 +112,12 @@ def render_j2_templates(*start_paths):
 start_path = "/opt/hiddify-manager/"
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "apply_users":
+        # watashi v12.2.62: other/amnezia belongs on this list. apply_users is
+        # the mode that runs when the user list changes, and a peer list that is
+        # never re-rendered is a peer list that goes stale.
         render_j2_templates(
-            start_path + "singbox/", start_path + "xray/", start_path + "other/wireguard/"
+            start_path + "singbox/", start_path + "xray/",
+            start_path + "other/wireguard/", start_path + "other/amnezia/"
         )
     else:
         render_j2_templates(start_path)

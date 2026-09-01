@@ -1,5 +1,6 @@
 {
-	{% if hconfigs['amnezia_enable'] %}
+	{# watashi v12.2.62: while the separate amneziawg daemon is on, it owns the port and this endpoint has to stand aside. Only one of the two can bind. #}
+	{% if hconfigs['amnezia_enable'] and not hconfigs.get('amnezia_native_enable') %}
 		"endpoints": [
 			{% for d in domains if d['internal_port_amnezia']  %}
 			{%set domain=d['domain']%}

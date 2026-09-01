@@ -1,0 +1,42 @@
+# watashi: the separate AmneziaWG system v12.2.62
+# This file is rendered to run.sh by common/jinja.py before it is run.
+
+source ./awg_utils.sh
+
+if ! ws_awg_ready; then
+    ws_awg_say "amneziawg is not installed, so there is no peer list to write"
+    exit 0
+fi
+
+if [ ! -f "$AWG_CONF" ]; then
+    ws_awg_say "$AWG_CONF is not there yet, install.sh has not described the interface"
+    exit 0
+fi
+
+umask 077
+
+# Every peer is written from scratch. A user who lost access has to lose the
+# line as well, and editing lines in place is a far easier thing to get wrong
+# than dropping all of them and writing the ones that are currently valid.
+sed -i '/\[Peer\]/,$d' "$AWG_CONF"
+
+{% for u in users %}{% if u['wg_pub'] and u['wg_ipv4'] %}
+cat >>"$AWG_CONF" <<'WS_PEER_END'
+
+[Peer]
+PublicKey = {{ u['wg_pub'] }}
+PresharedKey = {{ u['wg_psk'] }}
+AllowedIPs = {{ u['wg_ipv4'] }}/32, {{ u['wg_ipv6'] }}/128
+WS_PEER_END
+{% endif %}{% endfor %}
+
+chmod 600 "$AWG_CONF"
+
+# syncconf keeps everybody else's tunnel alive while the peer list changes.
+# A restart is the fallback, not the habit.
+if awg syncconf "$SERVER_AWG_NIC" <(awg-quick strip "$SERVER_AWG_NIC") 2>/dev/null; then
+    ws_awg_say "the peer list was synced without dropping $SERVER_AWG_NIC"
+else
+    systemctl restart "$AWG_UNIT" >/dev/null 2>&1
+    ws_awg_say "the peer list needed a restart of $AWG_UNIT"
+fi

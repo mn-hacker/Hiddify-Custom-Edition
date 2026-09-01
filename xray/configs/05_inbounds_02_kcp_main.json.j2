@@ -22,9 +22,12 @@
                 },
                 "streamSettings": {
                     "network": "kcp",
-                    "kcpSettings": {
-                        "seed": "{{ hconfigs['proxy_path'] }}"
-                        }
+                    // watashi v12.2.75: the "seed" and "header" fields were
+                    // removed from mKCP in Xray-core. Setting either one now fails
+                    // at config build, which means the core refuses to start at all
+                    // rather than warning. Both sides fall back to core defaults, so
+                    // they still agree. Masking moves to FinalMask in a later round.
+                    "kcpSettings": {}
                 }
             }
         ]

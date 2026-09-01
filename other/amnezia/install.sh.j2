@@ -1,0 +1,94 @@
+# watashi: the separate AmneziaWG system v12.2.62
+# This file is rendered to install.sh by common/jinja.py before it is run.
+
+source ../../common/utils.sh
+source ./awg_utils.sh
+
+if ! ws_awg_name_ok; then
+    ws_awg_say "awg-quick would refuse the interface name $SERVER_AWG_NIC, so nothing was touched"
+    exit 0
+fi
+
+if ! ws_awg_ready; then
+    ws_awg_say "amneziawg is not on this machine yet, asking the amnezia repository for it"
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get install -y software-properties-common >/dev/null 2>&1
+    add-apt-repository -y ppa:amnezia/ppa >/dev/null 2>&1
+    apt-get update -y >/dev/null 2>&1
+    apt-get install -y "linux-headers-$(uname -r)" >/dev/null 2>&1
+    apt-get install -y amneziawg amneziawg-tools >/dev/null 2>&1
+fi
+
+# A protocol that is already serving users is never taken down for a protocol
+# that could not be installed. If the tools are missing the script stops here
+# and says so, leaving the sing-box endpoint exactly as it was.
+if ! ws_awg_ready; then
+    ws_awg_say "amneziawg could not be installed here. nothing was changed and no service was stopped."
+    ws_awg_say "send the output of: apt-cache policy amneziawg amneziawg-tools"
+    exit 0
+fi
+
+{% if hconfigs['wireguard_enable'] %}
+# Both tunnels are handed the same per-user addresses by the panel, because
+# both are built from wireguard_ipv4/ipv6 plus the user id. Two interfaces that
+# claim one subnet is a routing argument the kernel settles by luck.
+ws_awg_say "warning: plain wireguard is switched on as well, and the panel gives both tunnels the same {{ hconfigs['wireguard_ipv4'] }} subnet. keep one of the two on until each protocol owns a subnet of its own."
+{% endif %}
+
+if ! ws_awg_headers_disguised "{{ hconfigs['amnezia_h1'] }}" "{{ hconfigs['amnezia_h2'] }}" "{{ hconfigs['amnezia_h3'] }}" "{{ hconfigs['amnezia_h4'] }}"; then
+    ws_awg_say "warning: H1..H4 are still the four packet types plain wireguard uses, so the header is not disguised at all and simple matching still recognises this tunnel. open the panel once so the database is brought up to date, then apply again."
+fi
+
+SERVER_PUB_NIC="$(ip -4 route ls | grep default | grep -Po '(?<=dev )(\S+)' | head -1)"
+AWG_PORT={{ hconfigs['amnezia_port'] }}
+
+umask 077
+mkdir -p "$AWG_DIR"
+chmod 700 "$AWG_DIR"
+
+# The interface is described from scratch on every apply. run.sh appends the
+# peers afterwards, which is why nothing below this line mentions a user.
+systemctl stop "$AWG_UNIT" >/dev/null 2>&1
+
+cat >"$AWG_CONF" <<EOF
+[Interface]
+Address = {{ hconfigs['wireguard_ipv4'] }}/16, {{ hconfigs['wireguard_ipv6'] }}/90
+ListenPort = ${AWG_PORT}
+PrivateKey = {{ hconfigs['wireguard_private_key'] }}
+MTU = 1280
+Jc = {{ hconfigs['amnezia_jc'] }}
+Jmin = {{ hconfigs['amnezia_jmin'] }}
+Jmax = {{ hconfigs['amnezia_jmax'] }}
+S1 = {{ hconfigs['amnezia_s1'] }}
+S2 = {{ hconfigs['amnezia_s2'] }}
+H1 = {{ hconfigs['amnezia_h1'] }}
+H2 = {{ hconfigs['amnezia_h2'] }}
+H3 = {{ hconfigs['amnezia_h3'] }}
+H4 = {{ hconfigs['amnezia_h4'] }}
+PostUp = iptables -I INPUT -p udp --dport ${AWG_PORT} -j ACCEPT
+PostUp = iptables -I FORWARD -i ${SERVER_PUB_NIC} -o ${SERVER_AWG_NIC} -j ACCEPT
+PostUp = iptables -I FORWARD -i ${SERVER_AWG_NIC} -j ACCEPT
+PostUp = iptables -t nat -A POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE
+PostUp = ip6tables -I FORWARD -i ${SERVER_AWG_NIC} -j ACCEPT
+PostUp = ip6tables -t nat -A POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE
+PostDown = iptables -D INPUT -p udp --dport ${AWG_PORT} -j ACCEPT
+PostDown = iptables -D FORWARD -i ${SERVER_PUB_NIC} -o ${SERVER_AWG_NIC} -j ACCEPT
+PostDown = iptables -D FORWARD -i ${SERVER_AWG_NIC} -j ACCEPT
+PostDown = iptables -t nat -D POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE
+PostDown = ip6tables -D FORWARD -i ${SERVER_AWG_NIC} -j ACCEPT
+PostDown = ip6tables -t nat -D POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE
+EOF
+chmod 600 "$AWG_CONF"
+
+echo "net.ipv4.ip_forward = 1
+net.ipv6.conf.all.forwarding = 1" >"/etc/sysctl.d/${SERVER_AWG_NIC}.conf"
+if [ "$MODE" != "docker" ]; then
+    sysctl --system >/dev/null 2>&1
+fi
+
+systemctl enable "$AWG_UNIT" >/dev/null 2>&1
+if systemctl start "$AWG_UNIT" >/dev/null 2>&1; then
+    ws_awg_say "$SERVER_AWG_NIC is up on udp ${AWG_PORT}"
+else
+    ws_awg_say "$SERVER_AWG_NIC refused to start; systemctl status $AWG_UNIT and journalctl -u $AWG_UNIT will say why"
+fi

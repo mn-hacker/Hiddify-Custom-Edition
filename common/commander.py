@@ -162,10 +162,32 @@ def apply_users():
     run(cmd)
 
 
+def ws_tunnel_transfer(tool: str, nic: str) -> str:
+    """Read a wireguard style transfer table without taking the caller down.
+
+    watashi v12.2.64: check_output raises the moment the tool is missing or the
+    interface is not up, and the driver that asked for it turns that into a
+    failed usage run for every other driver in the same batch. A tunnel that is
+    not running is not an error, it is simply nothing to report.
+    """
+    try:
+        out = subprocess.check_output([tool, 'show', nic, 'transfer'], stderr=subprocess.DEVNULL)
+    except (FileNotFoundError, PermissionError, subprocess.CalledProcessError):
+        return ''
+    return out.decode(errors='replace')
+
+
 @cli.command('update-wg-usage')
 def update_wg_usage():
-    wg_raw_output = subprocess.check_output(['wg', 'show', 'hiddifywg', 'transfer'])
-    print(wg_raw_output.decode())
+    print(ws_tunnel_transfer('wg', 'hiddifywg'))
+
+
+@cli.command('update-awg-usage')
+def update_awg_usage():
+    # watashi v12.2.64: the separate AmneziaWG system of v12.2.62 runs on its
+    # own interface, named once in other/amnezia/awg_utils.sh. Its bytes never
+    # reach the sing-box core, so they have to be read straight off awg.
+    print(ws_tunnel_transfer('awg', 'watashi-awg'))
 
 
 @cli.command('install-rathole')
@@ -243,6 +265,16 @@ def core(action: str, name: str, version: str):
     cmd = ['bash', Command.core.value, action, name]
     if version:
         cmd.append(version)
+    # watashi v12.2.76: the three actions that download are allowed to write
+    # down the sha256 of what they just fetched. core_manager refuses an
+    # unpinned version by default, which is right for an unattended run and
+    # wrong here: this door is only opened by a super admin pressing a button,
+    # and the download is still verified, staged, tried, and rolled back if the
+    # service does not come back. without this, every new upstream release dies
+    # with 'not pinned in packages.lock' and the page can never leave the old
+    # pin. rollback and prune are left out because they never fetch anything.
+    if action in ('install', 'upgrade', 'downgrade'):
+        os.environ['CM_ALLOW_UNPINNED'] = '1'
     run(cmd)
 
 

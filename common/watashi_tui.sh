@@ -21,8 +21,11 @@ function ws_skin_on() {
     case "$WATASHI_TUI" in
     0 | off | no | false) return 1 ;;
     esac
+    # watashi v12.2.70: a real terminal with no name is still a real
+    # terminal, so the skin only steps aside when there is nowhere to draw.
     case "$TERM" in
-    "" | dumb) return 1 ;;
+    dumb) return 1 ;;
+    "") [ -t 1 ] || return 1 ;;
     esac
     return 0
 }
