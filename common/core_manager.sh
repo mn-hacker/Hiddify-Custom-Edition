@@ -65,8 +65,53 @@ cm_cores() {
     grep -v '^[[:space:]]*#' "$CM_REGISTRY" 2>/dev/null | awk -F'|' 'NF>=10 {print $1}'
 }
 
-cm_installed() {
+# what the record says. the record only knows the versions this manager put
+# there itself.
+cm_recorded() {
     awk -F'|' -v n="$1" '$1==n {v=$2} END {print v}' "$CM_DB" 2>/dev/null
+}
+
+# watashi v12.2.82: ask the binary that is actually live. every core installed
+# by the old per core scripts, which is all of them on an existing server, has
+# no row in installed.db, so the panel page said "not installed" about six
+# cores that were running the whole time. this is quiet on purpose: no log line
+# and no stderr, because it runs once per core on every page load.
+cm_disk_version() {
+    local name=$1 bin cmd out
+    bin=$(cm_target "$name")
+    if [ ! -x "$bin" ]; then return 1; fi
+    cmd=$(cm_field "$(cm_row "$name")" 8)
+    if [ -z "$cmd" ] || [ "$cmd" = "-" ]; then return 1; fi
+    cmd=${cmd//@BIN@/$bin}
+    out=$(eval "$cmd" 2>/dev/null | head -1)
+    if [ -z "$out" ]; then return 1; fi
+    echo "$out" | grep -oE '[0-9]+[.][0-9]+([.][0-9A-Za-z_+-]+)*' | head -1
+}
+
+# is there a binary at all, even one that will not name its version
+cm_present() {
+    if [ -f "$(cm_target "$1")" ]; then echo true; else echo false; fi
+}
+
+cm_installed() {
+    local v
+    v=$(cm_recorded "$1")
+    if [ -n "$v" ]; then
+        echo "$v"
+        return 0
+    fi
+    cm_disk_version "$1" 2>/dev/null
+}
+
+# where the version came from, so the page can be honest about it
+cm_source() {
+    if [ -n "$(cm_recorded "$1")" ]; then
+        echo record
+    elif [ -n "$(cm_disk_version "$1" 2>/dev/null)" ]; then
+        echo disk
+    else
+        echo none
+    fi
 }
 
 cm_record() {
@@ -93,12 +138,66 @@ cm_target() {
     echo "$WS_ROOT/$(cm_field "$(cm_row "$1")" 6)"
 }
 
-# the newest published release, straight from the source of the core
+# watashi v12.2.82: the stable line of this core, and the channel it follows.
+# the panel has a beta channel of its own (package_mode) and it never reached
+# the cores; what did reach them was the tested pin, and in v12.2.75 that pin
+# was moved to a version the vendor publishes as a pre-release. so: stable is
+# what this manager installs when nobody names a version, and a test build is
+# only ever installed by a hand typing it.
+cm_stable() {
+    cm_field "$(cm_row "$1")" 11
+}
+
+cm_channel() {
+    local c
+    c=$(cm_field "$(cm_row "$1")" 12)
+    if [ -z "$c" ] || [ "$c" = "-" ]; then c=stable; fi
+    echo "$c"
+}
+
+# what upgrade installs when it is not told a version
+cm_default_version() {
+    local v=""
+    if [ "$(cm_channel "$1")" = "stable" ]; then v=$(cm_stable "$1"); fi
+    if [ -z "$v" ]; then v=$(cm_tested "$1"); fi
+    echo "$v"
+}
+
+cm_newer() {
+    printf '%s\n%s\n' "$1" "$2" | sort -V | tail -1
+}
+
+# is what is running past the stable line this panel trusts
+cm_is_pre() {
+    local inst stable
+    inst=$(cm_installed "$1")
+    stable=$(cm_stable "$1")
+    if [ -z "$inst" ] || [ -z "$stable" ] || [ "$inst" = "$stable" ]; then
+        echo false
+        return 0
+    fi
+    if [ "$(cm_newer "$inst" "$stable")" = "$inst" ]; then echo true; else echo false; fi
+}
+
+# the newest release the vendor calls stable. releases/latest never answers
+# with a pre-release, which is exactly why this is the default door.
 cm_latest() {
     local repo tag
     repo=$(cm_field "$(cm_row "$1")" 2)
     if [ -z "$repo" ]; then return 1; fi
     tag=$(curl -fsSL --connect-timeout 10 "$CM_GH_API/repos/$repo/releases/latest" 2>/dev/null | grep -m1 '"tag_name"' | cut -d'"' -f4)
+    if [ -z "$tag" ]; then return 1; fi
+    echo "${tag#v}"
+}
+
+# watashi v12.2.82: only asked for by hand. the vendor of xray marks nearly
+# every release as a pre-release, so this is the only way to reach them, and
+# it is never the default.
+cm_latest_pre() {
+    local repo tag
+    repo=$(cm_field "$(cm_row "$1")" 2)
+    if [ -z "$repo" ]; then return 1; fi
+    tag=$(curl -fsSL --connect-timeout 10 "$CM_GH_API/repos/$repo/releases?per_page=8" 2>/dev/null | grep -m1 '"tag_name"' | cut -d'"' -f4)
     if [ -z "$tag" ]; then return 1; fi
     echo "${tag#v}"
 }
@@ -313,7 +412,7 @@ cm_install() {
         return 1
     fi
     if [ -z "$version" ] || [ "$version" = "tested" ]; then
-        version=$(cm_tested "$name")
+        version=$(cm_default_version "$name")  # watashi v12.2.82: stable unless the registry says otherwise
     elif [ "$version" = "latest" ]; then
         version=$(cm_latest "$name")
         if [ -z "$version" ]; then
@@ -384,18 +483,26 @@ cm_status() {
         else
             state=down
         fi
-        printf '%-20s %-14s %-14s %-9s %s\n' "$name" "${inst:-unknown}" "$tested" "$state" "$(cm_target "$name")"
+        printf '%-20s %-14s %-14s %-9s %s\n' "$name" "${inst:-unknown}" "$(cm_default_version "$name")" "$state" "$(cm_target "$name")"  # watashi v12.2.82
     done
 }
 
 # what the panel page will read
 cm_json() {
-    local name inst tested unit active utd first=1
+    local name inst tested unit active utd first=1 stable channel pre present source want
     printf '['
     for name in $(cm_cores); do
         inst=$(cm_installed "$name")
         tested=$(cm_tested "$name")
         unit=$(cm_unit "$name")
+        # watashi v12.2.82: four fields the page never had. without them it
+        # could only guess, and it guessed "not installed" six times.
+        stable=$(cm_stable "$name")
+        channel=$(cm_channel "$name")
+        pre=$(cm_is_pre "$name")
+        present=$(cm_present "$name")
+        source=$(cm_source "$name")
+        want=$(cm_default_version "$name")
         if [ -z "$unit" ]; then
             active=null
         elif cm_unit_ok "$unit"; then
@@ -403,10 +510,11 @@ cm_json() {
         else
             active=false
         fi
-        if [ "$inst" = "$tested" ]; then utd=true; else utd=false; fi
+        # being ahead of the stable line is not being behind it
+        if [ -n "$inst" ] && { [ "$inst" = "$want" ] || [ "$pre" = true ]; }; then utd=true; else utd=false; fi
         if [ $first -eq 0 ]; then printf ','; fi
         first=0
-        printf '{"name":"%s","installed":"%s","tested":"%s","unit":"%s","path":"%s","active":%s,"uptodate":%s}' "$name" "$inst" "$tested" "$unit" "$(cm_target "$name")" "$active" "$utd"
+        printf '{"name":"%s","installed":"%s","tested":"%s","stable":"%s","channel":"%s","pre":%s,"present":%s,"source":"%s","unit":"%s","path":"%s","active":%s,"uptodate":%s}' "$name" "$inst" "$tested" "$stable" "$channel" "$pre" "$present" "$source" "$unit" "$(cm_target "$name")" "$active" "$utd"
     done
     printf ']\n'
 }
@@ -435,6 +543,10 @@ if [ "${BASH_SOURCE[0]}" = "$0" ]; then
     status) cm_status ;;
     json) cm_json ;;
     latest) cm_latest "$2" ;;
+    latest-pre) cm_latest_pre "$2" ;;  # watashi v12.2.82
+    stable) cm_stable "$2" ;;
+    channel) cm_channel "$2" ;;
+    default) cm_default_version "$2" ;;
     installed) cm_installed "$2" ;;
     tested) cm_tested "$2" ;;
     install | upgrade | downgrade) cm_install "$2" "$3" ;;
@@ -448,7 +560,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ]; then
         ;;
     verify) cm_verify "$2" ;;
     *)
-        echo "usage: $0 {list|status|json|latest|installed|tested|install|upgrade|downgrade|rollback|prune|verify} [core] [version]"
+        echo "usage: $0 {list|status|json|latest|latest-pre|stable|channel|default|installed|tested|install|upgrade|downgrade|rollback|prune|verify} [core] [version]"
         exit 1
         ;;
     esac
