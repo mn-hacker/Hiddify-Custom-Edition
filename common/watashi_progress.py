@@ -311,17 +311,18 @@ class Window(object):
         self.note = ""
         self.beat = 0
         self.painted = 0.0
+        self.frame_was = ""  # watashi v12.2.84
         self.opened = False
         self.keys_live = False
 
     def open(self):
-        sys.stdout.write("\033[?1049h\033[?25l")
+        sys.stdout.write("\033[?1049h\033[?25l\033[?7l")  # watashi v12.2.84
         sys.stdout.flush()
         self.opened = True
 
     def close(self):
         if self.opened:
-            sys.stdout.write("\033[?25h\033[?1049l\033[0m")
+            sys.stdout.write("\033[?7h\033[?25h\033[?1049l\033[0m")
             sys.stdout.flush()
             self.opened = False
 
@@ -430,11 +431,17 @@ class Window(object):
             tint = GRAD[min(int(i * len(GRAD) / max(len(mark), 1)), len(GRAD) - 1)]
             letters.append("%s%s%s" % (ink.bold(), ink.fg(tint), ch))
         head.append("%s%s%s" % (self.middle(width, len(mark)), "".join(letters), ink.off()))
-        name = self.title.split(" ")
+        # watashi v12.2.84: the mark above already spells the name out,
+        # so the second copy of it is dropped and only a different
+        # title is ever written under the mark.
+        if "".join(self.title.split()).upper() == "".join(WORD.split()).upper():
+            self.title = ""
+        name = (self.title or " ").split(" ")
         crown = "%s%s%s%s" % (ink.bold(), ink.fg(LILAC), name[0], ink.off())
         if len(name) > 1:
             crown += " %s%s%s%s" % (ink.bold(), ink.fg(CYAN), " ".join(name[1:]), ink.off())
-        head.append("%s%s" % (self.middle(width, len(self.title)), crown))
+        if self.title:
+            head.append("%s%s" % (self.middle(width, len(self.title)), crown))
         if self.subtitle:
             head.append(
                 "%s%s%s%s"
@@ -486,7 +493,7 @@ class Window(object):
         label = " LOG "
         top = "\u256d\u2500" + label + "\u2500" * max(frame - 4 - len(label), 0) + "\u2500\u256e"
         foot = "\u2570" + "\u2500" * max(frame - 2, 0) + "\u256f"
-        out = ["\033[H\033[2J"]
+        out = ["\033[H"]  # watashi v12.2.84
         for row in head:
             out.append(row + "\n")
         out.append("%s%s%s%s\n" % (side, ink.fg(VIOLET), top, ink.off()))
@@ -517,7 +524,16 @@ class Window(object):
             hint = where
         hint = hint[: frame - 2]
         out.append("%s%s%s%s%s" % (side, ink.faint(), ink.fg(MUTED), hint, ink.off()))
-        sys.stdout.write("".join(out))
+        # watashi v12.2.84: every line erases itself as it is drawn, and a
+        # frame that would look the same as the one on screen is not sent
+        # at all. The old full wipe before each frame was the flicker.
+        out = [r[:-1] + "\033[K\n" if r.endswith("\n") else r for r in out]
+        out.append("\033[K\033[J")
+        shot = "".join(out)
+        if not force and shot == self.frame_was:
+            return
+        self.frame_was = shot
+        sys.stdout.write(shot)
         sys.stdout.flush()
 
 

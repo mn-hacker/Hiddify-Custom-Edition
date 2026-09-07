@@ -363,7 +363,7 @@ function msg() {
         ws_box "$WS_BRAND" "$1"
         return 0
     fi
-    whiptail --title "Watashi Manager" --msgbox "$1" 0 60
+    whiptail --title "${WS_BRAND:-WATASHI MANAGER}" --msgbox "$1" 0 60
     disable_ansii_modes
 }
 
@@ -475,7 +475,8 @@ function check_hiddify_panel() {
         printf '\033[0m'
         center_text "$(qrencode -t utf8 -m 2 $(cat /opt/hiddify-manager/current.json | jq -r '.panel_links[]' | tail -n 1))"
         echo ""
-        center_text $'\t\033[92mFinished! Watashi Manager is up and breathing.\033[0m'
+        # watashi v12.2.84: the mark is drawn just above, one name is enough
+        center_text $'\t\033[92mFinished! The panel is up and breathing.\033[0m'
         
         echo -e "\n"
         echo "Please open the following link in the browser for client setup:"
@@ -704,7 +705,7 @@ function show_progress_window() {
         # the old road, kept as a safety net
         activate_python_venv
         install_pypi_package cli-progress
-        python3 -m cli_progress --title "Watashi Manager" "$@"
+        python3 -m cli_progress --title "${WS_BRAND:-WATASHI MANAGER}" "$@"
         exit_code=$?
     fi
     disable_ansii_modes

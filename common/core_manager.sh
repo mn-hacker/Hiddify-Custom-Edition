@@ -78,7 +78,7 @@ cm_recorded() {
 # and no stderr, because it runs once per core on every page load.
 cm_disk_version() {
     local name=$1 bin cmd out
-    bin=$(cm_target "$name")
+    bin=$(cm_near "$(cm_target "$name")") || return 1  # watashi v12.2.83
     if [ ! -x "$bin" ]; then return 1; fi
     cmd=$(cm_field "$(cm_row "$name")" 8)
     if [ -z "$cmd" ] || [ "$cmd" = "-" ]; then return 1; fi
@@ -88,9 +88,22 @@ cm_disk_version() {
     echo "$out" | grep -oE '[0-9]+[.][0-9]+([.][0-9A-Za-z_+-]+)*' | head -1
 }
 
+# watashi v12.2.83: an installer that never renamed its download leaves the
+# file beside the registered name, so a read looks at the neighbours with an
+# arch style suffix before it calls a core missing. only the two read helpers
+# below use this; install and activate still work on the exact registered path.
+cm_near() {
+    local target=$1 hit
+    if [ -f "$target" ]; then echo "$target"; return 0; fi
+    for hit in "$target"_* "$target"-*; do
+        if [ -f "$hit" ]; then echo "$hit"; return 0; fi
+    done
+    return 1
+}
+
 # is there a binary at all, even one that will not name its version
 cm_present() {
-    if [ -f "$(cm_target "$1")" ]; then echo true; else echo false; fi
+    if cm_near "$(cm_target "$1")" >/dev/null 2>&1; then echo true; else echo false; fi
 }
 
 cm_installed() {
@@ -487,9 +500,19 @@ cm_status() {
     done
 }
 
+# watashi v12.2.83: field 13 of the registry. wgcf and the v2ray plugin only
+# reach the disk once the feature that needs them is switched on, so an empty
+# path for one of those is the normal state and not a fault to report.
+cm_optional() {
+    case "$(cm_field "$(cm_row "$1")" 13)" in
+    yes | true | 1) echo true ;;
+    *) echo false ;;
+    esac
+}
+
 # what the panel page will read
 cm_json() {
-    local name inst tested unit active utd first=1 stable channel pre present source want
+    local name inst tested unit active utd first=1 stable channel pre present source want optional
     printf '['
     for name in $(cm_cores); do
         inst=$(cm_installed "$name")
@@ -501,6 +524,7 @@ cm_json() {
         channel=$(cm_channel "$name")
         pre=$(cm_is_pre "$name")
         present=$(cm_present "$name")
+        optional=$(cm_optional "$name")  # watashi v12.2.83
         source=$(cm_source "$name")
         want=$(cm_default_version "$name")
         if [ -z "$unit" ]; then
@@ -514,7 +538,7 @@ cm_json() {
         if [ -n "$inst" ] && { [ "$inst" = "$want" ] || [ "$pre" = true ]; }; then utd=true; else utd=false; fi
         if [ $first -eq 0 ]; then printf ','; fi
         first=0
-        printf '{"name":"%s","installed":"%s","tested":"%s","stable":"%s","channel":"%s","pre":%s,"present":%s,"source":"%s","unit":"%s","path":"%s","active":%s,"uptodate":%s}' "$name" "$inst" "$tested" "$stable" "$channel" "$pre" "$present" "$source" "$unit" "$(cm_target "$name")" "$active" "$utd"
+        printf '{"name":"%s","installed":"%s","tested":"%s","stable":"%s","channel":"%s","pre":%s,"present":%s,"optional":%s,"source":"%s","unit":"%s","path":"%s","active":%s,"uptodate":%s}' "$name" "$inst" "$tested" "$stable" "$channel" "$pre" "$present" "$optional" "$source" "$unit" "$(cm_target "$name")" "$active" "$utd"
     done
     printf ']\n'
 }
@@ -546,6 +570,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ]; then
     latest-pre) cm_latest_pre "$2" ;;  # watashi v12.2.82
     stable) cm_stable "$2" ;;
     channel) cm_channel "$2" ;;
+    optional) cm_optional "$2" ;;  # watashi v12.2.83
     default) cm_default_version "$2" ;;
     installed) cm_installed "$2" ;;
     tested) cm_tested "$2" ;;
@@ -560,7 +585,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ]; then
         ;;
     verify) cm_verify "$2" ;;
     *)
-        echo "usage: $0 {list|status|json|latest|latest-pre|stable|channel|default|installed|tested|install|upgrade|downgrade|rollback|prune|verify} [core] [version]"
+        echo "usage: $0 {list|status|json|latest|latest-pre|stable|channel|optional|default|installed|tested|install|upgrade|downgrade|rollback|prune|verify} [core] [version]"
         exit 1
         ;;
     esac
