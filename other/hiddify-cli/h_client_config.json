@@ -1,6 +1,6 @@
 {
     "region": "other",
-    "web-secret": "hiddify",
+    "web-secret": "watashi",
     "execute-config-as-is": false,
     "log-level": "warn",
     "resolve-destination": false,
