@@ -400,6 +400,28 @@ cm_unit_ok() {
     return 1
 }
 
+# watashi v12.2.95: the page could only be told running or not running, so a
+# unit that is meant to be stopped - the telegram proxy switched off, or a
+# different engine picked in the panel - read exactly like one that had
+# crashed. systemd holds both halves of the answer, so both are asked for.
+cm_unit_state() {
+    local unit=$1 run en
+    if [ -z "$unit" ]; then echo none; return 0; fi
+    run=$(systemctl is-active "$unit.service" 2>/dev/null | tail -1)
+    en=$(systemctl is-enabled "$unit.service" 2>/dev/null | tail -1)
+    case "$run" in
+    active) echo active; return 0 ;;
+    activating | reloading | deactivating) echo starting; return 0 ;;
+    failed) echo failed; return 0 ;;
+    esac
+    case "$en" in
+    '' | not-found) echo absent ;;
+    disabled | masked | masked-runtime) echo off ;;
+    *) echo stopped ;;
+    esac
+    return 0
+}
+
 # put a staged version in place, and undo it the moment it does not work
 cm_activate() {
     local name=$1 version=$2 force=$3 bin target unit prev binname
@@ -518,13 +540,8 @@ cm_status() {
         inst=$(cm_installed "$name")
         tested=$(cm_tested "$name")
         unit=$(cm_unit "$name")
-        if [ -z "$unit" ]; then
-            state="-"
-        elif cm_unit_ok "$unit"; then
-            state=active
-        else
-            state=down
-        fi
+        state=$(cm_unit_state "$unit")  # watashi v12.2.95
+        if [ "$state" = none ]; then state="-"; fi
         printf '%-20s %-14s %-14s %-9s %s\n' "$name" "${inst:-unknown}" "$(cm_default_version "$name")" "$state" "$(cm_target "$name")"  # watashi v12.2.82
     done
 }
@@ -541,7 +558,7 @@ cm_optional() {
 
 # what the panel page will read
 cm_json() {
-    local name inst tested unit active utd first=1 stable channel pre present source want optional
+    local name inst tested unit active utd first=1 stable channel pre present source want optional state
     printf '['
     for name in $(cm_cores); do
         inst=$(cm_installed "$name")
@@ -556,9 +573,12 @@ cm_json() {
         optional=$(cm_optional "$name")  # watashi v12.2.83
         source=$(cm_source "$name")
         want=$(cm_default_version "$name")
+        # watashi v12.2.95: active keeps the exact meaning it always had, so
+        # an older page still works, and state carries the finer answer.
+        state=$(cm_unit_state "$unit")
         if [ -z "$unit" ]; then
             active=null
-        elif cm_unit_ok "$unit"; then
+        elif [ "$state" = active ]; then
             active=true
         else
             active=false
@@ -567,7 +587,7 @@ cm_json() {
         if [ -n "$inst" ] && { [ "$inst" = "$want" ] || [ "$pre" = true ]; }; then utd=true; else utd=false; fi
         if [ $first -eq 0 ]; then printf ','; fi
         first=0
-        printf '{"name":"%s","installed":"%s","tested":"%s","stable":"%s","channel":"%s","pre":%s,"present":%s,"optional":%s,"source":"%s","unit":"%s","path":"%s","active":%s,"uptodate":%s}' "$name" "$inst" "$tested" "$stable" "$channel" "$pre" "$present" "$optional" "$source" "$unit" "$(cm_target "$name")" "$active" "$utd"
+        printf '{"name":"%s","installed":"%s","tested":"%s","stable":"%s","channel":"%s","pre":%s,"present":%s,"optional":%s,"source":"%s","unit":"%s","path":"%s","active":%s,"state":"%s","uptodate":%s}' "$name" "$inst" "$tested" "$stable" "$channel" "$pre" "$present" "$optional" "$source" "$unit" "$(cm_target "$name")" "$active" "$state" "$utd"
     done
     printf ']\n'
 }

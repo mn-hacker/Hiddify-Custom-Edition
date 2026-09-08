@@ -2,6 +2,12 @@
 Description=mtg - MTProto proxy server
 Documentation=https://github.com/9seconds/mtg
 After=network.target
+# watashi v12.2.95: systemd reads these two only in [Unit]. They sat in
+# [Service], where systemd logs "Unknown key name" and drops them, so the
+# restart loop this file meant to cap was never actually capped.
+# telemt.service in this same tree already keeps them in [Unit].
+StartLimitBurst=3
+StartLimitIntervalSec=300
 
 [Service]
 # Check that mtg binary exists and config file is present
@@ -11,9 +17,6 @@ ExecStart=/opt/hiddify-manager/other/telegram/tgo/mtg run /opt/hiddify-manager/o
 Restart=on-failure
 RestartSec=10
 
-# Limit restart attempts to prevent infinite loops
-StartLimitBurst=3
-StartLimitIntervalSec=300
 DynamicUser=true
 AmbientCapabilities=CAP_NET_BIND_SERVICE
 StandardOutput=file:/opt/hiddify-manager/log/system/telegram.out.log

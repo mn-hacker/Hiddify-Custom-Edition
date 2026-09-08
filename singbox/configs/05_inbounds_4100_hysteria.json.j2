@@ -16,7 +16,12 @@
 				{% if chconfigs[d['child_id']]['hysteria_obfs_enable'] %}
 				"obfs": {
 					"type": "salamander",
-					"password": "{{ hconfigs['proxy_path'] }}"
+				{# watashi v12.2.97: the switch above is read per node from chconfigs
+				   while the password was read from hconfigs, which is always node 0.
+				   on a child node the server therefore wrapped with node 0 secret while
+				   the panel wrote the child own secret into the link, and every
+				   hysteria2 packet was dropped. both halves read the same node now. #}
+					"password": "{{ chconfigs[d['child_id']].get('hysteria_obfs_password') or chconfigs[d['child_id']]['proxy_path'] }}"
 				},
 				{%endif%}
 				"users": [
