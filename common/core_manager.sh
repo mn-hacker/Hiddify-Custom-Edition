@@ -347,17 +347,46 @@ cm_stage() {
 
 # does this binary actually run on this machine?
 cm_probe() {
-    local name=$1 bin=$2 cmd out rc
+    local name=$1 bin=$2 cmd out rc magic
     cmd=$(cm_field "$(cm_row "$name")" 8)
     if [ -z "$cmd" ] || [ "$cmd" = "-" ]; then
-        if [ -x "$bin" ]; then return 0; fi
-        return 1
+        # watashi v12.2.93: a core that will not name its own version still
+        # has to be a real program. the old test was only [ -x ], which is
+        # just as true of a github error page saved with the execute bit on,
+        # so a download that went wrong could be activated as a core. read
+        # the first four bytes instead: either an ELF binary or a script.
+        if [ ! -f "$bin" ] || [ ! -x "$bin" ]; then
+            cm_err "$name has no runnable file at $bin"
+            return 1
+        fi
+        magic=$(head -c4 "$bin" 2>/dev/null | od -An -tx1 | tr -dc 'a-f0-9')
+        case "$magic" in
+        7f454c46)
+            if [ "$(stat -c%s "$bin" 2>/dev/null || echo 0)" -lt 65536 ]; then
+                cm_err "$name at $bin is far too small to be a core"
+                return 1
+            fi
+            ;;
+        2321*) ;;
+        *)
+            cm_err "$name at $bin is not a program this machine can run"
+            return 1
+            ;;
+        esac
+        return 0
     fi
     cmd=${cmd//@BIN@/$bin}
     out=$(eval "$cmd" 2>&1)
     rc=$?
     if [ $rc -ne 0 ] || [ -z "$out" ]; then
         cm_err "$name did not answer '$cmd'"
+        # watashi v12.2.93: say what it did answer. an install that stops
+        # here used to give no reason at all, and the reason is usually
+        # one line long, which is the difference between a report that can
+        # be acted on and a dead end.
+        if [ -n "$out" ]; then
+            cm_err "  it said: $(echo "$out" | head -1)"
+        fi
         return 1
     fi
     echo "$out" | head -1
