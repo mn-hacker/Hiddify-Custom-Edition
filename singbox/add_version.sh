@@ -5,11 +5,21 @@
 # hash as if it were a core.
 latest=$1
 if [ -z "$latest" ]; then
-    echo "usage: $0 <version>   e.g. $0 1.13.0.h10"
+    echo "usage: $0 <version>   e.g. $0 1.14.0.w1"
     exit 1
 fi
 cd "$(dirname -- "$0")" || exit 1
 source ../common/package_manager.sh
-base=https://github.com/mn-hacker/Hiddify-Custom-SingBox/releases/download/v$latest
+# watashi v12.2.98: the repository is no longer written down in two places.
+# It is read out of common/core_registry.conf, the same line the installer
+# and the cores page already read, so moving the core to another repository
+# is one edit in one file.
+reg=../common/core_registry.conf
+repo=$(awk -F'|' '$1 == "singbox" {print $2; exit}' "$reg")
+if [ -z "$repo" ]; then
+    echo "could not read the singbox repository out of $reg"
+    exit 1
+fi
+base=https://github.com/$repo/releases/download/v$latest
 add_package singbox $latest arm64 $base/sing-box-$latest-linux-arm64.tar.gz
 add_package singbox $latest amd64 $base/sing-box-$latest-linux-amd64.tar.gz

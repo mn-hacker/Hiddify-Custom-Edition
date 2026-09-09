@@ -176,8 +176,34 @@ cm_default_version() {
     echo "$v"
 }
 
+# watashi v12.2.98: the sing-box vendor publishes tags both ways round,
+# 1.13.0.h10 and h10.1.13.0, and this manager had two judges that read
+# them differently: sort -V called h10.1.13.0 the newer of the two, and
+# the panel called 1.13.0.h10 newer. so only one shape is judged now, a
+# build suffix printed first is moved to the back where the rest of this
+# file already expects it. the comparison is normalised, never the answer:
+# what comes back is always one of the two strings that came in.
+cm_ver_norm() {
+    echo "$1" | awk -F. '{
+        if ($1 ~ /^[a-zA-Z][0-9]+$/) {
+            out = ""
+            for (i = 2; i <= NF; i++) out = out (out == "" ? "" : ".") $i
+            print out "." tolower($1)
+        } else {
+            print tolower($0)
+        }
+    }'
+}
+
 cm_newer() {
-    printf '%s\n%s\n' "$1" "$2" | sort -V | tail -1
+    local a=$1 b=$2 ka kb
+    ka=$(cm_ver_norm "$a")
+    kb=$(cm_ver_norm "$b")
+    if [ "$(printf '%s\n%s\n' "$ka" "$kb" | sort -V | tail -1)" = "$ka" ]; then
+        echo "$a"
+    else
+        echo "$b"
+    fi
 }
 
 # is what is running past the stable line this panel trusts

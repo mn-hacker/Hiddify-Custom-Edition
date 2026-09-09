@@ -146,6 +146,14 @@ WS_OUR_PORTS="$WS_OUR_PORTS {{d['internal_port_tuic']}}"
 {% if d['internal_port_amnezia'] and d['internal_port_amnezia']>0 %}
 WS_OUR_PORTS="$WS_OUR_PORTS {{d['internal_port_amnezia']}}"
 {% endif %}
+{# watashi v12.2.101: the two new listeners are ours as well, so port
+   hopping must not redirect a stray udp packet onto them. #}
+{% if d['internal_port_anytls'] and d['internal_port_anytls']>0 %}
+WS_OUR_PORTS="$WS_OUR_PORTS {{d['internal_port_anytls']}}"
+{% endif %}
+{% if d['internal_port_snell'] and d['internal_port_snell']>0 %}
+WS_OUR_PORTS="$WS_OUR_PORTS {{d['internal_port_snell']}}"
+{% endif %}
 {% endfor %}
 export WS_HOP_LO WS_HOP_HI WS_HOP_TARGETS WS_OUR_PORTS
 ws_hop_apply

@@ -1,11 +1,28 @@
 {
+  {# watashi v12.2.99: a bare "address" string is the legacy DNS server format,
+     deprecated in sing-box 1.12.0 and removed in 1.14.0. a server is described
+     by "type" plus "server" now, and the per server "strategy" moved up to the
+     dns level. if the admin typed a scheme into dns_server we honour it. #}
+  {% set raw = (hconfigs['dns_server'] or '1.1.1.1') | trim %}
+  {% set scheme = (raw.split('://')[0] | lower) if '://' in raw else 'udp' %}
+  {% set rest = raw.split('://')[1] if '://' in raw else raw %}
+  {% set kind = {'udp':'udp','tcp':'tcp','tls':'tls','dot':'tls','https':'https',
+                 'doh':'https','h3':'h3','quic':'quic','local':'local',
+                 'dhcp':'dhcp'}.get(scheme, 'udp') %}
+  {% set host = rest.split('/')[0] %}
+  {% set dpath = rest.split('/', 1)[1] if '/' in rest else '' %}
   "dns": {
     "servers": [
-        {
+      {
         "tag": "cloudflare",
-        "address": "{{ hconfigs['dns_server'] or "1.1.1.1" }}",
-        "strategy": "prefer_ipv4",
-        "detour": "freedom",
+        "type": "{{ kind }}",
+        {% if kind not in ['local', 'dhcp'] %}
+        "server": "{{ host }}",
+        {% endif %}
+        {% if dpath and kind in ['https', 'h3'] %}
+        "path": "/{{ dpath }}",
+        {% endif %}
+        "detour": "freedom"
       }
     ],
     "rules": [],

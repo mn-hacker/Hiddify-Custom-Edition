@@ -1,6 +1,12 @@
 {
     "inbounds":[
-        {% if  hconfigs['mieru_enable'] %}
+        {# watashi v12.2.99: mieru was never part of upstream sing-box; only the
+       old custom fork carried it, and official 1.14.0 answers
+       unknown inbound type: mieru. The template is kept whole so it can
+       come back the moment a core that knows mieru is installed, but it
+       only renders when singbox_has_mieru is switched on. Running mieru as
+       its own service does not need this file at all. #}
+        {% if hconfigs['mieru_enable'] and hconfigs.get('singbox_has_mieru') %}
             {% set default_ports = domains | selectattr('internal_port_mieru') | map(attribute='internal_port_mieru') | list %}
             {% set default_ports = default_ports if default_ports else [4200] %}
             {% set ports = hconfigs["mieru_tcp_ports"].split(",") if hconfigs["mieru_tcp_ports"] else default_ports %}
@@ -11,9 +17,9 @@
                     "listen": "0.0.0.0",
                     "listen_port": {{ ports[0] }},
                     "tcp_fast_open": true,
-                    "sniff": true,
-                    "sniff_override_destination": true,
-                    "domain_strategy": "prefer_ipv4",
+                    {# watashi v12.2.99: sniff, sniff_override_destination and domain_strategy
+                       are gone from inbounds in sing-box 1.13.0+; 03_routing.json.j2 carries
+                       the sniff and resolve rule actions that replace them. #}
                     {% include '/opt/hiddify-manager/singbox/configs/common/protocols/mieru.pj2' %},
                     "portBindings": [ { "port": {{ ports[0] }}, "protocol": "TCP" } ]
                 },    
@@ -22,9 +28,9 @@
                     "tag":"v10-mieru-udp",
                     "listen": "0.0.0.0",
                     "listen_port": {{ udp_ports[0] }},
-                    "sniff": true,
-                    "sniff_override_destination": true,
-                    "domain_strategy": "prefer_ipv4",
+                    {# watashi v12.2.99: sniff, sniff_override_destination and domain_strategy
+                       are gone from inbounds in sing-box 1.13.0+; 03_routing.json.j2 carries
+                       the sniff and resolve rule actions that replace them. #}
                     {% include '/opt/hiddify-manager/singbox/configs/common/protocols/mieru.pj2' %},
                     "portBindings": [ { "port": {{ udp_ports[0] }}, "protocol": "UDP" } ]
                 },    

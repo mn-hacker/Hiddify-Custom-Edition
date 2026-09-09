@@ -23,18 +23,13 @@
 			"external_controller": "127.0.0.1:10087",
 			"secret": ""
 		},
+		// watashi v12.2.99: store_warp_config and the whole monitoring block
+		// only ever existed in the old custom fork. official sing-box 1.14.0
+		// refuses both by name, with json: unknown field "store_warp_config"
+		// and json: unknown field "monitoring".
 		"cache_file": {
 			"enabled": true,
-			"path": "cache.db",
-			"store_warp_config": true
-		},
-		"monitoring": {
-			"interval": "10m0s",
-			"urls": [
-				"https://google.com/generate_204"
-			],
-			"debounce_window": "500ms",
-			"idle_timeout": "18ms"
+			"path": "cache.db"
 		}
 	}
 }

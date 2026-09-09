@@ -1,8 +1,21 @@
+{# watashi v12.2.100: sing-box refuses to start when a 2022 key is not
+   exactly as long as the method asks for. the failure is fatal ("bad key")
+   and one refused inbound takes the whole core down, so every other config
+   on the box goes dark with it. the secret is folded to the exact size the
+   method needs here, and hutils/proxy/shared.py folds it the same way, so
+   the link and the server keep carrying the same key. a healthy 32 letter
+   uuid comes out of this untouched. #}
+{%- set ws_ss_method = hconfigs['shadowsocks2022_method']|string -%}
+{%- set ws_ss_size = 16 if '128' in ws_ss_method else 32 -%}
+{%- set ws_ss_raw = (hconfigs['shared_secret']|string).replace('-','') -%}
+{%- set ws_ss_zero = '00000000000000000000000000000000' -%}
+{%- set ws_ss_key = (ws_ss_raw ~ ws_ss_raw ~ ws_ss_raw ~ ws_ss_zero)[:ws_ss_size] -%}
 "type": "shadowsocks",
-"method": "{{hconfigs['shadowsocks2022_method']}}",
-"password": "{{ hconfigs['shared_secret'].replace('-','')|b64encode}}",
+"method": "{{ws_ss_method}}",
+"password": "{{ ws_ss_key|b64encode}}",
 "users": [
 {% for u in users %}
-    {"name": "{{ u['uuid'] }}@hiddify.com", "password": "{{ u['uuid'].replace('-','')|b64encode}}"},
+    {%- set ws_u_key = (u['uuid'].replace('-','') ~ ws_ss_zero)[:ws_ss_size] %}
+    {"name": "{{ u['uuid'] }}@hiddify.com", "password": "{{ ws_u_key|b64encode}}"},
 {% endfor%}
 ]

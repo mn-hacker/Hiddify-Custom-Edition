@@ -1,0 +1,29 @@
+{
+	{% set ws_v6 = exec("[ -f /proc/net/if_inet6 ] && echo -n 'true' || echo -n 'false'")=='true' %}
+	{# watashi v12.2.101: the listener is written only when the core that is
+	   really installed knows this inbound type. an unknown inbound type is
+	   fatal and one fatal inbound stops the whole core, so a rollback to an
+	   older core must not be able to take every other config down. an
+	   unreadable version is treated as new, because that is what this panel
+	   installs. #}
+	{% set ws_sb_ver = exec("/opt/hiddify-manager/singbox/sing-box version 2>/dev/null | head -1 | awk '{print $3}' | tr -d v").strip() %}
+	{% set ws_sb_p = (ws_sb_ver ~ '.0.0').split('.') %}
+	{% set ws_sb_num = ((ws_sb_p[0]|int) * 1000 + (ws_sb_p[1]|int)) if ws_sb_ver else 9999 %}
+	{# watashi v12.2.101: snell v6 arrived in sing-box 1.14 and carries no tls
+	   of its own, so it needs no certificate at all. the server key is the
+	   psk and each user is told apart by a userkey. #}
+	{% if hconfigs['snell_enable'] and ws_sb_num >= 1014 %}
+	"inbounds": [
+		{% for d in domains if d['internal_port_snell'] %}
+		{%set port=d['internal_port_snell']%}
+		{
+			"tag": "snell_in_{{port}}",
+			"listen": {% if ws_v6 %}"::"{%else%}"0.0.0.0"{%endif%},
+			"listen_port": {{ port }},
+			"tcp_fast_open": true,
+			{% include '/opt/hiddify-manager/singbox/configs/common/protocols/snell.pj2' %}
+		},
+		{%endfor%}
+	]
+	{% endif %}
+}

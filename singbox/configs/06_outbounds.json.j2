@@ -29,11 +29,10 @@
     { //do not change the following line since it will be replaced.
       "tag": "forbidden_sites",
       "type": "{% if hconfigs['block_iran_sites'] %}block{% else %}direct{%endif%}"
-    },
-    {
-      // A DNS Cache can be setup and added here to imporve performance (the corresponding rule should be uncommented)
-      "tag": "DNS-Internal",
-      "type": "dns"
     }
+    // watashi v12.2.99: the dns outbound type was deprecated in sing-box
+    // 1.11.0 and removed in 1.13.0. no rule ever pointed at DNS-Internal,
+    // so it is simply gone; dns hijacking is a rule action if we ever want
+    // it (see the note in 03_routing.json.j2).
   ]
 }

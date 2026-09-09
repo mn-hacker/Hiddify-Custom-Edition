@@ -100,7 +100,26 @@
     ],
     // "domainStrategy": "AsIs",
     "final": {% if hconfigs['warp_mode'] == 'all' %}"WARP"{% else %}"freedom"{% endif %},
+    {# the resolve action above needs to know which server to ask. #}
+    "default_domain_resolver": {
+      "server": "cloudflare",
+      "strategy": "prefer_ipv4"
+    },
       "rules": [
+        {# watashi v12.2.99: sniff, sniff_override_destination and
+           domain_strategy were removed from inbounds in sing-box 1.13.0.
+           These two actions reproduce exactly what every inbound used to
+           carry. DNS is left alone on purpose: no rule ever pointed at the
+           old dns outbound, so port 53 keeps going straight out. If we ever
+           want the core to answer DNS itself, add a rule with
+           "protocol": "dns", "action": "hijack-dns" here. #}
+        {
+          "action": "sniff"
+        },
+        {
+          "action": "resolve",
+          "strategy": "prefer_ipv4"
+        },
         {
             "outbound": "freedom",
             "port": [53]

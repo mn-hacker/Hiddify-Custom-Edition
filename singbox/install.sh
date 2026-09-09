@@ -3,7 +3,23 @@ source /opt/hiddify-manager/common/package_manager.sh
 rm -rf configs/*.template 2>/dev/null || true
 
 # latest= #$(get_release_version hiddify-sing-box)
-version="" #use specific version if needed otherwise it will use the latest
+# watashi v12.2.98: this file used to keep a pin of its own. an empty
+# version made download_package ask common/packages.lock for its newest
+# singbox line, so a core that had just been upgraded through the panel
+# and common/core_manager.sh was quietly put back to whatever the lock
+# happened to hold. common/core_registry.conf is the one place that
+# blesses a version now. if the lock has never heard of that version the
+# hash is fetched once, here, instead of the install failing.
+CM_SH=/opt/hiddify-manager/common/core_manager.sh
+version=$(bash "$CM_SH" default singbox 2>/dev/null | tail -1)
+if [ -z "$version" ]; then
+    version=$(get_latest_version singbox "$(detect_arch)")
+fi
+if [ -n "$version" ] && ! awk -F'|' -v v="$version" -v a="$(detect_arch)" '$1 == "singbox" && $2 == v && $3 == a {found = 1} END {exit !found}' "$PACKAGES_LOCK"; then
+    echo "singbox $version is blessed by the registry but is not in packages.lock, fetching its hash"
+    bash "$(dirname -- "$0")/add_version.sh" "$version" || echo "WARNING: singbox $version could not be added to packages.lock"
+fi
+echo "singbox: installing the blessed version $version"
 
 download_package singbox sb.tar.gz $version
 if [ "$?" == "0"  ] || ! is_installed ./sing-box; then

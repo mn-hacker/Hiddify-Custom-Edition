@@ -1,0 +1,10 @@
+{
+	{# watashi v12.2.101: sing-box 1.14 can carry its own certificate store.
+	   a box whose system ca bundle is old or broken made every outbound tls
+	   handshake of the core fail, and nothing on the panel could tell why.
+	   the mozilla store is compiled into the core, so it needs no file on
+	   disk and cannot go stale with the operating system. #}
+	"certificate": {
+		"store": "mozilla"
+	}
+}

@@ -26,3 +26,58 @@ if systemctl list-unit-files hiddify-singbox.service &>/dev/null; then
 else
 	echo "hiddify-singbox.service not installed yet"
 fi
+
+# watashi v12.2.100: the shadowsocks port was opened by common/run.sh only,
+# and that script is skipped on the light user save path, so a shadowsocks
+# switched on from the panel kept answering nothing until a full reinstall
+# finally opened the port. the ports this core listens on are synced here
+# every time the core is applied, which is what that reinstall really did.
+ws_sync_core_ports() {
+    local cj=/opt/hiddify-manager/current.json
+    [ -f "$cj" ] || return 0
+    command -v jq >/dev/null 2>&1 || return 0
+    local changed=0 en port
+    en=$(jq -r '.chconfigs["0"].shadowsocks2022_enable // false' "$cj")
+    port=$(jq -r '.chconfigs["0"].shadowsocks2022_port // empty' "$cj")
+    if [ "$en" == "true" ] && [ -n "$port" ] && [ -z "${port//[0-9]/}" ]; then
+        allow_port "tcp" "$port"
+        allow_port "udp" "$port"
+        changed=1
+    fi
+    if [ "$(jq -r '.chconfigs["0"].hysteria_enable // false' "$cj")" == "true" ]; then
+        for port in $(jq -r '.domains[]?.internal_port_hysteria2 // empty' "$cj"); do
+            if [ -n "$port" ] && [ "$port" != "0" ] && [ -z "${port//[0-9]/}" ]; then
+                allow_port "udp" "$port"
+                changed=1
+            fi
+        done
+    fi
+    if [ "$(jq -r '.chconfigs["0"].tuic_enable // false' "$cj")" == "true" ]; then
+        for port in $(jq -r '.domains[]?.internal_port_tuic // empty' "$cj"); do
+            if [ -n "$port" ] && [ "$port" != "0" ] && [ -z "${port//[0-9]/}" ]; then
+                allow_port "udp" "$port"
+                changed=1
+            fi
+        done
+    fi
+    # watashi v12.2.101: anytls and snell listen on tcp ports of their own.
+    # they are not in tls_ports or http_ports, so allow_apps_ports never
+    # opens them and every handshake would time out on a box whose firewall
+    # is on. the ports are read from the very same current.json the
+    # templates render from, so the firewall cannot drift from the config.
+    for key in anytls snell; do
+        if [ "$(jq -r --arg k "${key}_enable" '.chconfigs["0"][$k] // false' "$cj")" == "true" ]; then
+            for port in $(jq -r --arg k "internal_port_$key" '.domains[]?[$k] // empty' "$cj"); do
+                if [ -n "$port" ] && [ "$port" != "0" ] && [ -z "${port//[0-9]/}" ]; then
+                    allow_port "tcp" "$port"
+                    changed=1
+                fi
+            done
+        fi
+    done
+    if [ "$changed" == "1" ]; then
+        save_firewall
+    fi
+    return 0
+}
+ws_sync_core_ports

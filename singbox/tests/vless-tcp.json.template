@@ -8,7 +8,6 @@
             "tag": "mixed-in",
             "listen": "::",
             "listen_port": 10000,
-            "domain_strategy": "ipv4_only",
             "set_system_proxy": false
         }
     ],

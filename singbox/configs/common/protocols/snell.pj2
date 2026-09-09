@@ -1,0 +1,18 @@
+"type": "snell",
+"version": 6,
+{# watashi v12.2.101: sing-box answers "snell: psk length must be between 12
+   and 255 bytes" and refuses to start the whole core, so a short secret is
+   folded up and a long one is cut. hutils/proxy/shared.py ws_snell_psk
+   folds it in exactly the same steps, so the link and the listener always
+   hold the very same key. #}
+{% set ws_psk = (hconfigs.get('snell_psk') or hconfigs['shared_secret'])|string|replace('-','') %}
+{% if ws_psk|length < 12 %}{% set ws_psk = ws_psk ~ ('watashi' * ((12 - ws_psk|length + 6) // 7)) %}{% endif %}
+"psk": "{{ ws_psk[0:255] }}",
+{% if (hconfigs.get('snell_mode') or 'default') != 'default' %}
+"mode": "{{ hconfigs['snell_mode'] }}",
+{% endif %}
+"users": [
+    {% for u in users %}
+        {"name": "{{ u['uuid'] }}", "userkey": "{{ u['uuid'] }}"},
+    {% endfor%}
+]

@@ -1,0 +1,50 @@
+{
+	{% set ws_v6 = exec("[ -f /proc/net/if_inet6 ] && echo -n 'true' || echo -n 'false'")=='true' %}
+	{% set ws_cert_any = exec("ls /opt/hiddify-manager/ssl/*.crt 2>/dev/null | tail -1").strip() %}
+	{# watashi v12.2.101: the listener is written only when the core that is
+	   really installed knows this inbound type. an unknown inbound type is
+	   fatal and one fatal inbound stops the whole core, so a rollback to an
+	   older core must not be able to take every other config down. an
+	   unreadable version is treated as new, because that is what this panel
+	   installs. #}
+	{% set ws_sb_ver = exec("/opt/hiddify-manager/singbox/sing-box version 2>/dev/null | head -1 | awk '{print $3}' | tr -d v").strip() %}
+	{% set ws_sb_p = (ws_sb_ver ~ '.0.0').split('.') %}
+	{% set ws_sb_num = ((ws_sb_p[0]|int) * 1000 + (ws_sb_p[1]|int)) if ws_sb_ver else 9999 %}
+	{# watashi v12.2.101: anytls is a real inbound in sing-box since 1.12. it
+	   always speaks tls, so with no certificate on the box there is nothing
+	   to listen with and the listener is skipped instead of written half
+	   done. each user is told apart by a password, which is the uuid the
+	   panel already writes into the link. #}
+	{% if hconfigs['anytls_enable'] and ws_cert_any and ws_sb_num >= 1012 %}
+	"inbounds": [
+		{% for d in domains if d['internal_port_anytls'] %}
+		{%set domain=d['domain']%}
+		{%set port=d['internal_port_anytls']%}
+		{
+			"tag": "anytls_in_{{port}}",
+			{# watashi v12.2.101: :: cannot be bound on an ipv4 only server and
+			   the core exits on it, taking every other config down with it. #}
+			"listen": {% if ws_v6 %}"::"{%else%}"0.0.0.0"{%endif%},
+			"listen_port": {{ port }},
+			"tcp_fast_open": true,
+			{% include '/opt/hiddify-manager/singbox/configs/common/protocols/anytls.pj2' %},
+			"tls": {
+				"enabled": true,
+				"server_name": "{{domain}}",
+				"min_version": "1.2",
+				"max_version": "1.3",
+				{% if exec("[ -f /opt/hiddify-manager/ssl/"+domain[0:64]+".crt ] && echo -n 'true' || echo -n 'false'")=='true' %}
+				"certificate_path": "/opt/hiddify-manager/ssl/{{domain[0:64]}}.crt",
+				"key_path": "/opt/hiddify-manager/ssl/{{domain[0:64]}}.crt.key"
+				{%else %}
+				{# watashi v12.2.101: an empty certificate_path is fatal ("missing
+				   certificate"), so the certificate found once above is reused. #}
+				"certificate_path": "{{ws_cert_any}}",
+				"key_path": "{{ws_cert_any}}.key"
+				{%endif%}
+			}
+		},
+		{%endfor%}
+	]
+	{% endif %}
+}

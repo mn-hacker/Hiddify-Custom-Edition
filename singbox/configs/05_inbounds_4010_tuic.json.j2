@@ -1,5 +1,12 @@
 {
-	{% if hconfigs['tuic_enable'] %}
+	{% set ws_v6 = exec("[ -f /proc/net/if_inet6 ] && echo -n 'true' || echo -n 'false'")=='true' %}
+		{% set ws_cert_any = exec("ls /opt/hiddify-manager/ssl/*.crt 2>/dev/null | tail -1").strip() %}
+		{# watashi v12.2.100: with no certificate on the box the tls block
+		   below was written with an empty path, and a missing certificate
+		   is fatal for sing-box, so the whole core refused to start and
+		   every config stopped answering. this listener is written only
+		   when there really is a certificate to hand it. #}
+		{% if hconfigs['tuic_enable'] and ws_cert_any %}
 		"inbounds": [
 			{% for d in domains if d['internal_port_tuic']  %}
 			{%set domain=d['domain']%}
@@ -8,13 +15,15 @@
 			{
 				"type": "tuic",
 				"tag": "tuic_in_{{port}}",
-				"listen": "::",
+				{# watashi v12.2.100: :: cannot be bound on an ipv4 only server and the
+				   core exits on it, taking every other config down with it. #}
+				"listen": {% if ws_v6 %}"::"{%else%}"0.0.0.0"{%endif%},
 				"listen_port": {{ port }},
 				"tcp_fast_open": true,
-				"sniff": true,
-				"sniff_override_destination": true,
-				"domain_strategy": "prefer_ipv4",
-				"users": [
+				{# watashi v12.2.99: sniff, sniff_override_destination and domain_strategy
+				   are gone from inbounds in sing-box 1.13.0+; 03_routing.json.j2 carries
+				   the sniff and resolve rule actions that replace them. #}
+								"users": [
 					{% for u in users %}
 						{"name": "{{ u['uuid'] }}@hiddify.com", "uuid": "{{ u['uuid'] }}", "password": "{{ u['uuid'] }}"},
 					{% endfor%}
@@ -33,7 +42,10 @@
 					"certificate_path": "/opt/hiddify-manager/ssl/{{domain[0:64]}}.crt",
 					"key_path": "/opt/hiddify-manager/ssl/{{domain[0:64]}}.crt.key",
 					{%else %}
-					{%set cert=exec("ls /opt/hiddify-manager/ssl/*.crt | tail -1").strip()%}
+					{# watashi v12.2.100: an empty certificate_path is fatal ("missing
+					   certificate") and one fatal inbound stops the whole core, so the
+					   certificate looked up once above is reused here. #}
+					{%set cert=ws_cert_any%}
 					"certificate_path": "{{cert}}",
 					"key_path": "{{cert}}.key",
 					{%endif%}

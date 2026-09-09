@@ -1,0 +1,20 @@
+"type": "anytls",
+{# watashi v12.2.101: the padding scheme is the upstream default. both ends
+   must read the same one, and a client that is given none uses exactly
+   this, so it is written out rather than left to chance. #}
+"padding_scheme": [
+    "stop=8",
+    "0=30-30",
+    "1=100-400",
+    "2=400-500,c,500-1000,c,500-1000,c,500-1000,c,500-1000",
+    "3=9-9,500-1000",
+    "4=500-1000",
+    "5=500-1000",
+    "6=500-1000",
+    "7=500-1000"
+],
+"users": [
+    {% for u in users %}
+        {"name": "{{ u['uuid'] }}", "password": "{{ u['uuid'] }}"},
+    {% endfor%}
+]
