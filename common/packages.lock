@@ -12,3 +12,5 @@ wgcf|2.2.29|amd64|https://github.com/ViRb3/wgcf/releases/download/v2.2.29/wgcf_2
 wgcf|2.2.29|arm64|https://github.com/ViRb3/wgcf/releases/download/v2.2.29/wgcf_2.2.29_linux_arm64|6228ae03ce2004edb24888aa119d7bd3978004964113f9f1e00841db1b01313c
 ssh-liberty-bridge|1.3.0|arm64|https://github.com/hiddify/ssh-liberty-bridge/releases/download/v1.3.0/ssh-liberty-bridge-arm64|78cbbbf05a4d442ea79359649df76caa9c7e8d19b8889ea2d077eb2c72122a0f
 ssh-liberty-bridge|1.3.0|amd64|https://github.com/hiddify/ssh-liberty-bridge/releases/download/v1.3.0/ssh-liberty-bridge-amd64|2361ac482b5dccedab9e3910af204980353856b6a2b4da586cb67b8336bd0c9c
+mita|3.36.1|amd64|https://github.com/enfein/mieru/releases/download/v3.36.1/mita_3.36.1_linux_amd64.tar.gz|8e6ae525bbcaa688a8446aebf3c2ecbcb4ce606838d23edfa3f7f2fad506a8f7
+mita|3.36.1|arm64|https://github.com/enfein/mieru/releases/download/v3.36.1/mita_3.36.1_linux_arm64.tar.gz|cbdae447b5bcf0ebc1c41c46b6638ce91c5d61b35eb43bc3bdc288a11e6ded81

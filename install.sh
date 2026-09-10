@@ -146,6 +146,8 @@ function main() {
         install_run other/ssfaketls $(hconfig "ssfaketls_enable")
         install_run other/ssh $(hconfig "ssh_server_enable")
         install_run other/hiddify-cli $(hconfig "hiddifycli_enable" "true")
+        # watashi v12.2.103: mieru is served by mita, not by sing-box.
+        install_run other/mieru $(hconfig "mieru_enable")
 
 
 

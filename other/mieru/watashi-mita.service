@@ -1,0 +1,32 @@
+[Unit]
+# watashi v12.2.103: mieru gets a service of its own.
+#
+# sing-box has no mieru inbound - 1.14.0 answers "unknown inbound type: mieru"
+# - so the protocol can only be served by its own daemon, mita. mita is not a
+# one shot program: "mita run" brings up a daemon that owns nothing but an RPC
+# socket, and the proxy listeners are opened afterwards, when a configuration
+# is handed to that daemon over the socket. That is why run.sh talks to this
+# unit instead of passing a config file on the command line.
+Description=Watashi mieru server (mita)
+After=network-online.target
+Wants=network-online.target
+StartLimitBurst=3
+StartLimitIntervalSec=300
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/hiddify-manager/other/mieru
+# The daemon keeps the accepted configuration in this file, so a restart -
+# ours or systemd's - comes back up already serving the same users instead of
+# waiting for the next apply_configs.
+Environment=MITA_CONFIG_FILE=/opt/hiddify-manager/other/mieru/server.conf.pb
+Environment=MITA_UDS_PATH=/opt/hiddify-manager/other/mieru/mita.sock
+ExecStartPre=/usr/bin/test -x /opt/hiddify-manager/other/mieru/mita
+ExecStart=/opt/hiddify-manager/other/mieru/mita run
+Restart=on-failure
+RestartSec=10
+StandardOutput=file:/opt/hiddify-manager/log/system/mieru.out.log
+StandardError=file:/opt/hiddify-manager/log/system/mieru.err.log
+
+[Install]
+WantedBy=multi-user.target

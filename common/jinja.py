@@ -117,7 +117,10 @@ if __name__ == "__main__":
         # never re-rendered is a peer list that goes stale.
         render_j2_templates(
             start_path + "singbox/", start_path + "xray/",
-            start_path + "other/wireguard/", start_path + "other/amnezia/"
+            start_path + "other/wireguard/", start_path + "other/amnezia/",
+            # watashi v12.2.103: the mieru user list is written by this
+            # template too, so it has to be re-rendered when users change.
+            start_path + "other/mieru/"
         )
     else:
         render_j2_templates(start_path)

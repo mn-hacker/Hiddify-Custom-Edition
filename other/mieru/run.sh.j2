@@ -1,0 +1,126 @@
+# watashi v12.2.103: the mieru server is configured over its own socket.
+# This file is rendered to run.sh by common/jinja.py before it is run.
+#
+# What the mita binary really does, checked against 3.36.1 and not guessed:
+#   mita run                 brings up the daemon and the RPC socket only.
+#                            No proxy port is opened by this alone.
+#   mita apply config FILE   hands a json configuration to that daemon. The
+#                            daemon hashes every password and stores the whole
+#                            thing in MITA_CONFIG_FILE.
+#   mita start               opens the listeners. Without a configuration it
+#                            refuses with "server config is empty".
+#   mita reload              re-reads the stored configuration while the
+#                            listeners stay up, so a user added or removed
+#                            does not drop everybody else's connection.
+#
+# The accepted server fields were probed one by one on the same binary:
+# portBindings (port or portRange plus protocol), users (name, password,
+# quotas), loggingLevel, mtu, dns and egress. multiplexing, handshakeMode and
+# metricsLoggingInterval are client-side or newer names - mita answers
+# 'unknown field "multiplexing"' - so the panel's mieru_multiplexing and
+# mieru_handshake keys belong in the client link, never in this file.
+
+source /opt/hiddify-manager/common/utils.sh
+cd /opt/hiddify-manager/other/mieru
+
+MITA=/opt/hiddify-manager/other/mieru/mita
+export MITA_CONFIG_FILE=/opt/hiddify-manager/other/mieru/server.conf.pb
+export MITA_UDS_PATH=/opt/hiddify-manager/other/mieru/mita.sock
+
+if [ ! -x "$MITA" ]; then
+    echo "watashi: the mita binary is not on the disk, mieru was not started"
+    exit 0
+fi
+
+{% set tcp_raw = (hconfigs.get('mieru_tcp_ports') or '')|string %}
+{% set udp_raw = (hconfigs.get('mieru_udp_ports') or '')|string %}
+{% set tcp_list = tcp_raw.replace(' ', ',').split(',')|select|list %}
+{% set udp_list = udp_raw.replace(' ', ',').split(',')|select|list %}
+{% set mieru_users = users|selectattr('uuid')|list %}
+
+{% if not tcp_list and not udp_list %}
+echo "watashi: no mieru port is configured, so there is nothing to listen on"
+exit 0
+{% endif %}
+{% if not mieru_users %}
+echo "watashi: no user has a uuid, so mieru would accept nobody"
+exit 0
+{% endif %}
+
+umask 077
+
+# The whole configuration is written from scratch on every apply. A user whose
+# access ended has to lose the line, and editing lines in place is a far
+# easier thing to get wrong than writing the currently valid list.
+cat > server.json <<'WS_MITA_END'
+{
+  "portBindings": [
+{% set binds = [] %}
+{%- for p in tcp_list %}{% set _ = binds.append(('TCP', p.strip())) %}{% endfor %}
+{%- for p in udp_list %}{% set _ = binds.append(('UDP', p.strip())) %}{% endfor %}
+{%- for proto, p in binds %}
+    {% if '-' in p %}{ "portRange": "{{ p }}", "protocol": "{{ proto }}" }{% else %}{ "port": {{ p }}, "protocol": "{{ proto }}" }{% endif %}{{ "," if not loop.last else "" }}
+{%- endfor %}
+  ],
+  "users": [
+{%- for u in mieru_users %}
+    { "name": "{{ u['uuid'] }}", "password": "{{ u['uuid'] }}" }{{ "," if not loop.last else "" }}
+{%- endfor %}
+  ],
+  "loggingLevel": "WARN",
+  "mtu": 1400
+}
+WS_MITA_END
+chmod 600 server.json
+
+systemctl daemon-reload 2>/dev/null || true
+systemctl enable watashi-mita.service >/dev/null 2>&1 || true
+if ! systemctl is-active --quiet watashi-mita.service; then
+    systemctl start watashi-mita.service >/dev/null 2>&1 || true
+fi
+
+# The daemon answers on a unix socket it creates at startup. Talking to it
+# before the file exists fails with a connection error, so we wait for the
+# socket rather than for a fixed number of seconds.
+ws_mita_ready=0
+for _i in $(seq 1 30); do
+    if [ -S "$MITA_UDS_PATH" ]; then
+        ws_mita_ready=1
+        break
+    fi
+    sleep 0.5
+done
+if [ "$ws_mita_ready" != "1" ]; then
+    echo "watashi: the mita daemon did not open $MITA_UDS_PATH, see log/system/mieru.err.log"
+    exit 0
+fi
+
+if ! $MITA apply config server.json; then
+    echo "watashi: mita refused the configuration, the running proxy was left alone"
+    exit 0
+fi
+
+# A proxy that is already up is reloaded, which keeps live connections; one
+# that is idle is started. Asking for the status first is what makes an apply
+# on a busy server harmless.
+if $MITA status 2>/dev/null | grep -q RUNNING; then
+    $MITA reload >/dev/null 2>&1 || $MITA start >/dev/null 2>&1 || true
+else
+    $MITA start >/dev/null 2>&1 || true
+fi
+$MITA status 2>&1 | head -2
+
+# The firewall is fed from the very same list the configuration was built
+# from, so the two cannot drift apart. Ranges are written as one iptables
+# rule; allow_port only understands a single port.
+ws_mita_allow() { # proto entry
+    local proto=$1 entry=$2
+    if [[ $entry == *-* ]]; then
+        add2iptables46 "INPUT -p $proto --dport ${entry/-/:} -j ACCEPT"
+    else
+        allow_port "$proto" "$entry"
+    fi
+}
+{% for p in tcp_list %}ws_mita_allow tcp "{{ p.strip() }}"
+{% endfor %}{% for p in udp_list %}ws_mita_allow udp "{{ p.strip() }}"
+{% endfor %}save_firewall
