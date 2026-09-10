@@ -480,7 +480,11 @@ cm_activate() {
     cm_log "$name is now $version"
 
     if [ -n "$unit" ]; then
+        # watashi v12.2.105: a restart, never a reload. the process must be
+        # replaced so the new binary is the one that reads the config.
         systemctl restart "$unit.service" 2>/dev/null
+        sleep 1
+        systemctl is-active --quiet "$unit.service" || systemctl start "$unit.service" 2>/dev/null
         sleep "$CM_PROBE_WAIT"
         if ! cm_unit_ok "$unit"; then
             cm_err "$unit.service did not come up with $name $version"

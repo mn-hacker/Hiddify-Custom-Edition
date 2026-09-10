@@ -19,7 +19,36 @@ fi
 # Start singbox service
 if systemctl list-unit-files hiddify-singbox.service &>/dev/null; then
 	if systemctl is-active --quiet hiddify-singbox.service; then
-		systemctl reload hiddify-singbox.service 2>/dev/null || systemctl restart hiddify-singbox.service
+		# watashi v12.2.105: a reload only sends SIGHUP, so a core that was
+		# replaced on disk keeps running its old code and refuses every inbound
+		# type it does not know. that turns one new inbound into a frozen
+		# config for every protocol. compare the running binary with the one on
+		# disk and restart when they differ.
+		ws_sb_pid=$(systemctl show hiddify-singbox.service -p MainPID --value 2>/dev/null)
+		ws_sb_stale=no
+		if [ -n "$ws_sb_pid" ] && [ "$ws_sb_pid" != "0" ]; then
+			ws_sb_running=$(readlink -f "/proc/$ws_sb_pid/exe" 2>/dev/null)
+			ws_sb_ondisk=$(readlink -f /opt/hiddify-manager/singbox/sing-box 2>/dev/null)
+			if [ -n "$ws_sb_running" ] && [ "$ws_sb_running" != "$ws_sb_ondisk" ]; then
+				ws_sb_stale=yes
+			elif [ -n "$ws_sb_running" ] && [ ! -e "$ws_sb_running" ]; then
+				ws_sb_stale=yes
+			elif [ /opt/hiddify-manager/singbox/sing-box -nt "/proc/$ws_sb_pid" ]; then
+				ws_sb_stale=yes
+			fi
+		fi
+		# watashi v12.2.105: never hand a broken config to the running core. if
+		# the core's own validator rejects it, say so loudly and keep serving
+		# the config that still works instead of failing in silence.
+		if ! /opt/hiddify-manager/singbox/sing-box check -C /opt/hiddify-manager/singbox/configs >/tmp/watashi-singbox-check.log 2>&1; then
+			echo "watashi: the sing-box config was rejected by the core, not reloading" >&2
+			cat /tmp/watashi-singbox-check.log >&2
+		elif [ "$ws_sb_stale" = "yes" ]; then
+			echo "watashi: the core binary changed, restarting instead of reloading" >&2
+			systemctl restart hiddify-singbox.service
+		else
+			systemctl reload hiddify-singbox.service 2>/dev/null || systemctl restart hiddify-singbox.service
+		fi
 	else
 		systemctl start hiddify-singbox.service 2>/dev/null || true
 	fi
