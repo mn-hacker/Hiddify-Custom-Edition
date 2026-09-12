@@ -1,6 +1,13 @@
 [Unit]
 Description=Hiddify SingBox Service
 After=network.target nss-lookup.target
+# watashi v12.2.106: Restart=always with no start limit hid a fatal config
+# error behind an endless activating (auto-restart) state: 30672 restarts in a
+# row while systemd never reported failed. with a start limit the unit gives up
+# after 5 failures in 300s and lands in failed, where the panel and the admin
+# can actually see it.
+StartLimitIntervalSec=300
+StartLimitBurst=5
 
 [Service]
 User=root
@@ -9,7 +16,8 @@ WorkingDirectory=/opt/hiddify-manager/singbox
 #AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_NET_RAW
 ExecStart=/opt/hiddify-manager/singbox/sing-box run -C /opt/hiddify-manager/singbox/configs
 ExecReload=/bin/kill -HUP $MAINPID
-Restart=always
+# watashi v12.2.106: on-failure, not always. a clean stop stays stopped.
+Restart=on-failure
 RestartSec=5
 LimitNOFILE=infinity
 #StandardOutput=file:/opt/hiddify-manager/log/system/singbox.out.log

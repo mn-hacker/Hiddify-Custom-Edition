@@ -14,15 +14,25 @@
   "dns": {
     "servers": [
       {
+        {# watashi v12.2.106: this server used to end with "detour": "freedom".
+           sing-box 1.14.0 refuses to start a DNS server whose detour points at
+           an empty direct outbound and dies with
+           start dns/udp[cloudflare]: detour to an empty direct outbound makes
+           no sense. sing-box check still exits 0, so the failure only showed up
+           at run time and Restart=always kept the core in activating forever.
+           the default route of a DNS server is exactly an empty direct
+           outbound, so dropping the property changes no behaviour. "type" is
+           printed last because it is the only property that is always present,
+           which keeps this object free of a trailing comma instead of leaning
+           on the json5 comma stripping in common/jinja.py. #}
         "tag": "cloudflare",
-        "type": "{{ kind }}",
         {% if kind not in ['local', 'dhcp'] %}
         "server": "{{ host }}",
         {% endif %}
         {% if dpath and kind in ['https', 'h3'] %}
         "path": "/{{ dpath }}",
         {% endif %}
-        "detour": "freedom"
+        "type": "{{ kind }}"
       }
     ],
     "rules": [],
