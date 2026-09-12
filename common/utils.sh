@@ -676,8 +676,16 @@ function allow_apps_ports() {
     # an ipv6 only row turned into an empty port handed to allow_port.
     local path_list
     path_list=$(echo $paths | tr '\n' ' ' | sed 's/  */ /g; s/ *$//')
+    # watashi v12.2.109: x-ui is not part of this panel, so the note about it
+    # was printed on every apply to an admin who never installed x-ui, and in
+    # the install box a line like that reads as something that went wrong. a
+    # service that is not on the box at all is silent now; one that is
+    # installed but has no listening socket is still reported, because that is
+    # a real thing to look at.
     if [[ -z $ports ]]; then
-        echo "$service_name is not running here, no port to open"
+        if command -v "$service_name" >/dev/null 2>&1 || pgrep -x "$service_name" >/dev/null 2>&1; then
+            echo "$service_name is installed but has no listening port, nothing to open"
+        fi
         return 0
     fi
     local p

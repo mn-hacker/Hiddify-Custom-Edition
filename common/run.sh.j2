@@ -167,9 +167,14 @@ save_firewall
 #fi
 {% if hconfigs['auto_update'] %}
 echo "0 3 * * * root $(pwd)/../update.sh --no-gui --no-log" >/etc/cron.d/hiddify_auto_update
-service cron reload
+# watashi v12.2.109: the init script prints " * Reloading configuration files
+# for periodic command scheduler cron ...done." straight into the install box,
+# where a leading * on a line of its own looks like a warning. the reload is
+# quiet now and cannot abort an apply either; hiddify-panel/install.sh already
+# called it this way, so this only makes the rest of the tree consistent.
+service cron reload >/dev/null 2>&1 || true
 {%else%}
 rm -rf /etc/cron.d/hiddify_auto_update
-service cron reload
+service cron reload >/dev/null 2>&1 || true
 {%endif%}
 

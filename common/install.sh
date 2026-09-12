@@ -72,7 +72,9 @@ bash google-bbr.sh > /dev/null
 # Reboot cron - only start services, don't full reinstall
 echo "@reboot root /opt/hiddify-manager/install.sh --check-only --no-gui --no-log >> /opt/hiddify-manager/log/system/reboot.log 2>&1" >/etc/cron.d/hiddify_reinstall_on_reboot
 echo "@daily root /opt/hiddify-manager/common/daily_actions.sh >> /opt/hiddify-manager/log/system/daily_actions.log 2>&1" >/etc/cron.d/hiddify_daily_memory_release
-service cron reload
+# watashi v12.2.109: same reload banner as in common/run.sh.j2, printed during
+# the install itself; kept quiet and non fatal.
+service cron reload >/dev/null 2>&1 || true
 
 if [ "${MODE}" != "docker" ];then
   localectl set-locale LANG=C.UTF-8
