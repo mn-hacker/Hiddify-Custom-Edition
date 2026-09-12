@@ -10,8 +10,14 @@
 Description=Watashi mieru server (mita)
 After=network-online.target
 Wants=network-online.target
-StartLimitBurst=3
-StartLimitIntervalSec=300
+# watashi v12.2.113: this was StartLimitBurst=3 / StartLimitIntervalSec=300.
+# mita is restarted by core_manager.sh on every core install and again by
+# other/mieru/run.sh on every apply_configs, so three tries inside five
+# minutes are used up by ordinary panel work; systemd then answers "start
+# request repeated too quickly" and parks the unit in failed state, where it
+# stays until someone runs reset-failed by hand. 0 disables the rate limit
+# and leaves Restart=on-failure doing the actual work.
+StartLimitIntervalSec=0
 
 [Service]
 Type=simple
@@ -22,9 +28,15 @@ WorkingDirectory=/opt/hiddify-manager/other/mieru
 Environment=MITA_CONFIG_FILE=/opt/hiddify-manager/other/mieru/server.conf.pb
 Environment=MITA_UDS_PATH=/opt/hiddify-manager/other/mieru/mita.sock
 ExecStartPre=/usr/bin/test -x /opt/hiddify-manager/other/mieru/mita
+# watashi v12.2.113: a daemon that was killed leaves its socket file behind.
+# The next "mita apply config" then connects to a dead socket and mita
+# answers "server daemon is not running", which is what the install log
+# showed. Removing it at startup guarantees the file that is there belongs to
+# the process that is running now.
+ExecStartPre=-/bin/rm -f /opt/hiddify-manager/other/mieru/mita.sock
 ExecStart=/opt/hiddify-manager/other/mieru/mita run
 Restart=on-failure
-RestartSec=10
+RestartSec=5
 StandardOutput=file:/opt/hiddify-manager/log/system/mieru.out.log
 StandardError=file:/opt/hiddify-manager/log/system/mieru.err.log
 

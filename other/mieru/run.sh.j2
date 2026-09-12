@@ -73,30 +73,71 @@ cat > server.json <<'WS_MITA_END'
 WS_MITA_END
 chmod 600 server.json
 
+mkdir -p /opt/hiddify-manager/log/system
+
+# watashi v12.2.113: the daemon is restarted, not conditionally started.
+# "is-active" is false for a unit in failed state as well, and "start" on a
+# failed unit inside its rate limit window does nothing at all; reset-failed
+# plus restart is the only pair that comes back from both states.
 systemctl daemon-reload 2>/dev/null || true
 systemctl enable watashi-mita.service >/dev/null 2>&1 || true
-if ! systemctl is-active --quiet watashi-mita.service; then
-    systemctl start watashi-mita.service >/dev/null 2>&1 || true
-fi
+systemctl reset-failed watashi-mita.service 2>/dev/null || true
+systemctl restart watashi-mita.service >/dev/null 2>&1 || true
 
-# The daemon answers on a unix socket it creates at startup. Talking to it
-# before the file exists fails with a connection error, so we wait for the
-# socket rather than for a fixed number of seconds.
+# watashi v12.2.113: this used to wait for the socket *file* to appear. A
+# socket left behind by a daemon that died satisfied that test immediately,
+# the configuration was then handed to nobody and mita answered "mita server
+# daemon is not running; please run sudo systemctl restart mita" - the exact
+# line the install log carried. The daemon is asked instead: "mita status"
+# only answers IDLE or RUNNING when the RPC really is served.
 ws_mita_ready=0
-for _i in $(seq 1 30); do
-    if [ -S "$MITA_UDS_PATH" ]; then
+for _i in $(seq 1 40); do
+    if $MITA status 2>/dev/null | grep -qE 'IDLE|RUNNING'; then
         ws_mita_ready=1
         break
     fi
     sleep 0.5
 done
 if [ "$ws_mita_ready" != "1" ]; then
-    echo "watashi: the mita daemon did not open $MITA_UDS_PATH, see log/system/mieru.err.log"
+    # watashi v12.2.113: say why, in the apply log itself. Up to now the only
+    # trace was one line of ours, and the reason lived in two places nobody
+    # was asked to look at.
+    echo "watashi: the mita daemon did not answer on $MITA_UDS_PATH"
+    echo "watashi: unit is $(systemctl is-active watashi-mita.service 2>/dev/null), enabled=$(systemctl is-enabled watashi-mita.service 2>/dev/null)"
+    if [ -s /opt/hiddify-manager/log/system/mieru.err.log ]; then
+        echo "watashi: last lines of log/system/mieru.err.log:"
+        tail -5 /opt/hiddify-manager/log/system/mieru.err.log | sed 's/^/watashi:   /'
+    fi
+    journalctl -u watashi-mita --no-pager -n 10 2>/dev/null | tail -10 | sed 's/^/watashi:   /'
     exit 0
 fi
 
+# watashi v12.2.113: upstream issue #285 - applying a configuration whose
+# port is already taken by another process makes mita fail, and the message
+# it gives does not name the port. The ports are known here, so the clash is
+# named before the apply instead of being guessed afterwards.
+ws_mita_port_check() { # proto entry
+    local proto=$1 entry=$2 flag=-t holder
+    [ "$proto" = udp ] && flag=-u
+    command -v ss >/dev/null 2>&1 || return 0
+    case $entry in *-*) return 0 ;; esac
+    holder=$(ss -H -lnp $flag "sport = :$entry" 2>/dev/null | grep -v '"mita"' | head -1)
+    if [ -n "$holder" ]; then
+        echo "watashi: $proto port $entry is already held by another process, mieru will not be able to listen on it"
+        echo "watashi:   $holder"
+    fi
+}
+{% for p in tcp_list %}ws_mita_port_check tcp "{{ p.strip() }}"
+{% endfor %}{% for p in udp_list %}ws_mita_port_check udp "{{ p.strip() }}"
+{% endfor %}
+
 if ! $MITA apply config server.json; then
     echo "watashi: mita refused the configuration, the running proxy was left alone"
+    # watashi v12.2.113: the refusal reason is in mita's own log, so it is
+    # copied into the apply log rather than left for a second round trip.
+    if [ -s /opt/hiddify-manager/log/system/mieru.err.log ]; then
+        tail -5 /opt/hiddify-manager/log/system/mieru.err.log | sed 's/^/watashi:   /'
+    fi
     exit 0
 fi
 

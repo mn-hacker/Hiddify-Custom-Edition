@@ -6,6 +6,24 @@
 # untested build behind our back.
 source /opt/hiddify-manager/common/utils.sh
 
+# watashi v12.2.113: the unit file has to exist before core_manager.sh is
+# asked to install mita. cm_activate() ends with "systemctl restart
+# watashi-mita.service" and reports failure when the unit does not come up;
+# on a first install our symlink was still made *after* that call, so systemd
+# had no watashi-mita.service to restart and every single install printed
+# "ERROR: watashi-mita.service did not come up with mita 3.36.1" followed by
+# "watashi: mita could not be installed, mieru stays off" - while the binary
+# was in fact on the disk. Linking first makes the restart inside
+# core_manager.sh the real start of the daemon.
+mkdir -p /opt/hiddify-manager/log/system
+chmod 600 *.service* 2>/dev/null || true
+ln -sf $(pwd)/watashi-mita.service /etc/systemd/system/watashi-mita.service
+systemctl daemon-reload 2>/dev/null || true
+# a unit left in failed state by an earlier round refuses to start again
+# until its counter is cleared, and that is exactly the state the panel was
+# showing as "watashi-mita failed".
+systemctl reset-failed watashi-mita.service 2>/dev/null || true
+
 CM_SH=/opt/hiddify-manager/common/core_manager.sh
 if [ -f "$CM_SH" ]; then
     # watashi v12.2.111: this said "default mita", and that verb only
@@ -26,6 +44,7 @@ if [ ! -x /opt/hiddify-manager/other/mieru/mita ]; then
     exit 0
 fi
 
-chmod 600 *.service* 2>/dev/null || true
-ln -sf $(pwd)/watashi-mita.service /etc/systemd/system/watashi-mita.service
-systemctl daemon-reload 2>/dev/null || true
+# watashi v12.2.113: the link and the daemon-reload moved above, before the
+# core_manager call. Only the enable is left here, so a reboot brings the
+# daemon back without waiting for the next apply_configs.
+systemctl enable watashi-mita.service >/dev/null 2>&1 || true
