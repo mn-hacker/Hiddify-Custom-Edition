@@ -75,6 +75,18 @@ chmod 600 server.json
 
 mkdir -p /opt/hiddify-manager/log/system
 
+# watashi v12.2.114: the same account other/mieru/install.sh creates. An
+# apply on a box that was installed before this round runs here first, and
+# without the account mita exits 1 at every start, so the check belongs on
+# both paths.
+if ! getent passwd mita >/dev/null 2>&1; then
+    getent group mita >/dev/null 2>&1 || groupadd --system mita 2>/dev/null || true
+    useradd --system --gid mita --no-create-home --home-dir /nonexistent \
+        --shell /usr/sbin/nologin --comment "Watashi mieru server" mita 2>/dev/null ||
+        useradd -r -g mita -M -s /bin/false mita 2>/dev/null || true
+    echo "watashi: created the mita system account the daemon needs for its socket"
+fi
+
 # watashi v12.2.113: the daemon is restarted, not conditionally started.
 # "is-active" is false for a unit in failed state as well, and "start" on a
 # failed unit inside its rate limit window does nothing at all; reset-failed
