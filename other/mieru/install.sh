@@ -8,7 +8,17 @@ source /opt/hiddify-manager/common/utils.sh
 
 CM_SH=/opt/hiddify-manager/common/core_manager.sh
 if [ -f "$CM_SH" ]; then
-    bash $CM_SH default mita || echo "watashi: mita could not be installed, mieru stays off"
+    # watashi v12.2.111: this said "default mita", and that verb only
+    # prints the version core_registry.conf blesses; it downloads
+    # nothing. The binary therefore never arrived and other/mieru/run.sh
+    # answered "the mita binary is not on the disk, mieru was not
+    # started" on every apply, which is exactly what the install log
+    # shows. "install" is the verb that downloads, checks the sha256
+    # against packages.lock and activates. It is asked only when the
+    # binary is missing, so an apply on a healthy box downloads nothing.
+    if [ ! -x /opt/hiddify-manager/other/mieru/mita ]; then
+        bash $CM_SH install mita || echo "watashi: mita could not be installed, mieru stays off"
+    fi
 fi
 
 if [ ! -x /opt/hiddify-manager/other/mieru/mita ]; then
