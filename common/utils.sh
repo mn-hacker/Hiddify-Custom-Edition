@@ -539,12 +539,98 @@ function add2ip6tables() {
         ip6tables -I $1
     fi
 }
+# watashi v12.2.115: on a live box INPUT held 11202 rules, with ports 22, 80
+# and 443 repeated 638 times each: one copy per apply since the install. The
+# guard in add2iptables is "iptables -C", and on iptables-nft (ubuntu 24.04)
+# that check does not match a rule that was written by iptables-restore, so it
+# reported "rule missing" every single time and another copy was inserted. The
+# kernel then walks eleven thousand rules for every packet that arrives.
+#
+# The port rules live in a chain of our own now. Existence is decided from the
+# iptables-save dump instead of -C, in exactly the spelling iptables-save
+# prints, so the answer does not depend on the backend. add2iptables is left
+# alone: the conntrack, icmp and OUTPUT rules around it are single rules that
+# do not pile up.
+WS_ALLOW_CHAIN="WATASHI_ALLOW"
+
+function ws_allow_chain_init() { # ws_allow_chain_init iptables
+    local ipt=$1
+    command -v "$ipt" >/dev/null 2>&1 || return 1
+    $ipt -n -L "$WS_ALLOW_CHAIN" >/dev/null 2>&1 || $ipt -N "$WS_ALLOW_CHAIN" >/dev/null 2>&1 || return 1
+    if ! ${ipt}-save 2>/dev/null | grep -qxF -- "-A INPUT -j $WS_ALLOW_CHAIN"; then
+        $ipt -A INPUT -j "$WS_ALLOW_CHAIN" >/dev/null 2>&1
+    fi
+    return 0
+}
+
+function ws_allow_add() { # ws_allow_add tcp 443
+    local proto=$1 port=$2 ipt spec
+    for ipt in iptables ip6tables; do
+        ws_allow_chain_init "$ipt" || continue
+        for spec in "-p $proto -m $proto --dport $port -j ACCEPT" \
+            "-p $proto -m $proto --dport $port -m conntrack --ctstate NEW -j ACCEPT"; do
+            if ! ${ipt}-save 2>/dev/null | grep -qxF -- "-A $WS_ALLOW_CHAIN $spec"; then
+                echo "adding rule $WS_ALLOW_CHAIN $spec"
+                $ipt -A $WS_ALLOW_CHAIN $spec >/dev/null 2>&1
+            fi
+        done
+    done
+}
+
 function allow_port() { #allow_port "tcp" "80"
-    add2iptables46 "INPUT -p $1 --dport $2 -j ACCEPT"
-    
-    # if [[ $1 == 'udp' ]]; then
-    add2iptables46 "INPUT -p $1 -m $1 --dport $2 -m conntrack --ctstate NEW -j ACCEPT"
-    # fi
+    case "$2" in
+    '' | *[!0-9]*)
+        # a range or something that is not a port at all: the old path knows
+        # how to spell those, and there are only a few of them.
+        add2iptables46 "INPUT -p $1 --dport $2 -j ACCEPT"
+        add2iptables46 "INPUT -p $1 -m $1 --dport $2 -m conntrack --ctstate NEW -j ACCEPT"
+        return 0
+        ;;
+    esac
+    ws_allow_add "$1" "$2"
+}
+
+# watashi v12.2.115: fold the copies the old code left in INPUT. A rule is
+# dropped only when WATASHI_ALLOW already accepts that very protocol and port,
+# so a rule an admin wrote by hand for some other port is never touched, and
+# the whole ruleset is replaced in one iptables-restore instead of thousands
+# of -D calls.
+function ws_prune_legacy_allow_rules() {
+    local ipt tmp before after
+    for ipt in iptables ip6tables; do
+        command -v "$ipt" >/dev/null 2>&1 || continue
+        command -v "${ipt}-save" >/dev/null 2>&1 || continue
+        command -v "${ipt}-restore" >/dev/null 2>&1 || continue
+        tmp=$(mktemp) || return 0
+        if ! ${ipt}-save >"$tmp" 2>/dev/null; then
+            rm -f "$tmp"
+            continue
+        fi
+        before=$(grep -c '^-A INPUT ' "$tmp")
+        awk -v chain="$WS_ALLOW_CHAIN" '
+            NR==FNR {
+                if ($0 ~ ("^-A " chain " ")) {
+                    p=""; d=""
+                    for (i=1;i<=NF;i++) { if ($i=="-p") p=$(i+1); if ($i=="--dport") d=$(i+1) }
+                    if (p != "" && d ~ /^[0-9]+$/) have[p ":" d]=1
+                }
+                next
+            }
+            {
+                if ($0 ~ /^-A INPUT -p (tcp|udp)/ && $0 ~ /-j ACCEPT$/) {
+                    p=""; d=""
+                    for (i=1;i<=NF;i++) { if ($i=="-p") p=$(i+1); if ($i=="--dport") d=$(i+1) }
+                    if (d ~ /^[0-9]+$/ && ((p ":" d) in have)) next
+                }
+                print
+            }' "$tmp" "$tmp" >"$tmp.new" 2>/dev/null
+        after=$(grep -c '^-A INPUT ' "$tmp.new")
+        if [ -s "$tmp.new" ] && [ "$before" != "$after" ]; then
+            echo "watashi: folding $((before - after)) duplicated port rules out of INPUT into $WS_ALLOW_CHAIN"
+            ${ipt}-restore <"$tmp.new" 2>/dev/null || ${ipt}-restore <"$tmp" 2>/dev/null
+        fi
+        rm -f "$tmp" "$tmp.new"
+    done
 }
 
 function block_port() { #allow_port "tcp" "80"

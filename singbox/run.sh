@@ -122,7 +122,12 @@ ws_sync_core_ports() {
     # opens them and every handshake would time out on a box whose firewall
     # is on. the ports are read from the very same current.json the
     # templates render from, so the firewall cannot drift from the config.
-    for key in anytls snell; do
+    # watashi v12.2.115: naive is opened here as well. Its port comes
+    # from internal_port_naive, exactly like the two above, and this is
+    # the path that runs when the admin turns naive on from the panel,
+    # so without this line the port stayed closed until a full install
+    # ran common/run.sh again.
+    for key in anytls snell naive; do
         if [ "$(jq -r --arg k "${key}_enable" '.chconfigs["0"][$k] // false' "$cj")" == "true" ]; then
             for port in $(jq -r --arg k "internal_port_$key" '.domains[]?[$k] // empty' "$cj"); do
                 if [ -n "$port" ] && [ "$port" != "0" ] && [ -z "${port//[0-9]/}" ]; then

@@ -51,6 +51,22 @@ add2iptables46 "INPUT -i lo -j ACCEPT"
   {%endif%}
 {%endfor%}
 
+{# watashi v12.2.115: naive listens on a tcp port of its own, taken from
+   naive_port plus the port index of the domain, and that port is in
+   neither tls_ports nor http_ports. Every other listener of that kind
+   (shadowsocks, hysteria2, tuic, anytls, snell, mieru) is opened
+   somewhere; naive was the only one that was not. On a box with the
+   firewall switched on the INPUT policy is DROP, so every naive
+   handshake died in the kernel while the listener sat there answering
+   nothing. #}
+{% if hconfigs['naive_enable'] %}
+{% for d in domains if d['internal_port_naive'] %}
+  {% if d['internal_port_naive']>0 %}
+  allow_port "tcp" {{d['internal_port_naive']}} #naive
+  {%endif%}
+{%endfor%}
+{%endif%}
+
 # ICMP for ipv4
 add2iptables "INPUT -p icmp -j ACCEPT"
 # add2iptables "INPUT -p icmp -m icmp --icmp-type 0 -m conntrack --ctstate NEW -j ACCEPT"
@@ -160,6 +176,11 @@ ws_hop_apply
 {%else%}
 ws_hop_clear
 {%endif%}
+
+# watashi v12.2.115: every port of this run is in WATASHI_ALLOW by now,
+# so the copies the old code left in INPUT can go. Only a port that the
+# chain already serves is folded away, never a rule added by hand.
+ws_prune_legacy_allow_rules
 
 save_firewall
 
