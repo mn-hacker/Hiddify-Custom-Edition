@@ -668,17 +668,23 @@ function allow_apps_ports() {
     local ports=$(ss -tulpn | grep "$service_name" | awk '{print $5}' | cut -d':' -f2)
     local paths=$(pgrep -f "$service_name" | while read -r pid; do readlink -f /proc/"$pid"/exe; done | awk '!seen[$0]++')
 
+    # watashi v12.2.107: neither message said which service it meant, so every
+    # install log carried a bare "Service not found or not running" that reads
+    # like a failure while it only means an optional service (x-ui and friends)
+    # is not installed on this box. the port list is deduplicated too: the old
+    # nested loop printed and opened the same port once per process path, and
+    # an ipv6 only row turned into an empty port handed to allow_port.
+    local path_list
+    path_list=$(echo $paths | tr '\n' ' ' | sed 's/  */ /g; s/ *$//')
     if [[ -z $ports ]]; then
-        echo "Service not found or not running"
-    else
-        IFS=' ' read -ra portArray <<<"$ports"
-        for p in "${portArray[@]}"; do
-            for path in $paths; do
-                echo "Service is running on port $p and path $path"
-                allow_port "tcp" "$p"
-            done
-        done
+        echo "$service_name is not running here, no port to open"
+        return 0
     fi
+    local p
+    for p in $(echo "$ports" | tr ' ' '\n' | grep -E '^[0-9]+$' | sort -un); do
+        echo "$service_name is running on port $p (${path_list:-path unknown})"
+        allow_port "tcp" "$p"
+    done
 }
 function save_firewall() {
     mkdir -p /etc/iptables/

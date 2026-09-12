@@ -221,6 +221,16 @@ function set_config_from_hpanel() {
 
 function install_run() {
     echo "======================$1====================================={"
+    # watashi v12.2.107: runsh turns install.sh into disable.sh whenever the
+    # feature flag is false/0, and install_run called runsh twice (once for
+    # install.sh, once for run.sh). that is why every switched off service
+    # printed "===disable.sh other/warp" and ran its disable.sh two times in a
+    # row. a disabled service is disabled once now.
+    if [[ "${2:-}" == "false" || "${2:-}" == "0" ]]; then
+        runsh disable.sh $@
+        echo "}========================$1==================================="
+        return 0
+    fi
    if [ "$DO_NOT_INSTALL" != "true" ];then
             runsh install.sh $@
         if [ "$MODE" != "apply_users" ] && [ "$MODE" != "docker"  ]; then
