@@ -164,6 +164,20 @@ function main() {
         fi
     fi
 
+    # watashi v12.2.116: apply_users re-renders singbox/configs and the mieru
+    # server.json, but every "install_run" that applies them sits inside the
+    # "$MODE" != apply_users block above, so the running cores were never told
+    # about the change. xray loses a user instantly through its gRPC API, while
+    # sing-box has no live user management at all, so a disabled or deleted user
+    # kept connecting over shadowsocks 2022 and shadowtls (and every other
+    # sing-box inbound) until the next full apply_configs. The cores without a
+    # live user API are applied here, on the light path too.
+    if [ "$MODE" == "apply_users" ]; then
+        update_progress "${PROGRESS_ACTION}" "Applying users to Singbox" 88
+        install_run singbox
+        install_run other/mieru $(hconfig "mieru_enable")
+    fi
+
     update_progress "${PROGRESS_ACTION}" "Wireguard" 90
     install_run other/wireguard $(hconfig "wireguard_enable")
 

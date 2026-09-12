@@ -21,6 +21,28 @@ if [ -f "configs/01_api.json" ]; then
 fi
 # curl -s -x socks://127.0.0.1:3000 http://ip-api.com?fields=message,country,countryCode,city,isp,org,as,query
 
+# watashi v12.2.116: the user list the core holds in memory is the only thing
+# that decides whether a removed user can still authenticate. sing-box cannot
+# be told about a user over its API (its v2ray api is stats only), and a plain
+# reload is just SIGHUP, so the uuid set is fingerprinted here and a change
+# forces a real restart. the fingerprint is taken from the same current.json
+# the templates render from, so it cannot drift from the rendered configs.
+ws_sb_users_digest_file=/opt/hiddify-manager/singbox/.watashi-users.digest
+ws_sb_users_changed=no
+ws_sb_users_now=""
+ws_sb_users_fingerprint() {
+    local cj=/opt/hiddify-manager/current.json
+    [ -f "$cj" ] || return 1
+    command -v jq >/dev/null 2>&1 || return 1
+    jq -r '[.users[]?|(.uuid|tostring)]|sort|join(",")' "$cj" 2>/dev/null | md5sum | cut -d" " -f1
+}
+ws_sb_users_now=$(ws_sb_users_fingerprint)
+if [ -n "$ws_sb_users_now" ]; then
+    if [ ! -f "$ws_sb_users_digest_file" ] || [ "$(cat "$ws_sb_users_digest_file" 2>/dev/null)" != "$ws_sb_users_now" ]; then
+        ws_sb_users_changed=yes
+    fi
+fi
+
 # Start singbox service
 if systemctl list-unit-files hiddify-singbox.service &>/dev/null; then
 	if systemctl is-active --quiet hiddify-singbox.service; then
@@ -50,6 +72,11 @@ if systemctl list-unit-files hiddify-singbox.service &>/dev/null; then
 			cat /tmp/watashi-singbox-check.log >&2
 		elif [ "$ws_sb_stale" = "yes" ]; then
 			echo "watashi: the core binary changed, restarting instead of reloading" >&2
+			systemctl restart hiddify-singbox.service
+		elif [ "$ws_sb_users_changed" = "yes" ]; then
+			# watashi v12.2.116: a user was added, disabled or deleted. SIGHUP is
+			# not enough to be sure the old key is gone from memory.
+			echo "watashi: the user list changed, restarting the core so removed users lose access" >&2
 			systemctl restart hiddify-singbox.service
 		else
 			systemctl reload hiddify-singbox.service 2>/dev/null || systemctl restart hiddify-singbox.service
@@ -82,7 +109,12 @@ ws_sb_verify_started() {
 		grep -Ei "fatal|error|panic" | tail -5 >&2
 	return 1
 }
-ws_sb_verify_started || true
+if ws_sb_verify_started; then
+	# watashi v12.2.116: remember the applied user set only after the core is
+	# really up, so a failed start is applied again next time.
+	[ -n "$ws_sb_users_now" ] && printf '%s\n' "$ws_sb_users_now" >"$ws_sb_users_digest_file" 2>/dev/null || true
+	chmod 600 "$ws_sb_users_digest_file" 2>/dev/null || true
+fi
 
 # watashi v12.2.100: the shadowsocks port was opened by common/run.sh only,
 # and that script is skipped on the light user save path, so a shadowsocks

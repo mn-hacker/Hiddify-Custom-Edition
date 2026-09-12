@@ -13,9 +13,22 @@
 "type": "shadowsocks",
 "method": "{{ws_ss_method}}",
 "password": "{{ ws_ss_key|b64encode}}",
+{#- watashi v12.2.116: a user that lost its access has to lose its key. The
+    list is taken from the users that really have a uuid, and when it ends up
+    empty a placeholder is written instead of nothing. An empty "users" makes
+    sing-box treat the inbound as a single user service whose key is the
+    server "password" above, and that password is derived from shared_secret,
+    which every shadowtls client is given - so an empty list would let anyone
+    in with no user account at all. The placeholder key is derived from the
+    secret as well, so it is not a constant, and it belongs to no user. #}
+{%- set ws_ss_users = users|selectattr('uuid')|list %}
+{%- set ws_ss_dead = (ws_ss_raw ~ 'watashi-dead' ~ ws_ss_raw ~ ws_ss_zero)[16:16+ws_ss_size] %}
 "users": [
-{% for u in users %}
+{% for u in ws_ss_users %}
     {%- set ws_u_key = (u['uuid'].replace('-','') ~ ws_ss_zero)[:ws_ss_size] %}
     {"name": "{{ u['uuid'] }}@hiddify.com", "password": "{{ ws_u_key|b64encode}}"},
 {% endfor%}
+{% if not ws_ss_users %}
+    {"name": "watashi-no-active-user@invalid", "password": "{{ ws_ss_dead|b64encode}}"},
+{% endif %}
 ]
