@@ -450,7 +450,7 @@ cm_unit_state() {
 
 # put a staged version in place, and undo it the moment it does not work
 cm_activate() {
-    local name=$1 version=$2 force=$3 bin target unit prev binname
+    local name=$1 version=$2 force=$3 bin target unit prev binname state
     binname=$(basename "$(cm_target "$name")")
     bin="$CM_STORE/$name/$version/bin/$binname"
     target=$(cm_target "$name")
@@ -482,11 +482,28 @@ cm_activate() {
     if [ -n "$unit" ]; then
         # watashi v12.2.105: a restart, never a reload. the process must be
         # replaced so the new binary is the one that reads the config.
+        # watashi v12.2.125: the unit is judged by everything systemd knows
+        # about it, not by is-active alone. mtproxy is only linked into
+        # systemd when the telegram proxy runs the go engine, so on every
+        # other server the unit is absent and the old test read that as a
+        # failed start: it rolled a working core back, failed the same way
+        # again, and handed the panel exit code 3 for a copy that was fine.
+        systemctl reset-failed "$unit.service" 2>/dev/null
         systemctl restart "$unit.service" 2>/dev/null
         sleep 1
-        systemctl is-active --quiet "$unit.service" || systemctl start "$unit.service" 2>/dev/null
-        sleep "$CM_PROBE_WAIT"
-        if ! cm_unit_ok "$unit"; then
+        state=$(cm_unit_state "$unit")
+        if [ "$state" != active ] && [ "$state" != starting ]; then
+            sleep "$CM_PROBE_WAIT"
+            state=$(cm_unit_state "$unit")
+        fi
+        case "$state" in
+        active | starting) : ;;
+        absent | off | none)
+            # meant to be down. the binary is in place and whatever turns
+            # this unit on will pick it up.
+            cm_log "$unit.service is not in use on this server, so $name $version is in place but was not started"
+            ;;
+        *)
             cm_err "$unit.service did not come up with $name $version"
             if [ "$force" != "force" ] && [ -n "$prev" ] && [ "$prev" != "$version" ]; then
                 cm_log "rolling $name back to $prev"
@@ -494,7 +511,8 @@ cm_activate() {
                 return 3
             fi
             return 3
-        fi
+            ;;
+        esac
     fi
     return 0
 }
