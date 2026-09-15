@@ -1,8 +1,8 @@
 #!/bin/bash
-# watashi: warp v12.2.45
-cd "$(dirname -- "$0")" || exit 1
-systemctl disable --now hiddify-warp.service >/dev/null 2>&1
-# the old interface mode: if this server was ever set up that way, its routes
-# would fight with the socks mode, so make sure it stays down.
-systemctl disable --now wg-quick@warp >/dev/null 2>&1
-echo "WARP is off."
+# watashi: warp v12.2.126
+# The wgcf backend that used to live here is gone. It probed itself with
+# "wgcf --version", a flag wgcf does not have, so the installer exited
+# before it ever created the systemd unit. Everything now goes to the
+# warp-plus engine in ../warpplus.
+cd "$(dirname -- "$0")/../warpplus" || exit 1
+exec bash disable.sh "$@"
