@@ -1,5 +1,5 @@
 #!/bin/bash
-# watashi: warp v12.2.127
+# watashi: warp v12.2.128
 #
 # Installs the WARP engine (warp-plus) and registers the hiddify-warp unit.
 #

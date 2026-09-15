@@ -1,5 +1,5 @@
 #!/bin/bash
-# watashi: warp v12.2.127
+# watashi: warp v12.2.128
 #
 # Everything an operator needs to judge WARP in one screen, written to the
 # manager log folder so the menu's log viewer shows it like every other log.
@@ -29,6 +29,14 @@ function main() {
 
     if systemctl is-active --quiet hiddify-warp.service; then
         success "  - Service: running"
+        # A running service is not the same as a working tunnel: the engine
+        # was measured running happily while its readiness check looped.
+        local tf
+        tf=$(journalctl -u hiddify-warp.service -n 200 --no-pager 2>/dev/null | grep -c 'connection test failed')
+        if [ "${tf:-0}" -gt 10 ]; then
+            error "      but its readiness check is failing ($tf times recently)."
+            error "      TEST_URL in engine.conf should be http://1.1.1.1 (plain http, by IP)."
+        fi
     else
         error "  - Service: NOT running"
         journalctl -u hiddify-warp.service -n 15 --no-pager 2>/dev/null | sed 's|^|      |'

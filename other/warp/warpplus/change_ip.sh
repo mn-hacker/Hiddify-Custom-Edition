@@ -1,5 +1,5 @@
 #!/bin/bash
-# watashi: warp v12.2.127
+# watashi: warp v12.2.128
 #
 # A new WARP IP. warp-plus keeps its identity and its generated profile in the
 # cache folder, so a new IP means: park the cache, let run.sh build a fresh
