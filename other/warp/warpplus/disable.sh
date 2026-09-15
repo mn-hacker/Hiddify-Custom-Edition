@@ -1,5 +1,5 @@
 #!/bin/bash
-# watashi: warp v12.2.126
+# watashi: warp v12.2.127
 cd "$(dirname -- "$0")" || exit 1
 systemctl disable --now hiddify-warp.service >/dev/null 2>&1
 # older backends: if this server was ever set up in interface mode, its routes

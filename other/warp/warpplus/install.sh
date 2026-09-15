@@ -1,5 +1,5 @@
 #!/bin/bash
-# watashi: warp v12.2.126
+# watashi: warp v12.2.127
 #
 # Installs the WARP engine (warp-plus) and registers the hiddify-warp unit.
 #
@@ -29,15 +29,44 @@ if [[ "$(hconfig warp_mode disable)" == "disable" ]]; then
     exit 0
 fi
 
+# warp-plus writes its version to stderr, not stdout. Reading stdout only
+# returns an empty string from a binary that is in perfect health, which is
+# exactly how v12.2.126 talked itself out of a working install. Both streams
+# are read here.
 function engine_version() {
     [ -x "$BIN" ] || return 1
-    "$BIN" version 2>/dev/null | tr -d ' ' | head -n 1
+    "$BIN" version 2>&1 | tr -d ' ' | head -n 1
 }
 
+# A binary counts as working if it runs and says anything at all. If it runs
+# but stays silent (a future build could move the version elsewhere again),
+# fall back to asking whether this machine can execute the file, so a silent
+# version banner can never again block the whole feature.
 function engine_works() {
-    local v
-    v=$(engine_version) || return 1
-    [ -n "$v" ]
+    local v rc magic
+    [ -x "$BIN" ] || return 1
+    # First: is this a program for this machine at all? A file of the
+    # wrong type still answers on stderr, so text alone proves nothing.
+    magic=$(head -c4 "$BIN" 2>/dev/null | od -An -tx1 | tr -dc 'a-f0-9')
+    if [ "$magic" != "7f454c46" ]; then
+        echo "- WARP: $BIN is not a Linux program (bad file signature)." >&2
+        return 1
+    fi
+    # Second: the exit code, taken without a pipeline. PIPESTATUS was
+    # measured returning 0 here for a binary that really failed with 126.
+    v=$("$BIN" version 2>&1)
+    rc=$?
+    v=$(printf %s "$v" | tr -d ' ' | head -n 1)
+    if [ "$rc" -eq 0 ]; then
+        [ -n "$v" ] && return 0
+        # Runs but says nothing: keep it usable rather than block the
+        # whole feature over a missing version banner.
+        "$BIN" --help >/dev/null 2>&1 && return 0
+    fi
+    if [ -n "$v" ]; then
+        echo "- WARP: the engine answered with: $v" >&2
+    fi
+    return 1
 }
 
 # The pinned copy from common/packages.lock. Its sha256 is verified by

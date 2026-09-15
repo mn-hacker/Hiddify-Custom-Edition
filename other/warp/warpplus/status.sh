@@ -1,5 +1,5 @@
 #!/bin/bash
-# watashi: warp v12.2.126
+# watashi: warp v12.2.127
 #
 # Everything an operator needs to judge WARP in one screen, written to the
 # manager log folder so the menu's log viewer shows it like every other log.
@@ -17,7 +17,7 @@ function main() {
     warning "- WARP Status:"
 
     if [ -x "$BIN" ]; then
-        success "  - Engine: warp-plus $("$BIN" version 2>/dev/null | head -n 1)"
+        success "  - Engine: warp-plus $("$BIN" version 2>&1 | tr -d ' ' | head -n 1)"
     else
         error "  - Engine: not installed"
     fi

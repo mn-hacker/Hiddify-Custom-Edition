@@ -1,5 +1,5 @@
 #!/bin/bash
-# watashi: warp v12.2.126
+# watashi: warp v12.2.127
 #
 # Configures and starts the WARP engine (warp-plus) and proves it really works
 # before saying so.
@@ -146,8 +146,16 @@ function bring_up() {
     return 1
 }
 
+# warp-plus prints its version on stderr, so both streams are read.
+function engine_version() {
+    [ -x "$BIN" ] || { echo "not installed"; return 0; }
+    local v
+    v=$("$BIN" version 2>&1 | tr -d ' ' | head -n 1)
+    echo "${v:-unknown version}"
+}
+
 function main() {
-    echo "- WARP engine: $("$BIN" version 2>/dev/null | head -n 1), mode $MODE, ip version $IPV"
+    echo "- WARP engine: $(engine_version), mode $MODE, ip version $IPV"
     if bring_up; then
         success "- WARP is working on socks5://127.0.0.1:$PORT"
         curl -s -x "$PROXY" --connect-timeout 5 "http://ip-api.com/json?fields=country,city,org,query" 2>/dev/null | sed 's|^|    |'

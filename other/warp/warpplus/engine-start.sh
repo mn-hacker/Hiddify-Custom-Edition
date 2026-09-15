@@ -1,5 +1,5 @@
 #!/bin/bash
-# watashi: warp v12.2.126
+# watashi: warp v12.2.127
 #
 # The command systemd runs. It only reads engine.args, one argument per line,
 # which run.sh renders from the panel settings. The service therefore never
