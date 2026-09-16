@@ -94,7 +94,20 @@ function show() {
     # watashi v12.2.129.2: what this server looks like with no node in the way.
     # The page puts it beside the exit address so the difference is visible
     # instead of having to be tested by hand.
-    server_ip=$(curl -s --connect-timeout 4 http://1.1.1.1/cdn-cgi/trace 2>/dev/null | grep -E '^ip=' | cut -d= -f2)
+    # watashi v12.2.129.3: on a server whose own traffic is already warped the
+    # cloudflare trace answers with the node address or with nothing, so two
+    # plain echo services are tried after it. The panel fills the field in from
+    # its own side as well, so an empty answer here is no longer a dash.
+    server_ip=$(curl -s -4 --connect-timeout 4 http://1.1.1.1/cdn-cgi/trace 2>/dev/null | grep -E '^ip=' | cut -d= -f2)
+    if [[ -z "$server_ip" ]]; then
+        server_ip=$(curl -s -4 --connect-timeout 4 https://v4.ident.me/ 2>/dev/null | tr -d '[:space:]')
+    fi
+    if [[ -z "$server_ip" ]]; then
+        server_ip=$(curl -s -4 --connect-timeout 4 https://api4.ipify.org/ 2>/dev/null | tr -d '[:space:]')
+    fi
+    if [[ ! "$server_ip" =~ ^[0-9]{1,3}(\.[0-9]{1,3}){3}$ ]]; then
+        server_ip=""
+    fi
     if systemctl is-active --quiet "$UNIT"; then
         trace=$(curl -s -x "$PROXY" --connect-timeout 5 https://www.cloudflare.com/cdn-cgi/trace 2>/dev/null)
         warp=$(grep -E '^warp=' <<<"$trace" | cut -d= -f2)
