@@ -130,9 +130,18 @@ function build_args() {
 # The engine's own opinion is not trusted here, because it was measured
 # saying nothing at all while the tunnel underneath was already up.
 WS_TRACE=
+# watashi v12.2.129.2: readiness used to mean one thing only - cloudflare
+# answering warp=on. That is right for the warp and gool modes, where the exit
+# IS cloudflare. In cfon mode the exit is a psiphon server, so cloudflare
+# correctly answers warp=off and a healthy node was declared dead. Here the
+# question is the honest one: does the proxy carry traffic at all.
 function warp_trace() {
     WS_TRACE=$(curl -s -x "$PROXY" --connect-timeout 5 https://www.cloudflare.com/cdn-cgi/trace 2>/dev/null)
-    grep -qE '^warp=(on|plus)' <<<"$WS_TRACE"
+    if [ "$MODE" = "cfon" ]; then
+        grep -qE '^ip=[^[:space:]]+' <<<"$WS_TRACE"
+    else
+        grep -qE '^warp=(on|plus)' <<<"$WS_TRACE"
+    fi
 }
 
 # Whatever the engine printed. This is the part the old version threw away.
@@ -189,14 +198,18 @@ function engine_version() {
 function main() {
     echo "- WARP engine: $(engine_version), mode $MODE, ip version $IPV"
     if bring_up; then
-        success "- WARP is working on socks5://127.0.0.1:$PORT"
+        if [ "$MODE" = "cfon" ]; then
+            success "- The node is working on socks5://127.0.0.1:$PORT (psiphon exit, so warp=off is expected)"
+        else
+            success "- WARP is working on socks5://127.0.0.1:$PORT"
+        fi
         grep -E '^(warp|ip|colo|loc)=' <<<"$WS_TRACE" | sed 's|^|    |'
         curl -s -x "$PROXY" --connect-timeout 5 "http://ip-api.com/json?fields=country,city,org,query" 2>/dev/null | sed 's|^|    |'
         echo
         return 0
     fi
 
-    error "- WARP is NOT working. The panel will keep serving traffic directly."
+    error "- The node is NOT working. The panel will keep serving traffic directly."
     explain_failure
     echo "  Last lines from the engine:"
     engine_log 20

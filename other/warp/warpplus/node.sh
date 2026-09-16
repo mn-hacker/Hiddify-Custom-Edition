@@ -90,13 +90,21 @@ function conf_json() {
 }
 
 function show() {
-    local trace="" warp="" ip="" colo="" loc="" org="" city="" geo=""
+    local trace="" warp="" ip="" colo="" loc="" org="" city="" geo="" carrying="" server_ip=""
+    # watashi v12.2.129.2: what this server looks like with no node in the way.
+    # The page puts it beside the exit address so the difference is visible
+    # instead of having to be tested by hand.
+    server_ip=$(curl -s --connect-timeout 4 http://1.1.1.1/cdn-cgi/trace 2>/dev/null | grep -E '^ip=' | cut -d= -f2)
     if systemctl is-active --quiet "$UNIT"; then
         trace=$(curl -s -x "$PROXY" --connect-timeout 5 https://www.cloudflare.com/cdn-cgi/trace 2>/dev/null)
         warp=$(grep -E '^warp=' <<<"$trace" | cut -d= -f2)
         ip=$(grep -E '^ip=' <<<"$trace" | cut -d= -f2)
         colo=$(grep -E '^colo=' <<<"$trace" | cut -d= -f2)
         loc=$(grep -E '^loc=' <<<"$trace" | cut -d= -f2)
+        # carrying is the honest health question: did the proxy move traffic.
+        # In psiphon mode the exit is not cloudflare, so warp is off and only
+        # this tells the panel the node is alive.
+        [ -n "$ip" ] && carrying=yes || carrying=no
         if [ -n "$ip" ]; then
             geo=$(curl -s -x "$PROXY" --connect-timeout 5 "http://ip-api.com/json?fields=country,city,org" 2>/dev/null)
             org=$(jq -r '.org // empty' <<<"$geo" 2>/dev/null)
@@ -117,6 +125,10 @@ function show() {
     jkv panel_mode "$(hconfig warp_mode disable)"
     printf ','
     jkv warp "$warp"
+    printf ','
+    jkv carrying "$carrying"
+    printf ','
+    jkv server_ip "$server_ip"
     printf ','
     jkv ip "$ip"
     printf ','
