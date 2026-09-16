@@ -5,7 +5,40 @@
     'ru': 'ru'
 }.get(hconfigs['country'], 'cn') %}
 
-{% set geo_sites=['spotify','speedtest','google','netflix','nvidia','bytedance','tiktok','unity','reddit','openai'] %}
+{# watashi v12.2.129: the Nodes page decides what goes behind the node.
+   Until this round the list of sites below was written into this file by
+   hand and nothing could be taken out of it, which is why "the Google
+   services do not come up" had no switch anywhere in the panel.
+   warp_presets holds the chosen group names, comma separated, and the
+   local sites group is the only one that is on by default. #}
+{% set ws_groups = {
+    'google':    {'geo': ['google'],
+                  'dom': []},
+    'ai':        {'geo': ['openai'],
+                  'dom': ['openai.com', 'ai.com']},
+    'streaming': {'geo': ['netflix', 'spotify', 'tiktok', 'bytedance'],
+                  'dom': ['lookmovie2.to', '9anime.me', 'livechart.me', 'myanimelist.net', 'tunetank.com', 'kmplayer.com']},
+    'social':    {'geo': ['reddit'],
+                  'dom': ['snapchat.com', 'clubhouse.com', 'omegle.com', 'behance.net']},
+    'dev':       {'geo': ['nvidia', 'unity'],
+                  'dom': ['developer.mozilla.org', 'flutter.dev', 'xda-developers.com', 'gamebanana.com', 'sourcemod.net', 'alliedmods.net', 'pagespeed.web.dev', 'alldatasheet.com', 'pixelexperience.org', 'evolution-x.org', 'kenvyra.xyz', 'spark-os.live', 'pixelos.net', 'adbtc.top']},
+    'tools':     {'geo': ['speedtest'],
+                  'dom': ['ip.gs', 'ipinfo.io', 'freepik.com', 'flaticon.com', 'adobe.com', 'remini.com', 'giglio.com', 'homedepot.com', 'axieinfinity.com']}
+} %}
+{% set ws_presets = (hconfigs.get('warp_presets', 'ir') or 'ir').split(',') | map('trim') | reject('equalto', '') | list %}
+{% set ws_geo = [] %}
+{% set ws_dom = [] %}
+{% for ws_g in ws_presets if ws_g in ws_groups %}
+{% for ws_s in ws_groups[ws_g]['geo'] if ws_s not in ws_geo %}{% set ws_x = ws_geo.append(ws_s) %}{% endfor %}
+{% for ws_d in ws_groups[ws_g]['dom'] if ws_d not in ws_dom %}{% set ws_x = ws_dom.append(ws_d) %}{% endfor %}
+{% endfor %}
+{# The local sites go THROUGH the node on purpose: the real address of this
+   server must never touch an Iranian site, or that site blocks it. With the
+   group switched off they are refused, exactly as when the node is off,
+   never sent out directly. #}
+{% set ws_local = 'ir' in ws_presets %}
+{% set ws_local_out = '"forbidden_sites"' if (hconfigs['warp_mode'] == 'disable' or not ws_local) else '"WARP"' %}
+{% set geo_sites = ws_geo %}
 {
   "route": {
     "rule_set":[
@@ -165,20 +198,32 @@
         },
         {% endif %}
         {
-            "outbound": {% if hconfigs['warp_mode'] == 'disable' %}"forbidden_sites"{% else %}"WARP"{% endif %},
+            "outbound": {{ ws_local_out }},
              "rule_set":[
               "geoip-{{region}}", "geosite-{{region}}"
              ]
         },
         {% if hconfigs['warp_mode'] != 'disable' %}
+          {% if ws_geo %}
           {
               "outbound": "WARP",
               "rule_set":[
-                {% for site in geo_sites %}
+                {% for site in ws_geo %}
                   "geosite-{{site}}",
                 {% endfor %}
               ]
           },
+          {% endif %}
+          {% if ws_dom %}
+          {
+              "outbound": "WARP",
+              "domain_suffix":[
+                {% for ws_d in ws_dom %}
+                  "{{ws_d}}",
+                {% endfor %}
+              ]
+          },
+          {% endif %}
           {% set warp_sites = hconfigs.get('warp_sites','').split('\n') | map('trim') | reject('equalto', '') | list %}
           {% if warp_sites %}
           {

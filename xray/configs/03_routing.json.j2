@@ -1,3 +1,36 @@
+{# watashi v12.2.129: the Nodes page decides what goes behind the node.
+   Until this round the list of sites below was written into this file by
+   hand and nothing could be taken out of it, which is why "the Google
+   services do not come up" had no switch anywhere in the panel.
+   warp_presets holds the chosen group names, comma separated, and the
+   local sites group is the only one that is on by default. #}
+{% set ws_groups = {
+    'google':    {'geo': ['google'],
+                  'dom': []},
+    'ai':        {'geo': ['openai'],
+                  'dom': ['openai.com', 'ai.com']},
+    'streaming': {'geo': ['netflix', 'spotify', 'tiktok', 'bytedance'],
+                  'dom': ['lookmovie2.to', '9anime.me', 'livechart.me', 'myanimelist.net', 'tunetank.com', 'kmplayer.com']},
+    'social':    {'geo': ['reddit'],
+                  'dom': ['snapchat.com', 'clubhouse.com', 'omegle.com', 'behance.net']},
+    'dev':       {'geo': ['nvidia', 'unity'],
+                  'dom': ['developer.mozilla.org', 'flutter.dev', 'xda-developers.com', 'gamebanana.com', 'sourcemod.net', 'alliedmods.net', 'pagespeed.web.dev', 'alldatasheet.com', 'pixelexperience.org', 'evolution-x.org', 'kenvyra.xyz', 'spark-os.live', 'pixelos.net', 'adbtc.top']},
+    'tools':     {'geo': ['speedtest'],
+                  'dom': ['ip.gs', 'ipinfo.io', 'freepik.com', 'flaticon.com', 'adobe.com', 'remini.com', 'giglio.com', 'homedepot.com', 'axieinfinity.com']}
+} %}
+{% set ws_presets = (hconfigs.get('warp_presets', 'ir') or 'ir').split(',') | map('trim') | reject('equalto', '') | list %}
+{% set ws_geo = [] %}
+{% set ws_dom = [] %}
+{% for ws_g in ws_presets if ws_g in ws_groups %}
+{% for ws_s in ws_groups[ws_g]['geo'] if ws_s not in ws_geo %}{% set ws_x = ws_geo.append(ws_s) %}{% endfor %}
+{% for ws_d in ws_groups[ws_g]['dom'] if ws_d not in ws_dom %}{% set ws_x = ws_dom.append(ws_d) %}{% endfor %}
+{% endfor %}
+{# The local sites go THROUGH the node on purpose: the real address of this
+   server must never touch an Iranian site, or that site blocks it. With the
+   group switched off they are refused, exactly as when the node is off,
+   never sent out directly. #}
+{% set ws_local = 'ir' in ws_presets %}
+{% set ws_local_out = '"forbidden_sites"' if (hconfigs['warp_mode'] == 'disable' or not ws_local) else '"WARP"' %}
 {
   "routing": {
     // "domainStrategy": "AsIs",
@@ -73,7 +106,7 @@
         {% if hconfigs['warp_mode'] != 'all' %}
         {
             "type": "field", 
-            "outboundTag": {% if hconfigs['warp_mode'] == 'disable' %}"forbidden_sites"{% else %}"WARP"{% endif %},
+            "outboundTag": {{ ws_local_out }},
             {% if hconfigs['country'] in ['zh','cn'] %}
               "ip": ["geoip:cn"]
             {% elif hconfigs['country'] == 'ir' %}
@@ -86,7 +119,7 @@
         },
         {
             "type": "field", 
-            "outboundTag": {% if hconfigs['warp_mode'] == 'disable' %}"forbidden_sites"{% else %}"WARP"{% endif %},
+            "outboundTag": {{ ws_local_out }},
             {% if hconfigs['country'] in ['zh','cn'] %}
               "domain": ["geosite:cn","tld-cn"] 
             {% elif hconfigs['country'] == 'ir' %}
@@ -97,62 +130,20 @@
               "domain": ["geosite:cn","tld-cn"] 
             {% endif %}
         },
+         {% set ws_all = [] %}
+         {% for ws_s in ws_geo %}{% set ws_x = ws_all.append('geosite:' ~ ws_s) %}{% endfor %}
+         {% for ws_d in ws_dom %}{% set ws_x = ws_all.append('domain:' ~ ws_d) %}{% endfor %}
+         {% for ws_d in hconfigs.get('warp_sites', '').split('\n') if ws_d.strip() %}{% set ws_x = ws_all.append('domain:' ~ ws_d.strip()) %}{% endfor %}
+         {% if hconfigs['warp_mode'] != 'disable' and ws_all %}
          {
                 "type":"field",
-                "outboundTag": {% if hconfigs['warp_mode'] == 'disable' %}"freedom"{% else %}"WARP"{% endif %},
+                "outboundTag": "WARP",
                 "domain":[
-                    "geosite:google",
-                    "geosite:netflix",
-                    "geosite:spotify",
-                    "geosite:nvidia",
-                    "geosite:bytedance",
-                    "geosite:tiktok",
-                    "geosite:unity",
-                    "geosite:reddit",
-                    "geosite:openai",
-
-                    "domain:ip.gs",
-                    "domain:kmplayer.com",
-                    "domain:ipinfo.io",
-                    "domain:openai.com",
-                    "domain:ai.com",
-                    "domain:freepik.com",
-                    "domain:developer.mozilla.org",
-                    "domain:behance.net",
-                    "domain:remini.com",
-                    "domain:snapchat.com",
-                    "domain:tunetank.com",
-                    "domain:livechart.me",
-                    "domain:9anime.me",
-                    "domain:pixelexperience.org",
-                    "domain:evolution-x.org",
-                    "domain:kenvyra.xyz",
-                    "domain:spark-os.live",
-                    "domain:pixelos.net",
-                    "domain:gamebanana.com",
-                    "domain:myanimelist.net",
-                    "domain:sourcemod.net",
-                    "domain:alliedmods.net",
-                    "domain:pagespeed.web.dev",
-                    "domain:axieinfinity.com",
-                    "domain:clubhouse.com",
-                    "domain:omegle.com",
-                    "domain:alldatasheet.com",
-                    "domain:flaticon.com",
-                    "domain:xda-developers.com",
-                    "domain:giglio.com",
-                    "domain:lookmovie2.to",
-                    "domain:adbtc.top",
-                    "domain:homedepot.com",
-                    "domain:flutter.dev",
-                    "domain:adobe.com"
-                    {% if hconfigs['warp_mode'] != 'disable' %}
-                      {%for d in hconfigs.get('warp_sites','').split('\n')%}
-                      ,"domain:{{d.strip()}}"
-                      {% endfor %}
-                    {% endif %}
+                    {% for ws_e in ws_all %}"{{ ws_e }}"{% if not loop.last %},{% endif %}
+                    {% endfor %}
                 ]
             },
+         {% endif %}
         {% endif %}
         {
           "inboundTag": ["api"], "outboundTag": "api", "type": "field"

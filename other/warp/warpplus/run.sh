@@ -28,7 +28,12 @@ LOG="$LOGDIR/warp.log"
 WAIT=${WS_WARP_WAIT:-40}
 mkdir -p "$LOGDIR" "$CACHE"
 
-if [[ "$(hconfig warp_mode disable)" == "disable" ]]; then
+# watashi v12.2.129: the Nodes page writes warp_mode into the database
+# and then asks for the node to come up at once. current.json, which is
+# what hconfig reads, is only rewritten when the settings are applied,
+# so without this door the page would switch the node on and run.sh
+# would immediately switch it back off from a stale value.
+if [[ "${WS_WARP_FORCE:-0}" != "1" && "$(hconfig warp_mode disable)" == "disable" ]]; then
     warning "- WARP is disabled in the panel."
     bash disable.sh
     exit 0

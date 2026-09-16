@@ -31,6 +31,8 @@ class Command(StrEnum):
     create_tunnel = os.path.join(HIDDIFY_DIR, 'other/rathole/create_tunnel.sh')
     delete_tunnel = os.path.join(HIDDIFY_DIR, 'other/rathole/delete_tunnel.sh')
     control_tunnel = os.path.join(HIDDIFY_DIR, 'other/rathole/control_tunnel.sh')
+    # watashi v12.2.129: the only root door the nodes page has
+    node = os.path.join(HIDDIFY_DIR, 'other/warp/node.sh')
     id = 'id'
 
 
@@ -275,6 +277,29 @@ def core(action: str, name: str, version: str):
     # pin. rollback and prune are left out because they never fetch anything.
     if action in ('install', 'upgrade', 'downgrade'):
         os.environ['CM_ALLOW_UNPINNED'] = '1'
+    run(cmd)
+
+
+# watashi v12.2.129: the nodes page. Reading the state of a node and changing
+# it both need root, so everything the page asks for arrives here and is
+# checked again. The node scripts check the same values a third time, because
+# the page is not the only thing that may ever call them.
+WS_NODE_ACTIONS = ('show', 'on', 'off', 'change-ip', 'set')
+WS_NODE_KEYS = ('MODE', 'COUNTRY', 'IPV', 'SCAN', 'DNS', 'TEST_URL')
+WS_NODE_VALUE_RE = re.compile(r'^[A-Za-z0-9:/._@?&=%+-]{1,120}$')
+
+
+@cli.command('node')
+@click.option('--action', '-a', type=str, help='show, on, off, change-ip or set', required=True)
+@click.option('--key', '-k', type=str, help='The engine setting to write', default='')
+@click.option('--value', '-v', type=str, help='The value to write', default='')
+def node(action: str, key: str, value: str):
+    assert action in WS_NODE_ACTIONS, f"Error: {action} is not a node action"
+    cmd = ['bash', Command.node.value, action]
+    if action == 'set':
+        assert key in WS_NODE_KEYS, f"Error: {key} is not a node setting"
+        assert WS_NODE_VALUE_RE.match(value or ''), f"Error: Invalid value passed to the node command"
+        cmd.extend([key, value])
     run(cmd)
 
 
