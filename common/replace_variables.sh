@@ -29,7 +29,24 @@ for d in $domains; do
     (bash /opt/hiddify-manager/acme.sh/generate_self_signed_cert.sh $d >/dev/null 2>&1)
 done
 
-# /opt/hiddify-manager/.venv313/bin/python -c "import json5;import jinja2" || uv pip install json5 jinja2
+# watashi v12.2.130h: the renderer needs these two. A fresh install once reached
+# this line without json5 and rendered nothing at all, so the check is real
+# now instead of commented out.
+ws_ensure_render_deps() {
+    local py=/opt/hiddify-manager/.venv313/bin/python
+    [ -x "$py" ] || return 0
+    "$py" -c "import json5, jinja2" >/dev/null 2>&1 && return 0
+    echo "watashi: the render packages are missing, installing them"
+    if command -v uv >/dev/null 2>&1; then
+        uv pip install --python "$py" json5 jinja2 >/dev/null 2>&1 \
+            || VIRTUAL_ENV=/opt/hiddify-manager/.venv313 uv pip install json5 jinja2 >/dev/null 2>&1
+    fi
+    "$py" -c "import json5, jinja2" >/dev/null 2>&1 && return 0
+    "$py" -m pip install json5 jinja2 >/dev/null 2>&1 || true
+    "$py" -c "import json5, jinja2" >/dev/null 2>&1 \
+        || echo "watashi: json5 could not be installed, the renderer will use plain json"
+}
+ws_ensure_render_deps
 # rm -f /opt/hiddify-manager/singbox/configs/*.json
 rm -f /opt/hiddify-manager/xray/configs/05_inbounds_10*.json*
 rm -f /opt/hiddify-manager/xray/configs/05_inbounds_h2*.json*

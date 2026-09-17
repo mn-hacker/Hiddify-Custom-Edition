@@ -128,6 +128,21 @@ function ws_http_challenge_prepare() {
     systemctl reload hiddify-nginx 2>/dev/null || systemctl restart hiddify-nginx 2>/dev/null || true
 }
 
+# watashi v12.2.130h: asking a CA to fetch a file from us while no web server is
+# running wastes minutes and eats the account quota. This fetches the file
+# ourselves first; if we cannot read it, neither can the CA.
+function ws_challenge_reachable() {
+    local probe="watashi-check-$$"
+    local dir="$WS_ACME_HOME/www/.well-known/acme-challenge"
+    mkdir -p "$dir" 2>/dev/null || true
+    echo "watashi" >"$dir/$probe" 2>/dev/null || return 1
+    local code
+    code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 \
+        "http://127.0.0.1/.well-known/acme-challenge/$probe" 2>/dev/null)
+    rm -f "$dir/$probe" 2>/dev/null
+    [ "$code" = "200" ]
+}
+
 function ws_http_challenge_cleanup() {
     echo "" >/opt/hiddify-manager/nginx/parts/acme.conf
     systemctl reload hiddify-nginx 2>/dev/null || true
@@ -166,8 +181,12 @@ function try_get_cert_with_ca() {
     local CA_SERVER=$2
     local CA_DESC=$3
     local CHALLENGE=$4
-    local MAX_RETRIES=2
-    local RETRY_DELAY=10
+    # watashi v12.2.130h: two tries per authority, and each try is time limited.
+    # The "1/30" counting in the log was acme.sh waiting for the authority to
+    # finish; with no web server that wait ran to the end four times over.
+    local MAX_RETRIES=${WS_ACME_TRIES:-2}
+    local RETRY_DELAY=${WS_ACME_RETRY_DELAY:-8}
+    local ATTEMPT_TIMEOUT=${WS_ACME_ATTEMPT_TIMEOUT:-90}
     local i result
 
     echo "====== Trying $CA_DESC with the $CHALLENGE challenge for $DOMAIN ======"
@@ -194,13 +213,26 @@ function try_get_cert_with_ca() {
         args+=(--dns dns_cf)
     else
         ws_http_challenge_prepare
+        if ! ws_challenge_reachable; then
+            echo "The challenge folder cannot be read over port 80 on this server,"
+            echo "so no authority could read it either. Skipping $CA_DESC."
+            echo "Check that hiddify-nginx is running, then ask for the certificate again."
+            return 1
+        fi
         args+=(-w "$WS_ACME_HOME/www/")
     fi
 
     for ((i = 1; i <= MAX_RETRIES; i++)); do
         echo "Attempt $i of $MAX_RETRIES..."
-        acme.sh "${args[@]}" 2>&1
+        if command -v timeout >/dev/null 2>&1; then
+            timeout "$ATTEMPT_TIMEOUT" acme.sh "${args[@]}" 2>&1
+        else
+            acme.sh "${args[@]}" 2>&1
+        fi
         result=$?
+        if [ $result -eq 124 ]; then
+            echo "The authority did not answer within ${ATTEMPT_TIMEOUT}s, giving up on this attempt"
+        fi
 
         if [ $result -eq 0 ]; then
             echo "✓ Success with $CA_DESC!"

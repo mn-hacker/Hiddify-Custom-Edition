@@ -47,9 +47,13 @@ export DEBIAN_FRONTEND=noninteractive
 export USE_VENV=true
 
 echo "we are going to download needed files:)"
-GITHUB_REPOSITORY=hiddify-config
-GITHUB_USER=hiddify
+# watashi v12.2.130g: a bare server used to be handed the upstream project.
+# The repository, the folder and the panel all come from us now.
+GITHUB_REPOSITORY=hiddify-manager
+GITHUB_USER=mn-hacker
+GITHUB_PROJECT=Hiddify-Custom-Edition
 GITHUB_BRANCH_OR_TAG=main
+INSTALL_DIR=/opt/hiddify-manager
 
 # if [ ! -d "/opt/$GITHUB_REPOSITORY" ];then
 apt update
@@ -57,17 +61,34 @@ apt update
 #apt -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade
 
 apt install -y curl unzip
-mkdir -p /opt/$GITHUB_REPOSITORY
-cd /opt/$GITHUB_REPOSITORY
-curl -L -s -o $GITHUB_REPOSITORY.zip https://github.com/hiddify/$GITHUB_REPOSITORY/releases/download/v10.5.73/$GITHUB_REPOSITORY.zip
+mkdir -p $INSTALL_DIR
+cd $INSTALL_DIR
+# watashi v12.2.130g: our newest release, not a version frozen years ago
+curl -fL -o $GITHUB_REPOSITORY.zip https://github.com/$GITHUB_USER/$GITHUB_PROJECT/releases/latest/download/$GITHUB_REPOSITORY.zip
+if [ ! -s $GITHUB_REPOSITORY.zip ]; then
+    echo "the manager could not be downloaded, nothing was installed"
+    exit 1
+fi
 unzip -o $GITHUB_REPOSITORY.zip > /dev/null
 rm $GITHUB_REPOSITORY.zip
+# a release asset may hold one top folder; the files belong here
+if [ ! -f install.sh ]; then
+    inner=$(find . -maxdepth 2 -name install.sh -printf "%h\n" 2>/dev/null | head -n 1)
+    if [ -n "$inner" ] && [ "$inner" != "." ]; then
+        cp -a "$inner"/. . && rm -rf "$inner"
+    fi
+fi
+if [ ! -f install.sh ]; then
+    echo "the downloaded manager has no install.sh, nothing was installed"
+    exit 1
+fi
 rm -f xray/configs/*.json
 rm -f singbox/configs/*.json
-source /opt/hiddify-config/common/utils.sh
+source $INSTALL_DIR/common/utils.sh
 install_python
 install_pypi_package pip==24.0
-pip install -U hiddifypanel==8.8.99
+# watashi v12.2.130g: the panel that ships with this manager, never PyPI
+ws_install_panel_from_source
 bash install.sh --no-gui
 # exit 0
 # fi

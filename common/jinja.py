@@ -4,7 +4,42 @@ import os
 import sys
 import threading
 from jinja2 import Environment, FileSystemLoader
-import json5
+# watashi v12.2.130h: a fresh virtual environment did not carry json5, and this
+# import is the first line of the program that renders every config file.
+# One missing package therefore left nginx, haproxy, xray and singbox with
+# no configuration and took the whole server down. json5 is only used to
+# tidy rendered json, which plain json can also do once comments and
+# trailing commas are removed, so its absence is no longer fatal.
+try:
+    import json5
+except ModuleNotFoundError:
+    import json as _plain_json
+    import re as _re
+
+    _JSON5_NOISE = _re.compile(r'"(?:\\.|[^"\\])*"|/\*.*?\*/|//[^\n]*', _re.S)
+
+    def _json5_plain(text):
+        """The same text with comments and trailing commas taken out."""
+        def keep(match):
+            piece = match.group(0)
+            return piece if piece.startswith('"') else ''
+        text = _JSON5_NOISE.sub(keep, text)
+        return _re.sub(r',(\s*[}\]])', r'\1', text)
+
+    class _Json5Fallback:
+        """json5 is not installed here; plain json does the same job."""
+
+        @staticmethod
+        def loads(text, **_ignored):
+            return _plain_json.loads(_json5_plain(text))
+
+        @staticmethod
+        def dumps(obj, indent=2, **_ignored):
+            return _plain_json.dumps(obj, indent=indent, ensure_ascii=False)
+
+    json5 = _Json5Fallback()
+    print("watashi: json5 is not installed, rendering with plain json",
+          file=sys.stderr)
 import json
 import subprocess
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor

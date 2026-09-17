@@ -1101,3 +1101,27 @@ function get_public_ipv6() {
     done
     return 1
 }
+
+# watashi v12.2.130g: every install path used to pick its own source for the
+# panel: PyPI here, a git branch there, a pinned old version in the
+# bootstrap. The panel then did not match the manager around it, which
+# is how a fresh server ended up wearing the upstream theme. One
+# function now, used by all of them.
+function ws_install_panel_from_source() {
+    local src="${1:-/opt/hiddify-manager/hiddify-panel/src}"
+    if [ ! -f "$src/pyproject.toml" ] && [ ! -f "$src/setup.py" ]; then
+        echo "watashi: no panel source at $src, leaving the panel alone"
+        return 1
+    fi
+    activate_python_venv 2>/dev/null || true
+    if command -v uv >/dev/null 2>&1; then
+        uv pip install -U --force-reinstall --no-deps "$src" || return 1
+        uv pip install "$src" || return 1
+    else
+        pip install -U --force-reinstall --no-deps "$src" || return 1
+        pip install "$src" || return 1
+    fi
+    python -c "import hiddifypanel" >/dev/null 2>&1 \
+        || { echo "watashi: the panel was installed but cannot be imported"; return 1; }
+    echo "watashi: the panel was installed from $src"
+}

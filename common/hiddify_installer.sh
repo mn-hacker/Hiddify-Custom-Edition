@@ -96,21 +96,14 @@ function update_panel() {
             update_progress "Updating..." "Watashi Panel from $current_panel_version to $latest" 10
             panel_path=$(hiddifypanel_path)
             disable_panel_services
-            if [ ! -z "$USE_VENV" ]; then
-                activate_python_venv
-                if [ "$USE_VENV" == "310" ];then
-                    install_python310
-                    pip install -U --no-deps --force-reinstall git+https://github.com/hiddify/HiddifyPanel@${package_mode}
-                    pip install git+https://github.com/hiddify/HiddifyPanel@${package_mode}
-                else
-                    uv pip install -U --no-deps --force-reinstall git+https://github.com/hiddify/HiddifyPanel@${package_mode}
-                    uv pip install git+https://github.com/hiddify/HiddifyPanel@${package_mode}
-                fi
-            else 
-               install_python310
-               pip3 install -U --no-deps --force-reinstall git+https://github.com/hiddify/HiddifyPanel@${package_mode}
-               pip3 install git+https://github.com/hiddify/HiddifyPanel@${package_mode}
+            # watashi v12.2.130g: the version picker used to fetch the panel from
+            # the upstream project, which quietly replaced ours. The manager
+            # for this mode is our own tagged release, so the panel is taken
+            # from the source inside it.
+            if [ -z "$USE_VENV" ]; then
+                install_python310
             fi
+            ws_install_panel_from_source
             update_progress "Updated..." "Watashi Panel to ${package_mode}" 50
             return 0
         ;;
@@ -127,8 +120,11 @@ function update_panel() {
                
                 disable_panel_services
                 
-                uv pip install -U --no-deps --force-reinstall git+https://github.com/hiddify/HiddifyPanel
-                uv pip install git+https://github.com/hiddify/HiddifyPanel
+                # watashi v12.2.130g: the develop mode installed the panel from the
+                # upstream project, which is how our own work disappeared from a
+                # server. The source in this folder is what we ship, so it is
+                # what gets installed.
+                ws_install_panel_from_source || return 1
                 panel_path=$(hiddifypanel_path)
                 echo "setting $latest in $panel_path/VERSION"
                 echo $latest > $panel_path/VERSION
@@ -282,6 +278,14 @@ function post_update_tasks() {
       systemctl stop hiddify-panel-background-tasks.service 2>/dev/null || true
 
       # If panel was updated OR config was updated, apply configs
+      # watashi v12.2.130g: the manager files and the panel arrive in two separate
+      # steps, and the panel can be installed before the new files are on
+      # disk. Installing once more here, from the source that is now present,
+      # makes the order harmless and keeps the panel and the manager in step.
+      if [[ $panel_update == 0 || $config_update == 0 ]]; then
+          ws_install_panel_from_source || true
+      fi
+
       if [[ $panel_update == 0 || $config_update == 0 ]]; then
           echo "Applying configurations..."
           bash /opt/hiddify-manager/apply_configs.sh --no-gui --no-log
