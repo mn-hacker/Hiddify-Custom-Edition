@@ -284,13 +284,15 @@ def core(action: str, name: str, version: str):
 # it both need root, so everything the page asks for arrives here and is
 # checked again. The node scripts check the same values a third time, because
 # the page is not the only thing that may ever call them.
-WS_NODE_ACTIONS = ('show', 'on', 'off', 'change-ip', 'set')
+# watashi v12.2.129.3: job only reads the job file, so it is as harmless as
+# show and the panel may ask for it before every write.
+WS_NODE_ACTIONS = ('show', 'job', 'on', 'off', 'change-ip', 'set')
 WS_NODE_KEYS = ('MODE', 'COUNTRY', 'IPV', 'SCAN', 'DNS', 'TEST_URL')
 WS_NODE_VALUE_RE = re.compile(r'^[A-Za-z0-9:/._@?&=%+-]{1,120}$')
 
 
 @cli.command('node')
-@click.option('--action', '-a', type=str, help='show, on, off, change-ip or set', required=True)
+@click.option('--action', '-a', type=str, help='show, job, on, off, change-ip or set', required=True)
 @click.option('--key', '-k', type=str, help='The engine setting to write', default='')
 @click.option('--value', '-v', type=str, help='The value to write', default='')
 def node(action: str, key: str, value: str):

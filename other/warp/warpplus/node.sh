@@ -62,6 +62,25 @@ function job_start() {
     return 0
 }
 
+# watashi v12.2.129.3: the cheap question "is anything running right now".
+# show() answers it too, but show talks to the network and takes seconds; this
+# only reads one small file, so the panel can ask it before every write and
+# refuse a second click that would start the same work twice.
+function job_report() {
+    local action="" started=0 age=0
+    if job_running; then
+        action=$(sed -n '1p' "$JOB" 2>/dev/null)
+        started=$(sed -n '3p' "$JOB" 2>/dev/null)
+        [[ "$started" =~ ^[0-9]+$ ]] && age=$(( $(date +%s) - started ))
+        [ "$age" -lt 0 ] && age=0
+    fi
+    printf '{'
+    jkv job "$action"
+    printf ','
+    jkv age "$age"
+    printf '}\n'
+}
+
 # ---------------------------------------------------------------- reading
 function engine_version() {
     [ -x "$BIN" ] || return 0
@@ -267,12 +286,13 @@ function change_ip() {
 
 case "$1" in
 show) show ;;
+job) job_report ;;
 on) turn_on ;;
 off) turn_off ;;
 change-ip) change_ip ;;
 set) set_key "$2" "$3" ;;
 *)
-    echo "usage: node.sh show|on|off|change-ip|set KEY VALUE"
+    echo "usage: node.sh show|job|on|off|change-ip|set KEY VALUE"
     exit 1
     ;;
 esac
