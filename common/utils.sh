@@ -9,10 +9,17 @@ if [ -t 1 ]; then
     esac
 fi
 # --- Watashi v12.2.37 : one skin for every box the terminal draws ---
-WS_TUI_FILE="/opt/hiddify-manager/common/watashi_tui.sh"
-if [ ! -f "$WS_TUI_FILE" ]; then
-    WS_TUI_FILE="$(dirname "${BASH_SOURCE[0]}")/watashi_tui.sh"
-fi
+# watashi v12.2.130i: on a bare server this file runs from /tmp/hiddify, so the
+# skin is looked for there as well instead of only in the installed folder.
+WS_TUI_CANDIDATES="/opt/hiddify-manager/common/watashi_tui.sh $(dirname "${BASH_SOURCE[0]}")/watashi_tui.sh /tmp/hiddify/watashi_tui.sh"
+WS_TUI_FILE=""
+for ws_cand in $WS_TUI_CANDIDATES; do
+    if [ -f "$ws_cand" ]; then
+        WS_TUI_FILE="$ws_cand"
+        break
+    fi
+done
+export WS_TUI_FILE
 if [ -f "$WS_TUI_FILE" ]; then
     source "$WS_TUI_FILE"
 fi

@@ -325,9 +325,13 @@ emptyscale=,gray
 fullscale=,brightmagenta
 helpline=brightcyan,black'
 
-if ws_skin_on; then
-    export NEWT_COLORS="$WS_NEWT"
-fi
+# watashi v12.2.130i: the palette is exported unless the skin is switched off by hand.
+# Any box drawn by a script that does not go through this file, such as the old
+# whiptail menus kept as a safety net, then still wears our colours.
+case "$WATASHI_TUI" in
+0 | off | no | false) : ;;
+*) export NEWT_COLORS="$WS_NEWT" ;;
+esac
 
 # ---------- how wide a page may be ----------
 # The frame follows the window: it fills the terminal and keeps only a small
@@ -544,10 +548,18 @@ function ws_progress_window() {
             break
         fi
     done
-    local prog="/opt/hiddify-manager/common/watashi_progress.py"
-    if [ ! -f "$prog" ]; then
-        prog="$(dirname "${BASH_SOURCE[0]}")/watashi_progress.py"
-    fi
+    # watashi v12.2.130i: the same three places the skin itself is looked for, so the
+    # window that shows an install is drawn by us on a bare server too.
+    local prog=""
+    local ws_progress_prog=""
+    for ws_progress_prog in "/opt/hiddify-manager/common/watashi_progress.py" \
+        "$(dirname "${BASH_SOURCE[0]}")/watashi_progress.py" \
+        "/tmp/hiddify/watashi_progress.py"; do
+        if [ -f "$ws_progress_prog" ]; then
+            prog="$ws_progress_prog"
+            break
+        fi
+    done
     if [ -n "$py" ] && [ -f "$prog" ] && ws_skin_on; then
         "$py" "$prog" --title "$WS_BRAND" "$@"
         local code=$?
