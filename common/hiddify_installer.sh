@@ -148,8 +148,18 @@ function update_panel() {
                 update_progress "Updating..." "Watashi Panel from $current_panel_version to $latest" 10
                 # pip install -U --pre hiddifypanel==$latest
                 disable_panel_services
-                uv pip install -U --pre --force-reinstall --no-deps hiddifypanel
-                uv pip install --pre hiddifypanel
+                # watashi v12.2.130: this used to pull the panel from PyPI, where a
+                # different build than the one in this folder lives. An update could
+                # therefore replace a working panel with code that never matched the
+                # rest of the manager, and a failed install left no panel at all.
+                # The source next to us is the only thing we ship, so it is what we
+                # install, and if it will not import we say so instead of carrying on.
+                uv pip install /opt/hiddify-manager/hiddify-panel/src
+                if ! python -c "import hiddifypanel" >/dev/null 2>&1; then
+                    error "the panel could not be imported after the install"
+                    uv pip install --force-reinstall /opt/hiddify-manager/hiddify-panel/src
+                    python -c "import hiddifypanel" >/dev/null 2>&1 || return 1
+                fi
                 update_progress "Updated..." "Watashi Panel to $latest" 50
                 return 0
             fi
@@ -168,8 +178,18 @@ function update_panel() {
                 update_progress "Updating..." "Watashi Panel from $current_panel_version to $latest" 10
                 # pip3 install -U hiddifypanel==$latest
                 disable_panel_services
-                uv pip install -U --force-reinstall --no-deps hiddifypanel
-                uv pip install hiddifypanel
+                # watashi v12.2.130: this used to pull the panel from PyPI, where a
+                # different build than the one in this folder lives. An update could
+                # therefore replace a working panel with code that never matched the
+                # rest of the manager, and a failed install left no panel at all.
+                # The source next to us is the only thing we ship, so it is what we
+                # install, and if it will not import we say so instead of carrying on.
+                uv pip install /opt/hiddify-manager/hiddify-panel/src
+                if ! python -c "import hiddifypanel" >/dev/null 2>&1; then
+                    error "the panel could not be imported after the install"
+                    uv pip install --force-reinstall /opt/hiddify-manager/hiddify-panel/src
+                    python -c "import hiddifypanel" >/dev/null 2>&1 || return 1
+                fi
                 update_progress "Updated..." "Watashi Panel to $latest" 50
                 return 0
             fi

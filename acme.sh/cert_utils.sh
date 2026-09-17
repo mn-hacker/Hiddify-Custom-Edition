@@ -326,10 +326,19 @@ function get_cert() {
         echo "WARNING: Domain IP doesn't match server IP. The http challenge may fail."
     fi
 
-    # Backup existing certificates
+    # watashi v12.2.130: these copies used to be written inside ssl/ as .crt.bk and
+    # .crt.key.bk. haproxy loads every file it finds in that folder, so a left
+    # over copy became a certificate with no private key and took every bind
+    # down at once. The copies live outside the folder haproxy reads now.
+    ws_ssl_bk="/opt/hiddify-manager/log/ssl-backup"
+    mkdir -p "$ws_ssl_bk" 2>/dev/null || true
+    # any copy left in ssl/ by an older build goes to the same place
+    for stray in "$ssl_cert_path"/*.bk "$ssl_cert_path"/*.bk.key "$ssl_cert_path"/*.crt.bk.key; do
+        [ -e "$stray" ] && mv -f "$stray" "$ws_ssl_bk/" 2>/dev/null || true
+    done
     if [ -f "$ssl_cert_path/$DOMAIN.crt" ]; then
-        cp "$ssl_cert_path/$DOMAIN.crt" "$ssl_cert_path/$DOMAIN.crt.bk"
-        cp "$ssl_cert_path/$DOMAIN.crt.key" "$ssl_cert_path/$DOMAIN.crt.key.bk"
+        cp "$ssl_cert_path/$DOMAIN.crt" "$ws_ssl_bk/$DOMAIN.crt.bk"
+        cp "$ssl_cert_path/$DOMAIN.crt.key" "$ws_ssl_bk/$DOMAIN.crt.key.bk"
     fi
 
     # watashi: cloudflare first when a token is saved, then the classic webroot
@@ -363,12 +372,12 @@ function get_cert() {
     if [ $cert_obtained -eq 1 ]; then
         if ws_install_cert "$DOMAIN"; then
             echo "✓ Certificate installed successfully!"
-            rm -f "$ssl_cert_path/$DOMAIN.crt.bk" "$ssl_cert_path/$DOMAIN.crt.key.bk"
+            rm -f "$ws_ssl_bk/$DOMAIN.crt.bk" "$ws_ssl_bk/$DOMAIN.crt.key.bk"
             ws_cooldown_clear "$DOMAIN"
         else
             echo "ERROR: Failed to install certificate, restoring backup..."
-            [ -f "$ssl_cert_path/$DOMAIN.crt.bk" ] && mv "$ssl_cert_path/$DOMAIN.crt.bk" "$ssl_cert_path/$DOMAIN.crt"
-            [ -f "$ssl_cert_path/$DOMAIN.crt.key.bk" ] && mv "$ssl_cert_path/$DOMAIN.crt.key.bk" "$ssl_cert_path/$DOMAIN.crt.key"
+            [ -f "$ws_ssl_bk/$DOMAIN.crt.bk" ] && mv "$ws_ssl_bk/$DOMAIN.crt.bk" "$ssl_cert_path/$DOMAIN.crt"
+            [ -f "$ws_ssl_bk/$DOMAIN.crt.key.bk" ] && mv "$ws_ssl_bk/$DOMAIN.crt.key.bk" "$ssl_cert_path/$DOMAIN.crt.key"
             cert_obtained=0
             winner=""
         fi
@@ -376,8 +385,8 @@ function get_cert() {
 
     if [ $cert_obtained -eq 0 ]; then
         echo "ERROR: All CA providers failed! Generating self-signed certificate..."
-        [ -f "$ssl_cert_path/$DOMAIN.crt.bk" ] && mv "$ssl_cert_path/$DOMAIN.crt.bk" "$ssl_cert_path/$DOMAIN.crt"
-        [ -f "$ssl_cert_path/$DOMAIN.crt.key.bk" ] && mv "$ssl_cert_path/$DOMAIN.crt.key.bk" "$ssl_cert_path/$DOMAIN.crt.key"
+        [ -f "$ws_ssl_bk/$DOMAIN.crt.bk" ] && mv "$ws_ssl_bk/$DOMAIN.crt.bk" "$ssl_cert_path/$DOMAIN.crt"
+        [ -f "$ws_ssl_bk/$DOMAIN.crt.key.bk" ] && mv "$ws_ssl_bk/$DOMAIN.crt.key.bk" "$ssl_cert_path/$DOMAIN.crt.key"
         bash generate_self_signed_cert.sh $DOMAIN
         ws_cooldown_mark "$DOMAIN"
     fi

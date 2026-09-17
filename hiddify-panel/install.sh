@@ -90,7 +90,20 @@ fi
 
 rm -rf /etc/cron.d/{hiddify_usage_update,hiddify_auto_backup}
 # echo "*/1 * * * * root $(pwd)/update_usage.sh" >/etc/cron.d/hiddify_usage_update
-# echo "0 */6 * * * hiddify-panel $(pwd)/backup.sh" >/etc/cron.d/hiddify_auto_backup
+# watashi v12.2.130d: this line was commented out, which is why no automatic backup
+# ever ran on any panel: the only backups that existed were the ones update.sh
+# takes before an update. The cron runs every hour and the panel setting
+# decides whether it is time yet (backup_interval, 0 switches it off), so the
+# owner keeps control without editing cron. Old files are pruned by the same
+# task, so the folder cannot grow without end.
+cat >/etc/cron.d/hiddify_auto_backup <<'WSCRON'
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+# watashi: hourly check, the panel decides if a backup is due
+17 * * * * root /opt/hiddify-manager/hiddify-panel/backup.sh >/dev/null 2>&1
+WSCRON
+chmod 644 /etc/cron.d/hiddify_auto_backup
+systemctl restart cron 2>/dev/null || systemctl restart crond 2>/dev/null || true
 service cron reload >/dev/null 2>&1
 
 
