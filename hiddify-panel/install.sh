@@ -19,6 +19,14 @@ for ws_log in panel.log hiddify_panel.out.log hiddify_panel.err.log hiddify_pane
     chown hiddify-panel:root ../log/system/$ws_log 2>/dev/null || true
 done
 
+# watashi v12.2.130n: the panel runs as hiddify-panel while /opt/hiddify-manager
+# belongs to root at 755, so the panel could not create the backup folder and
+# the backup taken before every update died with PermissionError. Created here
+# as root and handed over, exactly like log/system above.
+mkdir -p ../backup
+chown hiddify-panel:hiddify-common ../backup 2>/dev/null || true
+chmod 2775 ../backup 2>/dev/null || true
+
 # watashi v12.2.124: the pictures of the account page live here, outside the installed
 # package, so an upgrade of the panel never takes them away.
 mkdir -p uploads/avatars
