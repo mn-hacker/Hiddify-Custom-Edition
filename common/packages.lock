@@ -18,3 +18,5 @@ mtproxygo|2.2.8|amd64|https://github.com/9seconds/mtg/releases/download/v2.2.8/m
 mtproxygo|2.2.8|arm64|https://github.com/9seconds/mtg/releases/download/v2.2.8/mtg-2.2.8-linux-arm64.tar.gz|562a94dd4cafcb8f179b76cfeafb76da12747c8e230bc76235bf8746cc189644
 warp-plus|1.2.6|amd64|https://github.com/bepass-org/warp-plus/releases/download/v1.2.6/warp-plus_linux-amd64.zip|380d2c8655b33db818adf407c706d52d14c2ab1764e702e91f356a7d7d9c3c98
 warp-plus|1.2.6|arm64|https://github.com/bepass-org/warp-plus/releases/download/v1.2.6/warp-plus_linux-arm64.zip|c0b430c117eaa33513fa012aca983303ee88a4bda0f935dc62ff016109e492f3
+mita|3.37.0|amd64|https://github.com/enfein/mieru/releases/download/v3.37.0/mita_3.37.0_linux_amd64.tar.gz|ebd7a4f13204ac69864a385a9841708ac17e6622c1d7ef1f4415b39502c08591
+mita|3.37.0|arm64|https://github.com/enfein/mieru/releases/download/v3.37.0/mita_3.37.0_linux_arm64.tar.gz|3cf85a6eb70a2ad512e2d10e5c1c0a38868c8ba5291f2a43326c466a10512fe0

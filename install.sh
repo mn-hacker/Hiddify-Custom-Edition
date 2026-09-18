@@ -176,6 +176,11 @@ function main() {
         update_progress "${PROGRESS_ACTION}" "Applying users to Singbox" 88
         install_run singbox
         install_run other/mieru $(hconfig "mieru_enable")
+        # watashi v12.2.130t: shadowsocks over faketls lives in a daemon of its
+        # own, and it was installed and disabled only on the heavy path, so
+        # switching it off in the panel left the old daemon running until a
+        # full reinstall. It is applied on the light path as well now.
+        install_run other/ssfaketls $(hconfig "ssfaketls_enable")
     fi
 
     update_progress "${PROGRESS_ACTION}" "Wireguard" 90

@@ -1,5 +1,13 @@
 {
-	{% if hconfigs['shadowsocks2022_enable'] or hconfigs['ssfaketls_enable'] or hconfigs['shadowtls_enable'] %}
+	{# watashi v12.2.130t: the port was printed straight into the json. A missing or
+	   empty shadowsocks2022_port wrote "listen_port":, which is not json at
+	   all, and sing-box refuses the whole configs folder over it - so vless,
+	   reality, tuic and hysteria all went dark because of one shadowsocks
+	   setting. A port that is not a real port now means this one inbound is
+	   simply not written. #}
+	{%- set ws_ss_port = (hconfigs.get('shadowsocks2022_port', '')|string|trim) -%}
+	{%- set ws_ss_ok = ws_ss_port.isdigit() and ws_ss_port|int > 0 and ws_ss_port|int < 65536 -%}
+	{% if (hconfigs['shadowsocks2022_enable'] or hconfigs['ssfaketls_enable'] or hconfigs['shadowtls_enable']) and ws_ss_ok %}
 		"inbounds": [
 			{
 				"tag":"ss-new",
@@ -9,7 +17,7 @@
 					   is chosen from what this kernel really has. #}
 					{% set ws_v6 = exec("[ -f /proc/net/if_inet6 ] && echo -n 'true' || echo -n 'false'")=='true' %}
 					"listen": {% if hconfigs['shadowsocks2022_enable']%}{% if ws_v6 %}"::"{%else%}"0.0.0.0"{%endif%}{%else%}"127.0.0.1"{%endif%},
-				"listen_port":{{hconfigs['shadowsocks2022_port']}},
+				"listen_port":{{ws_ss_port|int}},
 				"tcp_fast_open": true,
 				{# watashi v12.2.99: sniff, sniff_override_destination and domain_strategy
 				   are gone from inbounds in sing-box 1.13.0+; 03_routing.json.j2 carries

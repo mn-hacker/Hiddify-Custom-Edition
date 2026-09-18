@@ -121,6 +121,27 @@ fi
 # switched on from the panel kept answering nothing until a full reinstall
 # finally opened the port. the ports this core listens on are synced here
 # every time the core is applied, which is what that reinstall really did.
+# watashi v12.2.130t: a shadowsocks port that another program already holds
+# makes the inbound fail to bind, and a refused inbound takes the whole
+# core down with it, so every other protocol goes dark over one port.
+# The clash is named here, in the apply log, instead of being a silent
+# core that will not start.
+ws_ss_port_owner() {
+    local cj=/opt/hiddify-manager/current.json port owner
+    [ -f "$cj" ] || return 0
+    command -v jq >/dev/null 2>&1 || return 0
+    [ "$(jq -r '.chconfigs["0"].shadowsocks2022_enable // false' "$cj")" == "true" ] || return 0
+    port=$(jq -r '.chconfigs["0"].shadowsocks2022_port // empty' "$cj")
+    [ -n "$port" ] && [ -z "${port//[0-9]/}" ] || return 0
+    command -v ss >/dev/null 2>&1 || return 0
+    owner=$(ss -lntupH "sport = :$port" 2>/dev/null | grep -v 'sing-box' | head -1)
+    if [ -n "$owner" ]; then
+        echo "watashi: port $port, which shadowsocks wants, is held by something else: $owner" >&2
+    fi
+    return 0
+}
+ws_ss_port_owner
+
 ws_sync_core_ports() {
     local cj=/opt/hiddify-manager/current.json
     [ -f "$cj" ] || return 0
@@ -128,10 +149,31 @@ ws_sync_core_ports() {
     local changed=0 en port
     en=$(jq -r '.chconfigs["0"].shadowsocks2022_enable // false' "$cj")
     port=$(jq -r '.chconfigs["0"].shadowsocks2022_port // empty' "$cj")
+    # watashi v12.2.130t: turning shadowsocks off left its port open, because
+    # this only ever opened one. The port is now closed on the very same
+    # path that opens it, so off really means off without a reinstall. The
+    # port that was last opened is remembered, so a changed port does not
+    # leave the old one behind either.
+    ws_ss_port_state=/opt/hiddify-manager/singbox/.watashi-ss.port
+    ws_ss_old=$(cat "$ws_ss_port_state" 2>/dev/null)
     if [ "$en" == "true" ] && [ -n "$port" ] && [ -z "${port//[0-9]/}" ]; then
         allow_port "tcp" "$port"
         allow_port "udp" "$port"
         changed=1
+        if [ -n "$ws_ss_old" ] && [ "$ws_ss_old" != "$port" ]; then
+            ws_allow_del "tcp" "$ws_ss_old"
+            ws_allow_del "udp" "$ws_ss_old"
+        fi
+        printf '%s\n' "$port" >"$ws_ss_port_state" 2>/dev/null || true
+    else
+        for ws_ss_gone in "$port" "$ws_ss_old"; do
+            if [ -n "$ws_ss_gone" ] && [ -z "${ws_ss_gone//[0-9]/}" ]; then
+                ws_allow_del "tcp" "$ws_ss_gone"
+                ws_allow_del "udp" "$ws_ss_gone"
+                changed=1
+            fi
+        done
+        rm -f "$ws_ss_port_state" 2>/dev/null || true
     fi
     if [ "$(jq -r '.chconfigs["0"].hysteria_enable // false' "$cj")" == "true" ]; then
         for port in $(jq -r '.domains[]?.internal_port_hysteria2 // empty' "$cj"); do

@@ -5,7 +5,15 @@
    method needs here, and hutils/proxy/shared.py folds it the same way, so
    the link and the server keep carrying the same key. a healthy 32 letter
    uuid comes out of this untouched. #}
-{%- set ws_ss_method = hconfigs['shadowsocks2022_method']|string -%}
+{# watashi v12.2.130t: an empty or unknown method is fatal for sing-box ("unknown
+   method"), and one refused inbound takes the whole core down, so a single
+   bad setting switched off every protocol on the box. Only the three
+   methods sing-box really has are accepted; anything else falls back to
+   the one this panel installs by default, and the panel folds the key to
+   the same length on its side. #}
+{%- set ws_ss_known = ['2022-blake3-aes-256-gcm', '2022-blake3-aes-128-gcm', '2022-blake3-chacha20-poly1305'] -%}
+{%- set ws_ss_asked = (hconfigs.get('shadowsocks2022_method', '')|string|trim) -%}
+{%- set ws_ss_method = ws_ss_asked if ws_ss_asked in ws_ss_known else '2022-blake3-aes-256-gcm' -%}
 {%- set ws_ss_size = 16 if '128' in ws_ss_method else 32 -%}
 {%- set ws_ss_raw = (hconfigs['shared_secret']|string).replace('-','') -%}
 {%- set ws_ss_zero = '00000000000000000000000000000000' -%}

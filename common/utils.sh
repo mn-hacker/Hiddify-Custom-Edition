@@ -610,6 +610,34 @@ function allow_port() { #allow_port "tcp" "80"
     ws_allow_add "$1" "$2"
 }
 
+# watashi v12.2.130t: a port could only ever be opened. Nothing took a rule back
+# out, so a protocol switched off in the panel kept its hole in the firewall
+# until the next reinstall rebuilt the chain from scratch. Both spellings
+# ws_allow_add writes are removed, for v4 and v6, and a port that was never
+# opened is not an error.
+function ws_allow_del() { # ws_allow_del tcp 443
+    local proto=$1 port=$2 ipt spec
+    case "$port" in
+    '' | *[!0-9]*) return 0 ;;
+    esac
+    for ipt in iptables ip6tables; do
+        command -v "$ipt" >/dev/null 2>&1 || continue
+        $ipt -n -L "$WS_ALLOW_CHAIN" >/dev/null 2>&1 || continue
+        for spec in "-p $proto -m $proto --dport $port -j ACCEPT" \
+            "-p $proto -m $proto --dport $port -m conntrack --ctstate NEW -j ACCEPT"; do
+            while ${ipt}-save 2>/dev/null | grep -qxF -- "-A $WS_ALLOW_CHAIN $spec"; do
+                echo "removing rule $WS_ALLOW_CHAIN $spec"
+                $ipt -D $WS_ALLOW_CHAIN $spec >/dev/null 2>&1 || break
+            done
+        done
+    done
+    return 0
+}
+
+function deny_port() { #deny_port "tcp" "8443"
+    ws_allow_del "$1" "$2"
+}
+
 # watashi v12.2.115: fold the copies the old code left in INPUT. A rule is
 # dropped only when WATASHI_ALLOW already accepts that very protocol and port,
 # so a rule an admin wrote by hand for some other port is never touched, and
