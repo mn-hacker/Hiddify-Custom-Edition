@@ -170,6 +170,19 @@ function update_progress() {
     echo -e "####$percentage####$title####$text####"
 }
 
+# watashi v12.2.130p: the end of the work, said with a number.
+#
+# "Finished!" on its own is a sentence for a person reading a
+# terminal. Everything that watches an install from the panel reads
+# the ####number#### lines, so a run that never reaches 100 leaves a
+# progress bar sitting at whatever step happened to be last (95, for
+# an install) until it gives up waiting.
+function finish_progress() {
+    local title="${1:-${PROGRESS_ACTION:-Installing}}"
+    update_progress "$title" "Finished" 100
+    echo "---------------------Finished!------------------------"
+}
+
 function is_installed_pypi_package() {
     activate_python_venv
     package_name="$1"

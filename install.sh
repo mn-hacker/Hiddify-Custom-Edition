@@ -189,7 +189,7 @@ function main() {
     
     update_progress "${PROGRESS_ACTION}" "Almost Finished" 95
     
-    echo "---------------------Finished!------------------------"
+    finish_progress
     remove_lock $NAME
     # A SIGTERM followed by "start" is not a restart: systemd can bring the
     # unit back on its own policy, and start on a unit it still believes is

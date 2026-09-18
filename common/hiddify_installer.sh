@@ -284,7 +284,7 @@ function post_update_tasks() {
     local package_mode=$3
     
     if [[ $config_update != 0 ]]; then
-        echo "---------------------Finished!------------------------"
+        finish_progress "Updating..."
     fi
     remove_lock $NAME
 

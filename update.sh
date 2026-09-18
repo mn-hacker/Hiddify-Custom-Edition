@@ -74,7 +74,7 @@ function main() {
         echo "Nothing to update"
     fi
     remove_lock $NAME
-    echo "---------------------Finished!------------------------"
+    finish_progress "Updating..."
 
 }
 if [[ "$HIDDIFY_DISABLE_UPDATE" == "1" || "$HIDDIFY_DISABLE_UPDATE" == "true" ]];then
