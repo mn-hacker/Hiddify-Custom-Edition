@@ -76,6 +76,26 @@ function install_panel() {
 
 }
 
+# watashi v12.2.130l: every place below used to run "uv pip install" against
+# /opt/hiddify-manager/hiddify-panel/src whether or not that folder existed. On a
+# fresh server the version picker runs from the bootstrap copy in /tmp, before
+# the manager is unpacked, so uv answered "Distribution not found" and the next
+# line called the panel broken. The folder is checked first now.
+function ws_install_panel_source() {
+    local src=/opt/hiddify-manager/hiddify-panel/src
+    if [ ! -f "$src/pyproject.toml" ] && [ ! -f "$src/setup.py" ]; then
+        echo "the panel source is not unpacked yet, it is installed later in this run"
+        return 2
+    fi
+    uv pip install "$src" || return 1
+    if ! python -c "import hiddifypanel" >/dev/null 2>&1; then
+        echo "the panel did not import on the first try, installing it again"
+        uv pip install --force-reinstall "$src" || return 1
+        python -c "import hiddifypanel" >/dev/null 2>&1 || return 1
+    fi
+    return 0
+}
+
 function update_panel() {
     update_progress "Checking for Update..." "Watashi Panel" 5
     local package_mode=$1
@@ -89,7 +109,7 @@ function update_panel() {
             activate_python_venv
             # install_python310
             # uv pip install -U --no-deps --force-reinstall hiddify-panel/src
-            uv pip install /opt/hiddify-manager/hiddify-panel/src 
+            ws_install_panel_source
             # pip install -U hiddifypanel
         ;;
         v*)
@@ -150,12 +170,10 @@ function update_panel() {
                 # rest of the manager, and a failed install left no panel at all.
                 # The source next to us is the only thing we ship, so it is what we
                 # install, and if it will not import we say so instead of carrying on.
-                uv pip install /opt/hiddify-manager/hiddify-panel/src
-                if ! python -c "import hiddifypanel" >/dev/null 2>&1; then
-                    error "the panel could not be imported after the install"
-                    uv pip install --force-reinstall /opt/hiddify-manager/hiddify-panel/src
-                    python -c "import hiddifypanel" >/dev/null 2>&1 || return 1
-                fi
+                ws_install_panel_source
+                case $? in
+                1) error "the panel could not be imported after the install"; return 1 ;;
+                esac
                 update_progress "Updated..." "Watashi Panel to $latest" 50
                 return 0
             fi
@@ -180,12 +198,10 @@ function update_panel() {
                 # rest of the manager, and a failed install left no panel at all.
                 # The source next to us is the only thing we ship, so it is what we
                 # install, and if it will not import we say so instead of carrying on.
-                uv pip install /opt/hiddify-manager/hiddify-panel/src
-                if ! python -c "import hiddifypanel" >/dev/null 2>&1; then
-                    error "the panel could not be imported after the install"
-                    uv pip install --force-reinstall /opt/hiddify-manager/hiddify-panel/src
-                    python -c "import hiddifypanel" >/dev/null 2>&1 || return 1
-                fi
+                ws_install_panel_source
+                case $? in
+                1) error "the panel could not be imported after the install"; return 1 ;;
+                esac
                 update_progress "Updated..." "Watashi Panel to $latest" 50
                 return 0
             fi

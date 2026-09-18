@@ -363,10 +363,10 @@ function get_cert() {
             elif [ "$days_left" -le 30 ]; then
                 echo "Certificate expires in $days_left days, attempting renewal..."
             else
-                echo "Certificate has unusually long validity ($days_left days), likely self-signed. Getting new cert..."
+                echo "The certificate on disk is self-signed, asking an authority for a real one."
             fi
         else
-            echo "Existing certificate is self-signed or invalid, getting new cert..."
+            echo "There is no certificate from an authority yet, asking for one now."
         fi
     fi
 
