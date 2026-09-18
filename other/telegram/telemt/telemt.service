@@ -16,6 +16,14 @@ Restart=on-failure
 RestartSec=10
 LimitNOFILE=65536
 DynamicUser=true
+# watashi v12.2.130k: the listener is on 127.0.0.1:1001 and anything below 1024 is
+# privileged, so the dynamic account was refused with "Permission denied" and the
+# telegram proxy never came up. haproxy and other/telegram/tgo/mtg.toml.j2 both
+# point at 1001, so the port stays and the unit gets the single capability that
+# opening it needs. NoNewPrivileges below still holds: an ambient capability is
+# granted by systemd, not gained by the process.
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
 StateDirectory=telemt
 NoNewPrivileges=true
 StandardOutput=file:/opt/hiddify-manager/log/system/telegram.out.log

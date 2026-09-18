@@ -29,6 +29,15 @@ if [ -n "$total_ram_mb" ] && [ "$total_ram_mb" -gt 0 ]; then
 fi
 grep -q '^maxmemory-policy' redis.conf || echo "maxmemory-policy allkeys-lru" >>redis.conf
 
+# watashi v12.2.130k: redis prints "WARNING Memory overcommit must be enabled!" on
+# every start, and on a small box that warning is real: a background save forks
+# and can be refused. Set once, on the disk, so a reboot keeps it.
+if [ "$(cat /proc/sys/vm/overcommit_memory 2>/dev/null)" != "1" ]; then
+    mkdir -p /etc/sysctl.d
+    echo "vm.overcommit_memory = 1" >/etc/sysctl.d/98-watashi-redis.conf
+    sysctl -w vm.overcommit_memory=1 >/dev/null 2>&1 || true
+fi
+
 if ! grep -q "^requirepass" "redis.conf"; then
     # Generate a random password
     random_password=$(< /dev/urandom tr -dc 'a-zA-Z0-9' | head -c49; echo)

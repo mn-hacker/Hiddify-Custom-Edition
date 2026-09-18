@@ -148,10 +148,32 @@ function menu() {
             NEED_KEY=0
             ;;
         "uninstall")
-            bash uninstall.sh
+            # watashi v12.2.130k: the question is asked here, in the same kind of
+            # box as the rest of the menu, and uninstall.sh is then told not to
+            # ask again. Before this, the menu asked nothing and the script
+            # asked twice, the second time in the middle of the work.
+            if whiptail --clear --backtitle "$BACKTITLE" --title "Uninstall" \
+                --yes-button "Uninstall" --no-button "Cancel" --defaultno \
+                --yesno "Remove the panel from this server?\n\nThe database, the backups and your settings stay where they are, so installing again brings your users back." 14 70; then
+                bash uninstall.sh --yes
+            else
+                NEED_KEY=0
+            fi
             ;;
         "purge")
-            bash uninstall.sh purge
+            if whiptail --clear --backtitle "$BACKTITLE" --title "Purge" \
+                --yes-button "Erase everything" --no-button "Cancel" --defaultno \
+                --yesno "Erase the panel and everything it owns?\n\nUsers, admins, domains, certificates, backups and the database are all deleted. This cannot be undone and there is no way back without a backup you saved elsewhere." 15 70; then
+                WS_DB_SERVER=""
+                if whiptail --clear --backtitle "$BACKTITLE" --title "Purge" \
+                    --yes-button "Remove it too" --no-button "Keep it" --defaultno \
+                    --yesno "MariaDB is the database server itself. Other software on this server may be using it.\n\nRemove MariaDB as well?" 12 70; then
+                    WS_DB_SERVER="--remove-db-server"
+                fi
+                bash uninstall.sh purge --yes $WS_DB_SERVER
+            else
+                NEED_KEY=0
+            fi
             ;;
         "add_remote")
             bash common/add_remote_assistant.sh

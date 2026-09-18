@@ -41,7 +41,13 @@ if ! getent passwd mita >/dev/null 2>&1; then
 fi
 
 chmod 600 *.service* 2>/dev/null || true
-ln -sf $(pwd)/watashi-mita.service /etc/systemd/system/watashi-mita.service
+# watashi v12.2.130k: this was a symlink into /opt/hiddify-manager. A purge removes
+# that folder and leaves an enabled unit aimed at a file that is gone, which is
+# why systemd repeated "Failed to open /etc/systemd/system/watashi-mita.service:
+# No such file or directory" long after the panel was uninstalled. A copy has no
+# such tail. 644 because systemd reads it and 600 buys nothing here.
+cp -f watashi-mita.service /etc/systemd/system/watashi-mita.service
+chmod 644 /etc/systemd/system/watashi-mita.service
 systemctl daemon-reload 2>/dev/null || true
 # a unit left in failed state by an earlier round refuses to start again
 # until its counter is cleared, and that is exactly the state the panel was
@@ -71,4 +77,10 @@ fi
 # watashi v12.2.113: the link and the daemon-reload moved above, before the
 # core_manager call. Only the enable is left here, so a reboot brings the
 # daemon back without waiting for the next apply_configs.
+# watashi v12.2.130k: enable only put it in the boot list, so on a box where the
+# download had failed earlier mita stayed dead until the next apply_configs and
+# the panel simply showed "inactive" with nothing explaining why.
 systemctl enable watashi-mita.service >/dev/null 2>&1 || true
+if ! systemctl start watashi-mita.service >/dev/null 2>&1; then
+    echo "watashi: mita did not start, mieru stays off. see log/system/mieru.err.log"
+fi
