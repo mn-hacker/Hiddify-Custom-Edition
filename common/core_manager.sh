@@ -265,6 +265,16 @@ cm_sha() {
 }
 
 # the pinned hash for exactly this name, version and arch
+# watashi v12.2.130k: the newest version of this core that packages.lock carries a
+# checksum for, on this architecture. Used when the blessed version has no pin:
+# rather than leaving the feature off, the manager installs the newest build
+# that was actually checked and says so.
+cm_newest_pinned() {
+    local name=$1 arch=$2
+    awk -F'|' -v n="$name" -v a="$arch" '$1==n && $3==a {print $2}' "$CM_LOCK" 2>/dev/null |
+        sort -V | tail -1
+}
+
 cm_lock_hash() {
     awk -F'|' -v n="$1" -v v="$2" -v a="$3" '$1==n && $2==v && $3==a {print $5; exit}' "$CM_LOCK" 2>/dev/null
 }
@@ -538,6 +548,20 @@ cm_install() {
     fi
     archive=$(cm_download "$name" "$version")
     rc=$?
+    if [ $rc -eq 4 ]; then
+        # watashi v12.2.130k: the registry asked for a version that nobody pinned, which
+        # is how mita 3.37.0 left mieru switched off on a fresh server. The
+        # checksum rule stands, but a core that has a checked build available
+        # should get that build instead of nothing.
+        local pinned
+        pinned=$(cm_newest_pinned "$name" "$(cm_arch)")
+        if [ -n "$pinned" ] && [ "$pinned" != "$version" ]; then
+            cm_log "$name $version has no checksum, falling back to the checked $pinned"
+            version=$pinned
+            archive=$(cm_download "$name" "$version")
+            rc=$?
+        fi
+    fi
     if [ $rc -ne 0 ]; then return $rc; fi
     bin=$(cm_stage "$name" "$version" "$archive")
     if [ -z "$bin" ]; then return 1; fi

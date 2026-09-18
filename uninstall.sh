@@ -160,6 +160,15 @@ function main() {
     rm -f /usr/local/bin/hiddify* /usr/bin/hiddify* /usr/local/bin/watashi*
     rm -f /opt/hiddify-config /opt/hiddify-server
     sed -i '/hiddify-manager/d;/hiddify-config/d;/watashi/d' ~/.bashrc 2>/dev/null || true
+    # watashi v12.2.130k: the acme.sh installer adds a line that sources
+    # /root/.acme.sh/acme.sh.env from the login shell. Removing the folder
+    # without removing that line greeted every later ssh login with
+    # "-bash: /root/.acme.sh/acme.sh.env: No such file or directory".
+    for rc in ~/.bashrc ~/.profile ~/.bash_profile /etc/profile.d/acme.sh.sh; do
+        [[ -f "$rc" ]] && sed -i '/acme\.sh\.env/d' "$rc" 2>/dev/null
+    done
+    rm -f /etc/profile.d/acme.sh.sh
+    crontab -l 2>/dev/null | grep -v 'acme.sh' | crontab - 2>/dev/null || true
 
     if [[ "$PURGE_MODE" != "true" ]]; then
         ws_uninstall_keep_data
@@ -270,6 +279,10 @@ function ws_leftovers() {
     done
     if [[ "$PURGE_MODE" == "true" ]] && mysql -u root -e "USE $DB_NAME;" >/dev/null 2>&1; then
         log "  still here: the $DB_NAME database"
+        found=1
+    fi
+    if grep -qs 'acme\.sh\.env' ~/.bashrc ~/.profile ~/.bash_profile; then
+        log "  still here: the acme.sh line in your login shell"
         found=1
     fi
     if systemctl list-units --all --no-legend 'hiddify-*' 'watashi-*' 'telemt*' 2>/dev/null | grep -q .; then

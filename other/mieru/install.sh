@@ -46,6 +46,11 @@ chmod 600 *.service* 2>/dev/null || true
 # why systemd repeated "Failed to open /etc/systemd/system/watashi-mita.service:
 # No such file or directory" long after the panel was uninstalled. A copy has no
 # such tail. 644 because systemd reads it and 600 buys nothing here.
+# watashi v12.2.130k: a box installed before this round still has the old symlink
+# here, and that link points back at this very file, so cp said "are the same
+# file" and stopped. Removing the destination first handles the old link, a
+# dangling link left by a purge, and a stale copy alike.
+rm -f /etc/systemd/system/watashi-mita.service
 cp -f watashi-mita.service /etc/systemd/system/watashi-mita.service
 chmod 644 /etc/systemd/system/watashi-mita.service
 systemctl daemon-reload 2>/dev/null || true
