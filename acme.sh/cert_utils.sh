@@ -132,15 +132,37 @@ function ws_http_challenge_prepare() {
 # running wastes minutes and eats the account quota. This fetches the file
 # ourselves first; if we cannot read it, neither can the CA.
 function ws_challenge_reachable() {
+    # watashi v12.2.130j: the old probe asked 127.0.0.1 with no Host header, so it
+    # landed on whatever default server nginx had and reported a failure for a
+    # server that was serving the file perfectly well. The real name is used now,
+    # locally and then over the public address.
+    local domain="$1"
     local probe="watashi-check-$$"
     local dir="$WS_ACME_HOME/www/.well-known/acme-challenge"
+    local url="/.well-known/acme-challenge/$probe"
     mkdir -p "$dir" 2>/dev/null || true
     echo "watashi" >"$dir/$probe" 2>/dev/null || return 1
-    local code
-    code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 \
-        "http://127.0.0.1/.well-known/acme-challenge/$probe" 2>/dev/null)
+    local code=""
+    if [ -n "$domain" ]; then
+        code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 \
+            -H "Host: $domain" "http://127.0.0.1$url" 2>/dev/null)
+    fi
+    if [ "$code" != "200" ] && [ -n "$domain" ]; then
+        code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 8 \
+            "http://$domain$url" 2>/dev/null)
+    fi
+    if [ "$code" != "200" ]; then
+        code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 \
+            "http://127.0.0.1$url" 2>/dev/null)
+    fi
     rm -f "$dir/$probe" 2>/dev/null
     [ "$code" = "200" ]
+}
+
+# watashi v12.2.130j: what the next log needs in order to explain a dead port 80.
+function ws_port80_report() {
+    echo "  hiddify-nginx: $(systemctl is-active hiddify-nginx 2>/dev/null)"
+    echo "  listening on 80: $(ss -ltnp 2>/dev/null | grep -c ':80 ')"
 }
 
 function ws_http_challenge_cleanup() {
@@ -174,6 +196,31 @@ function ws_cooldown_mark() {
 
 function ws_cooldown_clear() {
     rm -f "$WS_STATE_DIR/lasttry-$1" 2>/dev/null
+}
+
+# watashi v12.2.130j: acme.sh here is a shell alias from lib/acme.sh.env, not a
+# program, so `timeout acme.sh ...` failed with "No such file or directory" and no
+# request was ever sent. The alias is called normally and a watchdog keeps the
+# time limit, so every --home of the alias stays untouched.
+function ws_acme_run() {
+    local limit="$1"
+    shift
+    local pid waited=0
+    acme.sh "$@" 2>&1 &
+    pid=$!
+    while kill -0 "$pid" 2>/dev/null; do
+        sleep 2
+        waited=$((waited + 2))
+        if [ "$limit" -gt 0 ] 2>/dev/null && [ "$waited" -ge "$limit" ]; then
+            kill -TERM "$pid" 2>/dev/null
+            sleep 2
+            kill -KILL "$pid" 2>/dev/null
+            wait "$pid" 2>/dev/null
+            return 124
+        fi
+    done
+    wait "$pid"
+    return $?
 }
 
 function try_get_cert_with_ca() {
@@ -213,22 +260,24 @@ function try_get_cert_with_ca() {
         args+=(--dns dns_cf)
     else
         ws_http_challenge_prepare
-        if ! ws_challenge_reachable; then
-            echo "The challenge folder cannot be read over port 80 on this server,"
-            echo "so no authority could read it either. Skipping $CA_DESC."
-            echo "Check that hiddify-nginx is running, then ask for the certificate again."
-            return 1
+        # watashi v12.2.130j: a warning, never a refusal. A panel without a certificate
+        # cannot be used at all, so a failed probe must not be what stops the request.
+        if ! ws_challenge_reachable "$DOMAIN"; then
+            echo "The challenge file could not be read over port 80 yet, restarting the web server..."
+            systemctl restart hiddify-nginx 2>/dev/null || true
+            sleep 3
+            if ! ws_challenge_reachable "$DOMAIN"; then
+                echo "WARNING: the challenge file still cannot be read here."
+                ws_port80_report
+                echo "Asking $CA_DESC anyway, in case only this local check is wrong."
+            fi
         fi
         args+=(-w "$WS_ACME_HOME/www/")
     fi
 
     for ((i = 1; i <= MAX_RETRIES; i++)); do
         echo "Attempt $i of $MAX_RETRIES..."
-        if command -v timeout >/dev/null 2>&1; then
-            timeout "$ATTEMPT_TIMEOUT" acme.sh "${args[@]}" 2>&1
-        else
-            acme.sh "${args[@]}" 2>&1
-        fi
+        ws_acme_run "$ATTEMPT_TIMEOUT" "${args[@]}"
         result=$?
         if [ $result -eq 124 ]; then
             echo "The authority did not answer within ${ATTEMPT_TIMEOUT}s, giving up on this attempt"
@@ -240,10 +289,10 @@ function try_get_cert_with_ca() {
         elif [ $result -eq 2 ]; then
             # Already issued, renew it with the same CA this time
             echo "Certificate already exists, attempting renewal with $CA_DESC..."
-            if acme.sh --renew -d "$DOMAIN" --server "$CA_SERVER" --force --log "$WS_ACME_LOG" 2>&1; then
+            if ws_acme_run "$ATTEMPT_TIMEOUT" --renew -d "$DOMAIN" --server "$CA_SERVER" --force --log "$WS_ACME_LOG"; then
                 return 0
             fi
-            if acme.sh --renew -d "$DOMAIN" --server "$CA_SERVER" --force --ecc --log "$WS_ACME_LOG" 2>&1; then
+            if ws_acme_run "$ATTEMPT_TIMEOUT" --renew -d "$DOMAIN" --server "$CA_SERVER" --force --ecc --log "$WS_ACME_LOG"; then
                 return 0
             fi
         fi
