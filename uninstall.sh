@@ -40,14 +40,37 @@ LOG_FILE=/tmp/watashi-uninstall.log
 DB_NAME=hiddifypanel
 DB_USER=hiddifypanel
 
+# watashi v12.2.130z: a step that takes minutes is invisible in a log that only
+# carries a wall clock, so every line also says how long the run has been
+# going. SECONDS starts at zero when bash starts.
 function log() {
-    echo "[$(date '+%H:%M:%S')] $1"
+    echo "[$(date '+%H:%M:%S')] (+${SECONDS}s) $1"
 }
 
 function ws_mysql() {
     # root over the unix socket is how every other script on this box talks to
     # the server; if MariaDB is already gone this simply does nothing.
-    mysql -u root -e "$1" >/dev/null 2>&1 || true
+    # watashi v12.2.130z: without a lock wait of its own, a DROP DATABASE waits for
+    # the server default, which is a year. That is the five minute pause at
+    # the end of a purge: the statement was not slow, it was waiting.
+    timeout 30 mysql --connect-timeout=5 -u root \
+        -e "SET SESSION lock_wait_timeout=15; SET SESSION innodb_lock_wait_timeout=15; $1" >/dev/null 2>&1 || true
+}
+
+function ws_free_database() {
+    # watashi v12.2.130z: a database cannot be dropped while another session still
+    # holds a table of it open. Gunicorn and celery keep a pool of such
+    # sessions, and a worker that outlived its unit keeps them open for as
+    # long as it lives. They are ended here, before the drop is asked for.
+    pkill -f hiddifypanel >/dev/null 2>&1 || true
+    pkill -f "gunicorn.*hiddify" >/dev/null 2>&1 || true
+    pkill -f "celery.*hiddify" >/dev/null 2>&1 || true
+    local ids id
+    ids=$(timeout 10 mysql --connect-timeout=3 -u root -N -B -e \
+        "SELECT id FROM information_schema.processlist WHERE db IN ('$DB_NAME', 'hiddify_panel') AND id <> CONNECTION_ID();" 2>/dev/null)
+    for id in $ids; do
+        timeout 10 mysql --connect-timeout=3 -u root -e "KILL $id;" >/dev/null 2>&1 || true
+    done
 }
 
 echo "============================================="
@@ -118,9 +141,12 @@ function main() {
     ws_final_backup
 
     log "Stopping services..."
+    # watashi v12.2.130z: systemd gives a unit ninety seconds to stop on its own.
+    # A unit stuck in activating uses every one of them, so it is given ten
+    # and then killed.
     for service in "${SERVICES[@]}"; do
-        systemctl stop "$service" >/dev/null 2>&1
-        systemctl disable "$service" >/dev/null 2>&1
+        timeout 10 systemctl stop "$service" >/dev/null 2>&1 || systemctl kill -s KILL "$service" >/dev/null 2>&1
+        timeout 10 systemctl disable "$service" >/dev/null 2>&1
         systemctl reset-failed "$service" >/dev/null 2>&1
     done
 
@@ -153,8 +179,16 @@ function main() {
     log "Removing web server configs..."
     rm -f /etc/nginx/sites-enabled/hiddify* /etc/nginx/sites-available/hiddify*
     rm -f /etc/nginx/conf.d/hiddify* /etc/haproxy/haproxy.cfg.hiddify*
-    systemctl restart nginx >/dev/null 2>&1 || true
-    systemctl restart haproxy >/dev/null 2>&1 || true
+    # watashi v12.2.130z: during a purge these two are on their way out, and haproxy
+    # without a config file only retries and waits. Restart them only when
+    # the panel is being removed but the box keeps serving.
+    if [[ "$PURGE_MODE" == "true" ]]; then
+        timeout 10 systemctl stop nginx >/dev/null 2>&1 || true
+        timeout 10 systemctl stop haproxy >/dev/null 2>&1 || true
+    else
+        timeout 20 systemctl restart nginx >/dev/null 2>&1 || true
+        timeout 20 systemctl restart haproxy >/dev/null 2>&1 || true
+    fi
 
     log "Removing shortcuts and the boot menu..."
     rm -f /usr/local/bin/hiddify* /usr/bin/hiddify* /usr/local/bin/watashi*
@@ -213,6 +247,7 @@ function ws_uninstall_keep_data() {
 
 function ws_purge_everything() {
     log "Dropping the database..."
+    ws_free_database
     # The old script dropped "hiddify_panel", a name this panel has never used;
     # ours is hiddifypanel, created by other/mysql/install.sh.
     ws_mysql "DROP DATABASE IF EXISTS $DB_NAME;"
@@ -240,7 +275,7 @@ function ws_purge_everything() {
     groupdel mita >/dev/null 2>&1 || true
 
     log "Removing the python package..."
-    pip3 uninstall -y hiddifypanel >/dev/null 2>&1 || true
+    timeout 60 pip3 uninstall -y hiddifypanel >/dev/null 2>&1 || true
 
     if [[ "$REMOVE_DB_SERVER" == "true" ]]; then
         log "Removing MariaDB as asked..."
@@ -277,7 +312,7 @@ function ws_leftovers() {
             found=1
         fi
     done
-    if [[ "$PURGE_MODE" == "true" ]] && mysql -u root -e "USE $DB_NAME;" >/dev/null 2>&1; then
+    if [[ "$PURGE_MODE" == "true" ]] && timeout 5 mysql --connect-timeout=3 -u root -e "USE $DB_NAME;" >/dev/null 2>&1; then
         log "  still here: the $DB_NAME database"
         found=1
     fi
@@ -285,7 +320,7 @@ function ws_leftovers() {
         log "  still here: the acme.sh line in your login shell"
         found=1
     fi
-    if systemctl list-units --all --no-legend 'hiddify-*' 'watashi-*' 'telemt*' 2>/dev/null | grep -q .; then
+    if timeout 5 systemctl list-units --all --no-legend 'hiddify-*' 'watashi-*' 'telemt*' 2>/dev/null | grep -q .; then
         log "  systemd still lists panel units, a reboot clears the last of them"
     fi
     [[ "$found" == "0" ]] && log "  nothing left behind."
