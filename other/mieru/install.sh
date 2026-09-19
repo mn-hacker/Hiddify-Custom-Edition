@@ -32,9 +32,16 @@ if ! getent group mita >/dev/null 2>&1; then
     groupadd --system mita 2>/dev/null || true
 fi
 if ! getent passwd mita >/dev/null 2>&1; then
-    useradd --system --gid mita --no-create-home --home-dir /nonexistent \
-        --shell /usr/sbin/nologin --comment "Watashi mieru server" mita 2>/dev/null ||
-        useradd -r -g mita -M -s /bin/false mita 2>/dev/null || true
+    # watashi v12.2.130aa: /nonexistent is the usual home of a service account, but
+    # the tools on ubuntu 24.04 print 'info: The home dir /nonexistent you
+    # specified can't be accessed' about it, and on a clean install that
+    # line reads like a fault. A real directory that nobody can enter says
+    # the same thing without the complaint.
+    install -d -m 0750 -o root -g root /var/lib/mita >/dev/null 2>&1 || true
+    useradd --system --gid mita --no-create-home --home-dir /var/lib/mita \
+        --shell /usr/sbin/nologin --comment "Watashi mieru server" mita >/dev/null 2>&1 ||
+        useradd -r -g mita -M -d /var/lib/mita -s /bin/false mita >/dev/null 2>&1 || true
+    chown mita:mita /var/lib/mita >/dev/null 2>&1 || true
 fi
 if ! getent passwd mita >/dev/null 2>&1; then
     echo "watashi: the mita system account could not be created, mieru cannot start"
