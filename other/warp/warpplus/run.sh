@@ -23,6 +23,10 @@ PORT=3000
 PROXY="socks5h://127.0.0.1:$PORT"
 CACHE="cache"
 CONF="engine.conf"
+# watashi v12.2.130v: the address the engine last left through, remembered so
+# that a restart lands on the same one. Empty or missing simply means
+# "nothing remembered yet", which is exactly the old behaviour.
+PIN="$CACHE/.watashi-endpoint"
 LOGDIR="${WS_LOG_DIR:-/opt/hiddify-manager/log/system}"
 LOG="$LOGDIR/warp.log"
 WAIT=${WS_WARP_WAIT:-40}
@@ -88,9 +92,56 @@ fi
 
 # One argument per line, because a WARP+ key or a country code must never be
 # re-split by the shell inside the systemd unit.
+# watashi v12.2.130v: an address is only ever used again if it still looks like
+# an address. Anything else is treated as nothing remembered.
+function ws_endpoint_ok() {
+    grep -qE '^(([0-9]{1,3}\.){3}[0-9]{1,3}|\[[0-9a-fA-F:]+\]):[0-9]{1,5}$' <<<"${1:-}"
+}
+
+# Does this engine take an address at all. An older build that does not
+# know --endpoint would refuse to start, so it is asked first and the
+# answer decides whether the pin is used.
+function ws_engine_takes_endpoint() {
+    [ -x "$BIN" ] || return 1
+    "$BIN" --help 2>&1 | grep -q -- "--endpoint"
+}
+
+# Prints the remembered address, or nothing. cfon leaves through psiphon,
+# where the cloudflare address means nothing, so that mode never pins.
+function ws_pinned_endpoint() {
+    local ep
+    [ "$MODE" = "cfon" ] && return 1
+    [ "${WS_WARP_NEW_IP:-0}" = "1" ] && return 1
+    ep=$(head -n 1 "$PIN" 2>/dev/null | tr -d '[:space:]')
+    ws_endpoint_ok "$ep" || return 1
+    ws_engine_takes_endpoint || return 1
+    printf '%s\n' "$ep"
+}
+
+# After a tunnel really carried traffic, write down the address it used so
+# the next start can ask for the same one. If the engine never named it,
+# nothing is written and nothing changes.
+function ws_remember_endpoint() {
+    local ep
+    [ "$MODE" = "cfon" ] && return 0
+    ws_engine_takes_endpoint || return 0
+    ep=$(head -n 1 "$PIN" 2>/dev/null | tr -d '[:space:]')
+    ws_endpoint_ok "$ep" && return 0
+    ep=$(journalctl -u hiddify-warp.service -n 200 --no-pager 2>/dev/null |
+        grep -oE '(([0-9]{1,3}\.){3}[0-9]{1,3}|\[[0-9a-fA-F:]+\]):(2408|500|1701|4500|854|880|939|1002|1010|1014|1018|1070|1180|1387|1843|2371|2506|3138|3476|3581|3854|4177|4198|4233|5279|5956|7103|7152|7156|7281|7559|8319|8742|8854|8886)' |
+        tail -n 1)
+    ws_endpoint_ok "$ep" || return 0
+    mkdir -p "$CACHE"
+    printf '%s\n' "$ep" >"$PIN"
+    chmod 600 "$PIN" 2>/dev/null
+}
+
+# watashi v12.2.130v: the file it writes is an argument now, so the new list can
+# be built beside the live one and compared with it before anything is
+# restarted. With no argument it behaves exactly as it always did.
 function build_args() {
-    local key
-    : >engine.args
+    local key out="${1:-engine.args}"
+    : >"$out"
     {
         echo "-b"
         echo "127.0.0.1:$PORT"
@@ -100,30 +151,38 @@ function build_args() {
         echo "${DNS:-1.1.1.1}"
         echo "--test-url"
         echo "${TEST_URL:-http://1.1.1.1}"
-    } >>engine.args
+    } >>"$out"
     case "$IPV" in
-    4) echo "-4" >>engine.args ;;
-    6) echo "-6" >>engine.args ;;
+    4) echo "-4" >>"$out" ;;
+    6) echo "-6" >>"$out" ;;
     esac
-    if [ "$SCAN" == "1" ]; then
-        echo "--scan" >>engine.args
+    # watashi v12.2.130v: a remembered address replaces the scan, because the
+    # scan is the thing that hands out a different exit IP every time the
+    # engine starts. If the engine of this machine does not understand
+    # --endpoint, or nothing is remembered, the scan is used exactly as
+    # before, so the worst case is the behaviour of the previous version.
+    if ws_pinned_endpoint >/dev/null; then
+        echo "--endpoint" >>"$out"
+        ws_pinned_endpoint >>"$out"
+    elif [ "$SCAN" == "1" ]; then
+        echo "--scan" >>"$out"
     fi
     case "$MODE" in
     gool)
-        echo "--gool" >>engine.args
+        echo "--gool" >>"$out"
         ;;
     cfon)
-        echo "--cfon" >>engine.args
-        echo "--country" >>engine.args
-        echo "${COUNTRY:-AT}" >>engine.args
+        echo "--cfon" >>"$out"
+        echo "--country" >>"$out"
+        echo "${COUNTRY:-AT}" >>"$out"
         ;;
     esac
     key=$(hconfig warp_plus_code)
     if [ -n "$key" ] && [ "$key" != "-" ]; then
-        echo "-k" >>engine.args
-        echo "$key" >>engine.args
+        echo "-k" >>"$out"
+        echo "$key" >>"$out"
     fi
-    chmod 600 engine.args 2>/dev/null
+    chmod 600 "$out" 2>/dev/null
 }
 
 # The only honest test: real traffic through the proxy the panel will use.
@@ -169,9 +228,9 @@ function explain_failure() {
     fi
 }
 
-function bring_up() {
+# watashi v12.2.130v: one restart and the wait that goes with it.
+function ws_start_and_wait() {
     local i
-    build_args
     systemctl restart hiddify-warp.service 2>&1 | sed 's|^|    |'
     for i in $(seq 1 "$WAIT"); do
         if warp_trace; then
@@ -184,6 +243,58 @@ function bring_up() {
         fi
         sleep 1
     done
+    return 1
+}
+
+# watashi v12.2.130v: the engine used to be restarted on every apply, every
+# update and every settings save, and a restart with --scan comes back
+# through a different cloudflare address, so an operator who had found a
+# good exit IP lost it to work that had nothing to do with WARP. A running
+# engine whose argument list has not changed, and which is carrying
+# traffic right now, is now left exactly where it is.
+function ws_can_leave_alone() {
+    local started binary
+    [ "${WS_WARP_NEW_IP:-0}" = "1" ] && return 1
+    [ -f engine.args ] || return 1
+    cmp -s engine.args.new engine.args || return 1
+    systemctl is-active --quiet hiddify-warp.service || return 1
+    # a freshly installed binary must be picked up, so the running service
+    # has to be younger than the file it runs.
+    started=$(date -d "$(systemctl show -p ActiveEnterTimestamp --value hiddify-warp.service 2>/dev/null)" +%s 2>/dev/null)
+    binary=$(stat -c %Y "$BIN" 2>/dev/null)
+    if [[ "$started" =~ ^[0-9]+$ && "$binary" =~ ^[0-9]+$ && "$binary" -gt "$started" ]]; then
+        return 1
+    fi
+    warp_trace
+}
+
+function bring_up() {
+    build_args engine.args.new
+    if ws_can_leave_alone; then
+        rm -f engine.args.new
+        echo "- Nothing about the node changed, so it keeps running and keeps its address."
+        ws_remember_endpoint
+        return 0
+    fi
+    mv -f engine.args.new engine.args
+    chmod 600 engine.args 2>/dev/null
+    if ws_start_and_wait; then
+        ws_remember_endpoint
+        return 0
+    fi
+    # The remembered address is never allowed to be the reason WARP is
+    # down: if the start that used it failed, it is thrown away and the
+    # engine is given one more chance to find an address by itself.
+    if ws_pinned_endpoint >/dev/null; then
+        warning "- The address the node used last time did not answer, looking for another one."
+        rm -f "$PIN"
+        build_args engine.args
+        chmod 600 engine.args 2>/dev/null
+        if ws_start_and_wait; then
+            ws_remember_endpoint
+            return 0
+        fi
+    fi
     return 1
 }
 
