@@ -186,11 +186,11 @@ function main() {
     update_progress "${PROGRESS_ACTION}" "Wireguard" 90
     install_run other/wireguard $(hconfig "wireguard_enable")
 
-    # watashi v12.2.62: AmneziaWG on a daemon of its own. The switch is off
-    # until the owner turns it on, so a machine that cannot get the amneziawg
-    # tools never loses the amnezia the sing-box endpoint serves today.
+    # watashi v12.2.62: AmneziaWG on a daemon of its own.
+    # watashi v12.2.130u: and it is the only amnezia there is, so it follows
+    # amnezia_enable. The core never had an awg endpoint to fall back on.
     update_progress "${PROGRESS_ACTION}" "AmneziaWG" 92
-    install_run other/amnezia $(hconfig "amnezia_native_enable")
+    install_run other/amnezia $(hconfig "amnezia_enable")
     
     update_progress "${PROGRESS_ACTION}" "Almost Finished" 95
     

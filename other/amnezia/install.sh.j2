@@ -10,6 +10,14 @@ if ! ws_awg_name_ok; then
 fi
 
 if ! ws_awg_ready; then
+    # watashi v12.2.130u: the repository below is a ppa, which only exists on
+    # debian and ubuntu. On anything else apt-get is not there at all and
+    # every line simply failed in the dark, ending in the vague "could not
+    # be installed" below. The reason is named now.
+    if ! command -v apt-get >/dev/null 2>&1; then
+        ws_awg_say "this machine has no apt-get, and amneziawg ships as an ubuntu ppa. Install amneziawg and amneziawg-tools by hand, then switch amnezia on again."
+        exit 0
+    fi
     ws_awg_say "amneziawg is not on this machine yet, asking the amnezia repository for it"
     export DEBIAN_FRONTEND=noninteractive
     apt-get install -y software-properties-common >/dev/null 2>&1
@@ -19,9 +27,9 @@ if ! ws_awg_ready; then
     apt-get install -y amneziawg amneziawg-tools >/dev/null 2>&1
 fi
 
-# A protocol that is already serving users is never taken down for a protocol
-# that could not be installed. If the tools are missing the script stops here
-# and says so, leaving the sing-box endpoint exactly as it was.
+# watashi v12.2.130u: nothing else on this box serves amnezia, so if the tools are
+# missing the script stops here and says so plainly, without taking any
+# other protocol down with it.
 if ! ws_awg_ready; then
     ws_awg_say "amneziawg could not be installed here. nothing was changed and no service was stopped."
     ws_awg_say "send the output of: apt-cache policy amneziawg amneziawg-tools"

@@ -1,42 +1,11 @@
 {
-	{# watashi v12.2.62: while the separate amneziawg daemon is on, it owns the port and this endpoint has to stand aside. Only one of the two can bind. #}
-	{# watashi v12.2.99: awg was never part of upstream sing-box either;
-	   official 1.14.0 answers unknown endpoint type: awg. Kept whole behind
-	   singbox_has_awg for the same reason as mieru. The standalone
-	   amneziawg daemon (amnezia_native_enable) is unaffected. #}
-		{% if hconfigs['amnezia_enable'] and not hconfigs.get('amnezia_native_enable') and hconfigs.get('singbox_has_awg') %}
-		"endpoints": [
-			{% for d in domains if d['internal_port_amnezia']  %}
-			{%set domain=d['domain']%}
-			{%set port=d['internal_port_amnezia']%}
-
-			{
-				"type": "awg",
-				"tag": "amnezia_in_{{port}}",
-				"private_key": "{{ hconfigs['wireguard_private_key'] }}",
-				"address": ["{{ hconfigs['wireguard_ipv4'] }}/24", "{{ hconfigs['wireguard_ipv6'] }}/64"],
-				"listen_port": {{ port }},
-				"mtu": 1380,
-				"s1": {{ hconfigs['amnezia_s1'] }},
-				"s2": {{ hconfigs['amnezia_s2'] }},
-				"h1": "{{ hconfigs['amnezia_h1'] }}",
-				"h2": "{{ hconfigs['amnezia_h2'] }}",
-				"h3": "{{ hconfigs['amnezia_h3'] }}",
-				"h4": "{{ hconfigs['amnezia_h4'] }}",
-				"jc": {{ hconfigs['amnezia_jc'] }},
-				"jmin": {{ hconfigs['amnezia_jmin'] }},
-				"jmax": {{ hconfigs['amnezia_jmax'] }},
-				"peers": [
-					{% for u in users %}
-						{
-							"public_key": "{{ u['wg_pub'] }}",
-							"preshared_key": "{{ u['wg_psk'] }}",
-							"allowed_ips": ["{{ u['wg_ipv4'] }}/32", "{{ u['wg_ipv6'] }}/128"]
-						},
-					{% endfor%}
-				]
-			},
-			{%endfor%}
-		]
-	{% endif %}
+	{# watashi v12.2.130u: amnezia used to be described twice, once as an "awg"
+	   endpoint of this core and once as a daemon of its own. sing-box has no
+	   awg endpoint at all - official 1.14.0 answers "unknown endpoint type:
+	   awg" and then refuses every other protocol with it - so that half was
+	   never anything but a dead switch. AmneziaWG is served by awg-quick on
+	   the interface named in other/amnezia/awg_utils.sh, and amnezia_enable
+	   is the one switch that turns it on. This file is left in place, and
+	   empty, so an older installation that still has it on disk is simply
+	   overwritten with nothing instead of keeping the old endpoint. #}
 }
