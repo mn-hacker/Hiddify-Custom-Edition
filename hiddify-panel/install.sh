@@ -108,7 +108,7 @@ cat >/etc/cron.d/hiddify_auto_backup <<'WSCRON'
 SHELL=/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 # watashi: hourly check, the panel decides if a backup is due
-17 * * * * root /opt/hiddify-manager/hiddify-panel/backup.sh >/dev/null 2>&1
+17 * * * * root /opt/hiddify-manager/hiddify-panel/backup.sh --if-due >/dev/null 2>&1
 WSCRON
 chmod 644 /etc/cron.d/hiddify_auto_backup
 systemctl restart cron 2>/dev/null || systemctl restart crond 2>/dev/null || true
