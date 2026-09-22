@@ -15,6 +15,9 @@ fi
 
 umask 077
 
+# watashi v12.2.130am: the addresses come from amnezia_ipv4/ipv6 through the
+# panel dump (awg_ipv4/awg_ipv6). An older dump has neither, and then
+# the wireguard pair is used exactly as before.
 # Every peer is written from scratch. A user who lost access has to lose the
 # line as well, and editing lines in place is a far easier thing to get wrong
 # than dropping all of them and writing the ones that are currently valid.
@@ -26,7 +29,7 @@ cat >>"$AWG_CONF" <<'WS_PEER_END'
 [Peer]
 PublicKey = {{ u['wg_pub'] }}
 PresharedKey = {{ u['wg_psk'] }}
-AllowedIPs = {{ u['wg_ipv4'] }}/32, {{ u['wg_ipv6'] }}/128
+AllowedIPs = {{ u.get('awg_ipv4') or u['wg_ipv4'] }}/32, {{ u.get('awg_ipv6') or u['wg_ipv6'] }}/128
 WS_PEER_END
 {% endif %}{% endfor %}
 

@@ -29,6 +29,14 @@ allow_port "tcp" 53
 
 allow_port "udp" {{hconfigs['wireguard_port']}} #wireguard
 
+{% if hconfigs.get('amnezia_enable') and hconfigs.get('amnezia_port') %}
+# watashi v12.2.130am: this line never existed. The only thing that opened the
+# amnezia port was PostUp inside the interface file, while disable.sh
+# closed a port the manager had never opened, so WATASHI_ALLOW did not
+# carry it and a rebuilt chain dropped the handshake in silence.
+allow_port "udp" {{hconfigs['amnezia_port']}} #amnezia
+{% endif %}
+
 
 add2iptables46 "INPUT -p udp -m conntrack --ctstatus SEEN_REPLY,ASSURED,CONFIRMED -j ACCEPT"
 

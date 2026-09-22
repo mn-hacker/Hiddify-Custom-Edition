@@ -33,6 +33,9 @@ class Command(StrEnum):
     control_tunnel = os.path.join(HIDDIFY_DIR, 'other/rathole/control_tunnel.sh')
     # watashi v12.2.129: the only root door the nodes page has
     node = os.path.join(HIDDIFY_DIR, 'other/warp/node.sh')
+    # watashi v12.2.130an: everything the panel needs in order to say where the
+    # amnezia packets stop, read in one place.
+    amnezia_status = os.path.join(HIDDIFY_DIR, 'other/amnezia/status.sh')
     id = 'id'
 
 
@@ -190,6 +193,13 @@ def update_awg_usage():
     # own interface, named once in other/amnezia/awg_utils.sh. Its bytes never
     # reach the sing-box core, so they have to be read straight off awg.
     print(ws_tunnel_transfer('awg', 'watashi-awg'))
+
+
+@cli.command('amnezia-status')
+def amnezia_status():
+    # watashi v12.2.130an: status.sh only looks and always exits 0, so run() with
+    # check=True is safe here.
+    run([Command.amnezia_status.value])
 
 
 @cli.command('install-rathole')
