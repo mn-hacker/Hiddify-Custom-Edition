@@ -123,13 +123,61 @@ function success() {
     echo -e "\033[92m$1\033[0m" >&2
 }
 
+# watashi v12.2.130bb: this used to be one systemctl is-active and nothing else.
+# Every unit here carries Restart=always, which is right - a core that dies
+# must come back - but it also means a unit that cannot start spends three
+# seconds in activating and one second in active, over and over. One instant
+# sample reports whichever of those it landed on, so the same broken service
+# read "active" and then "activating" and nobody could tell which service was
+# actually the sick one.
+#
+# systemd already counts the restarts and remembers when the unit last came
+# up. Both are read here in a single call, so a service that is merely
+# starting, a service that is flapping, and a service that is genuinely up
+# are three different words.
 function get_pretty_service_status() {
-    status=$(systemctl is-active $1)
-    if [ $? == 0 ]; then
-        success $status
-	else
-        error $status
-	fi
+    local unit="$1" ws_state ws_sub ws_n ws_since ws_now ws_up line
+    while IFS='=' read -r key value; do
+        case "$key" in
+        ActiveState) ws_state="$value" ;;
+        SubState) ws_sub="$value" ;;
+        NRestarts) ws_n="$value" ;;
+        ActiveEnterTimestampMonotonic) ws_since="$value" ;;
+        esac
+    done < <(systemctl show -p ActiveState -p SubState -p NRestarts \
+        -p ActiveEnterTimestampMonotonic "$unit" 2>/dev/null)
+
+    [ -n "$ws_state" ] || { error "unknown"; return; }
+    ws_n=${ws_n:-0}
+    # seconds this unit has been up, from the same monotonic clock systemd uses
+    ws_now=$(awk '{printf "%d", $1 * 1000000}' /proc/uptime 2>/dev/null)
+    ws_up=0
+    if [ -n "$ws_since" ] && [ "$ws_since" -gt 0 ] 2>/dev/null && [ -n "$ws_now" ]; then
+        ws_up=$(((ws_now - ws_since) / 1000000))
+        [ "$ws_up" -lt 0 ] && ws_up=0
+    fi
+
+    case "$ws_state" in
+    active)
+        # up for less than a minute after several restarts is not "active",
+        # it is the good half of a loop.
+        if [ "$ws_n" -gt 3 ] && [ "$ws_up" -lt 60 ]; then
+            error "flapping ${ws_n}x"
+        else
+            success active
+        fi
+        ;;
+    activating)
+        if [ "$ws_sub" = "auto-restart" ]; then
+            error "restarting ${ws_n}x"
+        else
+            warning starting
+        fi
+        ;;
+    deactivating) warning stopping ;;
+    failed) error failed ;;
+    *) error "$ws_state" ;;
+    esac
 }
 function add_DNS_if_failed() {
     # Domain to check

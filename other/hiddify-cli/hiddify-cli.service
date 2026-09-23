@@ -14,6 +14,13 @@ RestartSec=30
 WorkingDirectory=/opt/hiddify-manager/other/hiddify-cli
 # Check if .env exists, exit gracefully if not (will retry via Restart)
 ExecStartPre=/bin/bash -c 'test -f /opt/hiddify-manager/other/hiddify-cli/.env || { echo ".env not found, waiting for run.sh to create it"; exit 1; }'
+# watashi v12.2.130bb: the subscription this service runs on comes from the panel
+# on 127.0.0.1:9000. After=hiddify-panel.service only orders the start, it
+# does not wait for the panel to be listening, and the panel needs seconds.
+# So a restart of everything at once had the cli knock on a closed port,
+# print "connection refused" and die, which is the activating that never
+# ends. Two minutes is longer than any panel start measured so far.
+ExecStartPre=/bin/bash -c 'for i in $(seq 1 60); do curl -s -o /dev/null --max-time 2 http://127.0.0.1:9000/ && exit 0; sleep 2; done; echo "the panel did not answer on 127.0.0.1:9000 within 120s"; exit 1'
 EnvironmentFile=-/opt/hiddify-manager/other/hiddify-cli/.env
 ExecStart=/opt/hiddify-manager/other/hiddify-cli/hiddify-cli run -c $SUB_LINK -d h_client_config.json
 User=hiddify-cli

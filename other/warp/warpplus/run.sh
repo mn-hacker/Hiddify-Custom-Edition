@@ -145,22 +145,65 @@ function ws_pinned_endpoint() {
     printf '%s\n' "$ep"
 }
 
+# Every address shaped like a cloudflare WARP endpoint: a v4 or a bracketed
+# v6 address on one of the ports WARP actually listens on. The port list is
+# what keeps 127.0.0.1:3000 and 1.1.1.1:53 out of the answer.
+# watashi v12.2.130be: the port list WarpPorts() really returns in warp-plus 1.2.6,
+# all 54 of them (warp/endpoint.go). The list here carried 35, so a
+# tunnel that came up on 988 or 894 - both perfectly normal warp ports -
+# was not recognised as an endpoint at all and its address was never
+# written down. Proven against the real binary, which answered
+# 162.159.192.70:988 on the very first try.
+WS_EP_PAT='(([0-9]{1,3}\.){3}[0-9]{1,3}|\[[0-9a-fA-F:]+\]):(500|854|859|864|878|880|890|891|894|903|908|928|934|939|942|943|945|946|955|968|987|988|1002|1010|1014|1018|1070|1074|1180|1387|1701|1843|2371|2408|2506|3138|3476|3581|3854|4177|4198|4233|4500|5279|5956|7103|7152|7156|7281|7559|8319|8742|8854|8886)'
+
+# watashi v12.2.130bd: the address this run of the engine is really on.
+#
+# It used to be tail -1 of the last 200 journal lines, which spans older
+# starts and, during a --scan, the whole list of addresses being measured.
+# The last one printed there is simply the last one tried. Here only the
+# lines of the current start are read, and a line that names the endpoint
+# is preferred over any other.
+function ws_endpoint_from_log() {
+    local since j ep
+    since=$(systemctl show -p ActiveEnterTimestamp --value hiddify-warp.service 2>/dev/null)
+    if [ -n "$since" ]; then
+        j=$(journalctl -u hiddify-warp.service --since "$since" --no-pager 2>/dev/null)
+    fi
+    [ -n "$j" ] || j=$(journalctl -u hiddify-warp.service -n 200 --no-pager 2>/dev/null)
+    # watashi v12.2.130be: app.go prints 'using warp endpoints endpoints=[a b]' and the
+    # tunnel is built on the first of them; the second is only the inner hop
+    # of gool mode. So that line is read first, and the first address on it.
+    #
+    # Error lines are thrown away before anything is read. A scan that fails
+    # fills the journal with 'ping error ... addr=188.114.99.31 ...:878', and
+    # the catch all that used to stand at the end of this function happily
+    # wrote one of those down: an address that had just been proven dead,
+    # remembered as the good one.
+    j=$(grep -v 'level=ERROR' <<<"$j")
+    ep=$(grep -F 'using warp endpoints' <<<"$j" | tail -n 1 | grep -oE "$WS_EP_PAT" | head -n 1)
+    [ -n "$ep" ] || ep=$(grep -iE 'endpoint|connected|handshake' <<<"$j" | grep -oE "$WS_EP_PAT" | tail -n 1)
+    printf '%s\n' "$ep"
+}
+
 # After a tunnel really carried traffic, write down the address it used so
 # the next start can ask for the same one. If the engine never named it,
 # nothing is written and nothing changes.
 function ws_remember_endpoint() {
-    local ep
+    local ep old
     [ "$MODE" = "cfon" ] && return 0
     ws_engine_takes_endpoint || return 0
-    ep=$(head -n 1 "$PIN" 2>/dev/null | tr -d '[:space:]')
-    ws_endpoint_ok "$ep" && return 0
-    ep=$(journalctl -u hiddify-warp.service -n 200 --no-pager 2>/dev/null |
-        grep -oE '(([0-9]{1,3}\.){3}[0-9]{1,3}|\[[0-9a-fA-F:]+\]):(2408|500|1701|4500|854|880|939|1002|1010|1014|1018|1070|1180|1387|1843|2371|2506|3138|3476|3581|3854|4177|4198|4233|5279|5956|7103|7152|7156|7281|7559|8319|8742|8854|8886)' |
-        tail -n 1)
+    # watashi v12.2.130bd: this used to return the moment a pin file existed, so the
+    # first address ever written became permanent. The node could never move
+    # to a better edge, and a dead one cost two full starts on every single
+    # apply: one waiting the pin out, one for the scan behind it. What the
+    # engine is on right now is what gets written down.
+    ep=$(ws_endpoint_from_log)
     ws_endpoint_ok "$ep" || return 0
     # watashi v12.2.130ay: and do not write one of the wrong family either, or the next
     # start throws it away again and the scan runs every single time.
     ws_endpoint_family_ok "$ep" || return 0
+    old=$(head -n 1 "$PIN" 2>/dev/null | tr -d '[:space:]')
+    [ "$ep" = "$old" ] && return 0
     mkdir -p "$CACHE"
     printf '%s\n' "$ep" >"$PIN"
     chmod 600 "$PIN" 2>/dev/null
@@ -194,7 +237,19 @@ function build_args() {
     if ws_pinned_endpoint >/dev/null; then
         echo "--endpoint" >>"$out"
         ws_pinned_endpoint >>"$out"
-    elif [ "$SCAN" == "1" ]; then
+    elif [ "${WS_WARP_NO_SCAN:-0}" = "1" ]; then
+        # watashi v12.2.130be: no --scan and no --endpoint means the engine takes one
+        # random warp address of the family that was asked for
+        # (cmd/warp-plus/rootcmd.go, "If the endpoint is not set"). No
+        # probing, no minute long search: it either answers or it does not.
+        # This is the last thing tried when the scan cannot finish, and on a
+        # server where UDP to cloudflare is throttled it is what works.
+        :
+    elif [ "$SCAN" == "1" ] || [ "${WS_WARP_NEW_IP:-0}" = "1" ]; then
+        # watashi v12.2.130bd: asking for a new IP means asking for a different
+        # cloudflare edge, and the scan is the only thing that picks one. It
+        # is switched on for that one run even when SCAN is off, otherwise
+        # the button on the Nodes page has nothing to work with.
         echo "--scan" >>"$out"
     fi
     case "$MODE" in
@@ -245,6 +300,12 @@ function explain_failure() {
         error "- Cloudflare answered 429 (too many requests) to this server IP."
         error "  Registrations from this IP are rate limited. Wait and try again,"
         error "  or put a working WARP key in the panel settings."
+    elif grep -qi 'user canceled the operation' <<<"$j"; then
+        error "- The endpoint scan did not find two reachable WARP addresses"
+        error "  inside the one minute it allows itself, so the engine gave up."
+        error "  UDP to cloudflare is throttled or blocked on this server."
+        error "  IPV=auto in engine.conf lets it try IPv6 as well, and SCAN=0"
+        error "  makes it take one address directly instead of searching."
     elif grep -qi 'context deadline\|timeout\|i/o timeout' <<<"$j"; then
         error "- The engine could not reach any WARP endpoint (timeout)."
         error "  Set IPV=4 in engine.conf if this server has no IPv6, or keep SCAN=1."
@@ -258,11 +319,30 @@ function explain_failure() {
     fi
 }
 
+# watashi v12.2.130be: how long one start is given, read off the arguments it was
+# given. The scanner of warp-plus 1.2.6 allows itself a full minute
+# (wiresocks/scanner.go) and returns only after it has found two reachable
+# addresses, probing them one at a time. WAIT was 40 seconds, so a scan that
+# was still working was called dead at second forty - on every apply, and
+# the more the family filter narrows the search the more often it happened.
+function ws_wait_for() {
+    local args="${1:-engine.args}" want="$WAIT"
+    if grep -qx -- '--scan' "$args" 2>/dev/null; then
+        want=75
+        [ "$WAIT" -gt 75 ] && want="$WAIT"
+    elif grep -qx -- '--endpoint' "$args" 2>/dev/null; then
+        # a remembered address answers in the first seconds or it is gone
+        want=20
+        [ "$WAIT" -lt 20 ] && want="$WAIT"
+    fi
+    echo "$want"
+}
+
 # watashi v12.2.130v: one restart and the wait that goes with it.
 function ws_start_and_wait() {
-    local i
+    local i limit="${1:-$WAIT}"
     systemctl restart hiddify-warp.service 2>&1 | sed 's|^|    |'
-    for i in $(seq 1 "$WAIT"); do
+    for i in $(seq 1 "$limit"); do
         if warp_trace; then
             return 0
         fi
@@ -282,11 +362,27 @@ function ws_start_and_wait() {
 # good exit IP lost it to work that had nothing to do with WARP. A running
 # engine whose argument list has not changed, and which is carrying
 # traffic right now, is now left exactly where it is.
+# watashi v12.2.130bd: the argument list without the address in it. A remembered
+# address is a preference for the next start, not a reason to throw a
+# healthy tunnel away - and since it is written down right after a --scan
+# start, the freshly built list said --endpoint where the live one still
+# said --scan, so every apply restarted the node. That is the opposite of
+# what remembering it was for.
+function ws_args_body() {
+    awk 'skip { skip = 0; next }
+         $0 == "--endpoint" { skip = 1; next }
+         $0 == "--scan" { next }
+         { print }' "$1" 2>/dev/null
+}
+
 function ws_can_leave_alone() {
     local started binary
     [ "${WS_WARP_NEW_IP:-0}" = "1" ] && return 1
+    # watashi v12.2.130bd: one door for "restart it even though nothing changed",
+    # used when the files under the engine changed instead of its arguments.
+    [ "${WS_WARP_RESTART:-0}" = "1" ] && return 1
     [ -f engine.args ] || return 1
-    cmp -s engine.args.new engine.args || return 1
+    [ "$(ws_args_body engine.args.new)" = "$(ws_args_body engine.args)" ] || return 1
     systemctl is-active --quiet hiddify-warp.service || return 1
     # a freshly installed binary must be picked up, so the running service
     # has to be younger than the file it runs.
@@ -308,7 +404,7 @@ function bring_up() {
     fi
     mv -f engine.args.new engine.args
     chmod 600 engine.args 2>/dev/null
-    if ws_start_and_wait; then
+    if ws_start_and_wait "$(ws_wait_for engine.args)"; then
         ws_remember_endpoint
         return 0
     fi
@@ -320,7 +416,25 @@ function bring_up() {
         rm -f "$PIN"
         build_args engine.args
         chmod 600 engine.args 2>/dev/null
-        if ws_start_and_wait; then
+        if ws_start_and_wait "$(ws_wait_for engine.args)"; then
+            ws_remember_endpoint
+            return 0
+        fi
+    fi
+
+    # watashi v12.2.130be: the last thing to try, and the one that answers the "I chose
+    # IPv4 and got nothing" report. The scan needs two reachable addresses
+    # inside one minute; where UDP to cloudflare is throttled it will never
+    # have them, and narrowing it to one family only makes that likelier.
+    # Without --scan the engine simply takes one random address of the
+    # family that was asked for, which needs nothing to succeed first.
+    if grep -qx -- '--scan' engine.args 2>/dev/null; then
+        warning "- The endpoint scan did not finish in time, trying a single address instead."
+        export WS_WARP_NO_SCAN=1
+        build_args engine.args
+        unset WS_WARP_NO_SCAN
+        chmod 600 engine.args 2>/dev/null
+        if ws_start_and_wait "$(ws_wait_for engine.args)"; then
             ws_remember_endpoint
             return 0
         fi

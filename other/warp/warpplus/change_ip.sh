@@ -33,8 +33,14 @@ function restore_cache() {
         # watashi v12.2.130v: putting the old identity back means the old
         # address may be reachable again, so run.sh is allowed to use and
         # remember it instead of hunting for yet another one.
+        # watashi v12.2.130bd: the flag is dropped so the restored identity may keep
+        # its address, but the engine is still running on the identity that
+        # has just been thrown away, and the argument list did not change.
+        # Without a door that says "restart anyway", run.sh looked at a
+        # healthy tunnel and left it exactly where it was, so putting the
+        # old cache back did nothing at all.
         unset WS_WARP_NEW_IP
-        bash run.sh >/dev/null 2>&1
+        WS_WARP_RESTART=1 bash run.sh >/dev/null 2>&1
     fi
 }
 
@@ -45,18 +51,31 @@ rm -rf "$BACKUP"
 [ -d "$CACHE" ] && cp -a "$CACHE" "$BACKUP"
 
 for try in 1 2 3; do
-    rm -rf "$CACHE"
-    mkdir -p "$CACHE"
+    # watashi v12.2.130bd: the account is made once, not once per try. Wiping the
+    # cache registers a brand new account with cloudflare, and doing that
+    # three times in a row from the same server IP is how a rate limit turns
+    # into a permanent one - the header of run.sh names it as the mistake of
+    # the version this replaced, and this loop was making it anyway. The
+    # retries keep the identity and only ask for another edge, which is what
+    # actually decides the exit IP.
+    if [ "$try" = 1 ]; then
+        rm -rf "$CACHE"
+        mkdir -p "$CACHE"
+    else
+        echo "- Keeping the new account, looking for another cloudflare edge."
+    fi
     rm -f "$PIN"
     bash run.sh >/dev/null 2>&1
     new=$(current_ip)
     if [ -n "$new" ] && [ "$new" != "$old" ]; then
         success "- WARP IP changed from ${old:-none} to $new"
         rm -rf "$BACKUP"
-        # watashi v12.2.130v: from here on the new address is the one to keep,
-        # so let run.sh write it down without the "give me a new one" flag.
-        unset WS_WARP_NEW_IP
-        bash run.sh >/dev/null 2>&1
+        # watashi v12.2.130bd: run.sh has already written the address down on its
+        # way out. The second run that used to stand here restarted the
+        # engine onto the pinned address right after the operator had been
+        # shown the new IP, so the IP they were told was often not the one
+        # they were left with - and when that address did not answer, the
+        # whole thing ended up back on the scan, a minute later.
         exit 0
     fi
     warning "- Try $try gave ${new:-no answer}, trying again..."
