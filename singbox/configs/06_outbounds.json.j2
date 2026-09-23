@@ -12,6 +12,14 @@
       "tag": "WARP",
       "type": "socks",
       "version": "5",
+      {% if ws_warp_ipv is defined and ws_warp_ipv == '4' %}
+      // watashi v12.2.130bf: same reason as in xray/configs/06_outbounds.json.j2 -
+      // the engine's -4 only chooses the cloudflare address it dials, and
+      // the tunnel behind it always carries both families.
+      "domain_strategy": "ipv4_only",
+      {% elif ws_warp_ipv is defined and ws_warp_ipv == '6' %}
+      "domain_strategy": "ipv6_only",
+      {% endif %}
       "server": "127.0.0.1",
       "server_port": 3000
     },

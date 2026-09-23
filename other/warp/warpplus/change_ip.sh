@@ -14,9 +14,9 @@ source /opt/hiddify-manager/common/utils.sh
 
 CACHE="cache"
 BACKUP="cache.backup"
-# watashi v12.2.130v: run.sh remembers the address the node left through, so a
-# deliberate change of IP has to forget it first. It is exported as well,
-# so the run.sh started below cannot write the old one straight back.
+# watashi v12.2.130bg: run.sh does not remember an address any more, so there is
+# nothing to forget here either. The leftover file of the versions that did
+# is removed on the way past.
 PIN="$CACHE/.watashi-endpoint"
 export WS_WARP_NEW_IP=1
 PORT=3000

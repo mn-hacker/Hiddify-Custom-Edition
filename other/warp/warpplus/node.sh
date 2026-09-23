@@ -257,13 +257,16 @@ function set_key() {
         echo "${key}=${value}" >>"$CONF"
     fi
     chmod 600 "$CONF" 2>/dev/null
-    # watashi v12.2.130ay: a remembered address of the old family would be handed to the
-    # engine beside the new -4 or -6 and would win, so the choice has to take
-    # the pin with it. Only IPV does this: the address is still the right one
-    # for a change of mode, country, dns or readiness url.
-    if [ "$key" = "IPV" ] && [ -f "$PIN" ]; then
-        rm -f "$PIN" 2>/dev/null
-        echo "- the remembered endpoint was dropped, the engine will look for one that matches"
+    # watashi v12.2.130bg: nothing remembers a cloudflare address any more, so a change
+    # of family has nothing to drop. The file the old versions wrote is
+    # cleared away if it is still there.
+    rm -f "$PIN" 2>/dev/null
+    # watashi v12.2.130bf: the engine flag alone only chooses the cloudflare address to
+    # dial. The family the traffic leaves on is decided by the core, and the
+    # core reads it when the configuration is rendered.
+    if [ "$key" = "IPV" ] && [ "$value" != "auto" ]; then
+        echo "- apply the configuration once, so xray and sing-box send the traffic"
+        echo "  out of the tunnel on IPv$value as well"
     fi
     echo "- $key is now $value"
 }
