@@ -1,5 +1,21 @@
 global
     limited-quic
+
+    # watashi v12.2.130ax: on the same customer server the master from a reload an hour
+    # and a half earlier was still alive, holding 95 MB and its own threads,
+    # because a soft stopping process waits for every connection and
+    # "timeout tunnel" here is 1h. Reloads happen on every certificate
+    # install, so the generations pile up. 90 seconds is longer than any
+    # handshake and shorter than any tunnel.
+    hard-stop-after 90s
+
+    # watashi v12.2.130ax: the cheapest handshake is the one that does not happen. The
+    # default session cache is 20k entries with a 5 minute life, which a box
+    # holding nine thousand connections empties in seconds, so clients that
+    # could have resumed pay for a full signature instead. 100k entries is
+    # about 3 MB.
+    tune.ssl.cachesize 100000
+    tune.ssl.lifetime 3600
     {%if hconfigs['log_level']!="CRITICAL"%}
     # # Access logs
     # #log-format %ci:%cp\ [%t]\ %ft\ %b/%s\ %Tcc\ %Tw/%Tc/%Tr/%Ta\ %ST\ %B\ %CC\ %CS\ %tsc\ %ac/%fc/%bc/%sc/%rc\ %sq/%bq\ %hr\ %hs\ %{+Q}r

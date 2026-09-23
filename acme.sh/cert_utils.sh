@@ -22,7 +22,32 @@ WS_SSL_DIR="${WS_SSL_DIR:-/opt/hiddify-manager/ssl}"
 WS_ACME_LOG="${WS_ACME_LOG:-/opt/hiddify-manager/log/system/acme.log}"
 WS_STATE_DIR="${WS_STATE_DIR:-$WS_ACME_HOME/lib/data/watashi}"
 WS_RETRY_HOURS="${WS_RETRY_HOURS:-6}"
-WS_KEYLENGTH="${WS_KEYLENGTH:-2048}"
+# watashi v12.2.130ax: this said 2048, so every certificate on every watashi server was
+# RSA. An RSA 2048 signature costs the cpu ten to twenty times what an
+# ecdsa P-256 signature costs, and haproxy signs once per tls handshake.
+# On a busy box that is the whole cpu bill: a customer server showed four
+# haproxy threads at 35% each, all of them inside RSA_private_encrypt,
+# with one thread blocked 179 ms while 4647 streams waited behind it.
+# ec-256 is what acme.sh issues by default and what every client already
+# prefers. Set WS_KEYLENGTH=2048 in the environment to go back.
+WS_KEYLENGTH="${WS_KEYLENGTH:-ec-256}"
+
+# watashi v12.2.130ax: an ec key lives in the <domain>_ecc store, an rsa key does not.
+# Everything that reaches into an acme.sh store has to say which one, so
+# the answer is computed once here instead of being guessed at each call.
+case "$WS_KEYLENGTH" in
+    ec-*) WS_ACME_ECC=(--ecc) ;;
+    *) WS_ACME_ECC=() ;;
+esac
+
+# watashi v12.2.130ax: true when the certificate on disk carries an RSA public key.
+# Used by the one time migration in run.sh, and harmless anywhere else.
+function ws_cert_is_rsa() {
+    local crt="$1"
+    [ -s "$crt" ] || return 1
+    openssl x509 -in "$crt" -noout -text 2>/dev/null |
+        grep -qE "Public Key Algorithm: rsaEncryption"
+}
 
 # Function to check if a domain is restricted for ZeroSSL
 is_ok_domain_zerossl() {
@@ -289,11 +314,17 @@ function try_get_cert_with_ca() {
         elif [ $result -eq 2 ]; then
             # Already issued, renew it with the same CA this time
             echo "Certificate already exists, attempting renewal with $CA_DESC..."
-            if ws_acme_run "$ATTEMPT_TIMEOUT" --renew -d "$DOMAIN" --server "$CA_SERVER" --force --log "$WS_ACME_LOG"; then
+            # watashi v12.2.130ax: the store that matches WS_KEYLENGTH is tried first now.
+            # With an ec key the plain store is empty, so the old order spent a
+            # whole attempt, and one authority round trip, on a store that could
+            # not hold the certificate.
+            if ws_acme_run "$ATTEMPT_TIMEOUT" --renew -d "$DOMAIN" --server "$CA_SERVER" --force "${WS_ACME_ECC[@]}" --log "$WS_ACME_LOG"; then
                 return 0
             fi
-            if ws_acme_run "$ATTEMPT_TIMEOUT" --renew -d "$DOMAIN" --server "$CA_SERVER" --force --ecc --log "$WS_ACME_LOG"; then
-                return 0
+            if [ ${#WS_ACME_ECC[@]} -eq 0 ]; then
+                ws_acme_run "$ATTEMPT_TIMEOUT" --renew -d "$DOMAIN" --server "$CA_SERVER" --force --ecc --log "$WS_ACME_LOG" && return 0
+            else
+                ws_acme_run "$ATTEMPT_TIMEOUT" --renew -d "$DOMAIN" --server "$CA_SERVER" --force --log "$WS_ACME_LOG" && return 0
             fi
         fi
 
@@ -307,20 +338,26 @@ function try_get_cert_with_ca() {
     return 1
 }
 
-# watashi: acme.sh keeps an ec-256 certificate in <domain>_ecc, and --install-cert
-# only looks there when it is given --ecc. we ask for rsa but still accept a
-# store left behind by an older run.
+# watashi: acme.sh keeps an ec-256 certificate in <domain>_ecc and an rsa one
+# in <domain>, and --install-cert only looks in the ecc store when it is given
+# --ecc.
+# watashi v12.2.130ax: the store we are issuing into is asked first, and the other one
+# is still accepted so a server that has been issuing rsa for months keeps
+# working on the very first run after the update, before the migration has
+# had a chance to reissue anything.
 function ws_install_cert() {
     local DOMAIN=$1
     local reload="systemctl reload hiddify-haproxy 2>/dev/null || true; systemctl reload hiddify-singbox 2>/dev/null || true"
-    if acme.sh --install-cert -d "$DOMAIN" \
+    if acme.sh --install-cert -d "$DOMAIN" "${WS_ACME_ECC[@]}" \
         --fullchainpath "$WS_SSL_DIR/$DOMAIN.crt" \
         --keypath "$WS_SSL_DIR/$DOMAIN.crt.key" \
         --reloadcmd "$reload"; then
         return 0
     fi
-    echo "The rsa store did not have it, trying the ecc store..."
-    acme.sh --install-cert -d "$DOMAIN" --ecc \
+    echo "That store did not have it, trying the other one..."
+    local other=(--ecc)
+    [ ${#WS_ACME_ECC[@]} -eq 0 ] || other=()
+    acme.sh --install-cert -d "$DOMAIN" "${other[@]}" \
         --fullchainpath "$WS_SSL_DIR/$DOMAIN.crt" \
         --keypath "$WS_SSL_DIR/$DOMAIN.crt.key" \
         --reloadcmd "$reload"
@@ -357,7 +394,12 @@ function get_cert() {
             days_left=$(((expire_epoch - now_epoch) / 86400))
 
             # Skip only if cert is from a real CA (validity < 400 days) and still valid
-            if [ "$days_left" -gt 30 ] && [ "$days_left" -lt 400 ]; then
+            # watashi v12.2.130ax: WS_CERT_REKEY=1 says the key itself is wrong, not the
+            # expiry date, so a certificate that is still valid for months has
+            # to be asked for again anyway. Only the one time rsa to ec
+            # migration sets it; the panel button still stops here, so nobody
+            # can burn an authority quota by clicking twice.
+            if [ "$days_left" -gt 30 ] && [ "$days_left" -lt 400 ] && [ "${WS_CERT_REKEY:-0}" != "1" ]; then
                 echo "✓ Existing certificate is valid for $days_left more days, skipping renewal."
                 return 0
             elif [ "$days_left" -le 30 ]; then
@@ -532,7 +574,16 @@ function get_self_signed_cert() {
 
     # Generate a new certificate if necessary
     if [ "$generate_new_cert" -eq 1 ]; then
-        openssl req -x509 -newkey rsa:2048 -keyout "$private_key" -out "$certificate" -days 3650 -nodes -subj "/C=GB/ST=London/L=London/O=Google Trust Services LLC/CN=$d"
+        # watashi v12.2.130ax: a fake certificate is handed to the same haproxy that signs
+        # every handshake, so it pays the same RSA bill as a real one. ec-256
+        # here too. rsa:2048 stays as the fallback for an openssl too old to
+        # know prime256v1, which no supported release is.
+        if ! openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 \
+            -keyout "$private_key" -out "$certificate" -days 3650 -nodes \
+            -subj "/C=GB/ST=London/L=London/O=Google Trust Services LLC/CN=$d" 2>/dev/null; then
+            echo "This openssl cannot make an ec key, falling back to rsa:2048."
+            openssl req -x509 -newkey rsa:2048 -keyout "$private_key" -out "$certificate" -days 3650 -nodes -subj "/C=GB/ST=London/L=London/O=Google Trust Services LLC/CN=$d"
+        fi
         echo "New certificate and private key generated."
     fi
     chmod 600 -R $private_key
