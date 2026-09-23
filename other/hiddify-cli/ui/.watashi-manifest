@@ -1,0 +1,30 @@
+# watashi v12.2.130ba: every file this release of the dashboard ships.
+# The publish step deletes anything in ui/ that is not listed here,
+# so an old build cannot survive an update. Regenerate with
+# patch130ba.py whenever the bundle is replaced.
+CNAME
+Twemoji_Mozilla.ttf
+_headers
+apple-touch-icon-precomposed.png
+assets/Twemoji_Mozilla-BSQKJ6aF.ttf
+assets/chart-lib-BM-GosIA.js
+assets/en-BWAlTNj7.js
+assets/index-CHSHHUIQ.css
+assets/index-e-AJ8Aow.js
+assets/inter-latin-400-normal-C38fXH4l.woff2
+assets/inter-latin-400-normal-CyCys3Eg.woff
+assets/inter-latin-800-normal-BYj_oED-.woff2
+assets/inter-latin-800-normal-D1mf63XC.woff
+assets/roboto-mono-latin-400-normal-DBZPkcnn.woff
+assets/roboto-mono-latin-400-normal-GekRknry.woff2
+assets/ru-DmhlFbyw.js
+assets/vi-D94qZ-8n.js
+assets/zh-cn-CSGy0Ayd.js
+assets/zh-tw-DQPAu0V1.js
+index.html
+logo.png
+manifest.webmanifest
+registerSW.js
+sw.js
+yacd.ico
+yacd.png

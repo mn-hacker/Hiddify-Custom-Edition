@@ -18,7 +18,7 @@
     "url-test-interval": 600,
     "enable-clash-api": true,
     "clash-api-port": 16756,
-    "external-ui": "ui",
+    "external-ui": "webui",
     "enable-tun": false,
     "enable-tun-service": false,
     "set-system-proxy": false,

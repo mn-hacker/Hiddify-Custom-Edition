@@ -98,6 +98,24 @@ function ws_endpoint_ok() {
     grep -qE '^(([0-9]{1,3}\.){3}[0-9]{1,3}|\[[0-9a-fA-F:]+\]):[0-9]{1,5}$' <<<"${1:-}"
 }
 
+# watashi v12.2.130ay: 4 or 6, read off the shape of the address. A bracket is only ever
+# written around an ipv6 address, which is what makes this safe to read.
+function ws_endpoint_family() {
+    case "${1:-}" in
+    \[*) echo 6 ;;
+    *) echo 4 ;;
+    esac
+}
+
+# watashi v12.2.130ay: does a remembered address agree with the IPV setting of this
+# node. auto agrees with everything, which is the old behaviour.
+function ws_endpoint_family_ok() {
+    case "$IPV" in
+    4 | 6) [ "$(ws_endpoint_family "${1:-}")" = "$IPV" ] ;;
+    *) return 0 ;;
+    esac
+}
+
 # Does this engine take an address at all. An older build that does not
 # know --endpoint would refuse to start, so it is asked first and the
 # answer decides whether the pin is used.
@@ -114,6 +132,15 @@ function ws_pinned_endpoint() {
     [ "${WS_WARP_NEW_IP:-0}" = "1" ] && return 1
     ep=$(head -n 1 "$PIN" 2>/dev/null | tr -d '[:space:]')
     ws_endpoint_ok "$ep" || return 1
+    # watashi v12.2.130ay: this is the whole bug. The address was handed to the engine
+    # next to -4 or -6, and an address always wins over a preference, so the
+    # tunnel came back up on the family of the address and the choice on the
+    # Nodes page did nothing. A pin of the wrong family is not a pin: it is
+    # thrown away here so the scan can find one that is allowed.
+    if ! ws_endpoint_family_ok "$ep"; then
+        rm -f "$PIN" 2>/dev/null
+        return 1
+    fi
     ws_engine_takes_endpoint || return 1
     printf '%s\n' "$ep"
 }
@@ -131,6 +158,9 @@ function ws_remember_endpoint() {
         grep -oE '(([0-9]{1,3}\.){3}[0-9]{1,3}|\[[0-9a-fA-F:]+\]):(2408|500|1701|4500|854|880|939|1002|1010|1014|1018|1070|1180|1387|1843|2371|2506|3138|3476|3581|3854|4177|4198|4233|5279|5956|7103|7152|7156|7281|7559|8319|8742|8854|8886)' |
         tail -n 1)
     ws_endpoint_ok "$ep" || return 0
+    # watashi v12.2.130ay: and do not write one of the wrong family either, or the next
+    # start throws it away again and the scan runs every single time.
+    ws_endpoint_family_ok "$ep" || return 0
     mkdir -p "$CACHE"
     printf '%s\n' "$ep" >"$PIN"
     chmod 600 "$PIN" 2>/dev/null
@@ -307,7 +337,15 @@ function engine_version() {
 }
 
 function main() {
-    echo "- WARP engine: $(engine_version), mode $MODE, ip version $IPV"
+    # watashi v12.2.130ay: the setting alone was never proof. The address the tunnel is
+    # really on is printed next to it, so a mismatch is visible instead of
+    # having to be guessed at.
+    ws_ep_now=$(ws_pinned_endpoint 2>/dev/null)
+    if [ -n "$ws_ep_now" ]; then
+        echo "- WARP engine: $(engine_version), mode $MODE, ip version $IPV (endpoint IPv$(ws_endpoint_family "$ws_ep_now"))"
+    else
+        echo "- WARP engine: $(engine_version), mode $MODE, ip version $IPV"
+    fi
     if bring_up; then
         if [ "$MODE" = "cfon" ]; then
             success "- The node is working on socks5://127.0.0.1:$PORT (psiphon exit, so warp=off is expected)"

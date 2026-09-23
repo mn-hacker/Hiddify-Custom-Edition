@@ -52,6 +52,53 @@ else
     echo "Using bundled Yacd UI (local)."
 fi
 
+# watashi v12.2.130az: hiddify-cli does not read "external-ui" out of
+# h_client_config.json. It always serves the folder called webui, and on
+# first start it creates that folder empty. Our yacd build lives in ui, so
+# the dashboard answered with an empty directory listing and the page came
+# up white. Measured on a real server: /ui/ was 81 bytes and every asset
+# under it was a 404.
+#
+# The two folders are kept identical here. A copy, not a symlink: this is
+# three megabytes, it is read by another user, and a copy cannot be broken
+# by whatever the binary decides to do with its own folder next.
+ws_ui=/opt/hiddify-manager/other/hiddify-cli/ui
+ws_webui=/opt/hiddify-manager/other/hiddify-cli/webui
+if [ -f "$ws_ui/index.html" ]; then
+# watashi v12.2.130ba: an update copies new files over old ones and never removes one,
+# so every dashboard we ever shipped would pile up in ui/assets and get
+# copied into webui together. The manifest names exactly what this release
+# ships; anything else in the folder is from an older build and goes.
+ws_manifest="$ws_ui/.watashi-manifest"
+ws_pruned=0
+if [ -f "$ws_manifest" ]; then
+    ws_stale=$(cd "$ws_ui" && find . -type f ! -name .watashi-manifest -printf '%P\n' |
+        while read -r ws_f; do grep -qxF "$ws_f" "$ws_manifest" || echo "$ws_f"; done)
+    if [ -n "$ws_stale" ]; then
+        ws_pruned=1
+        printf '%s\n' "$ws_stale" | while read -r ws_f; do
+            echo "watashi: removing $ws_f, left over from an older dashboard"
+            rm -f "$ws_ui/$ws_f"
+        done
+        find "$ws_ui" -type d -empty -delete 2>/dev/null || true
+    fi
+fi
+    # watashi v12.2.130ba: the timestamp alone was not enough. A prune can change what
+    # the folder holds without touching index.html, so the manifest of the
+    # published copy is compared with ours as well.
+    if [ ! -f "$ws_webui/index.html" ] ||
+        [ "$ws_ui/index.html" -nt "$ws_webui/index.html" ] ||
+        [ "$ws_pruned" = 1 ] ||
+        ! cmp -s "$ws_ui/.watashi-manifest" "$ws_webui/.watashi-manifest"; then
+        echo "watashi: publishing the proxy stats dashboard into webui/"
+        rm -rf "$ws_webui"
+        cp -r "$ws_ui" "$ws_webui"
+    fi
+    chown -R hiddify-cli "$ws_webui" 2>/dev/null || true
+else
+    echo "watashi: WARNING the bundled dashboard is missing, the proxy stats page will be empty"
+fi
+
 
 ln -sf /opt/hiddify-manager/other/hiddify-cli/hiddify-cli.service /etc/systemd/system/hiddify-cli.service
 systemctl enable hiddify-cli.service

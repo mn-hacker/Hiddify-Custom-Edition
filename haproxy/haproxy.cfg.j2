@@ -5,9 +5,10 @@ global
     # and a half earlier was still alive, holding 95 MB and its own threads,
     # because a soft stopping process waits for every connection and
     # "timeout tunnel" here is 1h. Reloads happen on every certificate
-    # install, so the generations pile up. 90 seconds is longer than any
-    # handshake and shorter than any tunnel.
-    hard-stop-after 90s
+    # install, so the generations pile up. 5 minutes is the trade: long
+    # enough that almost nobody notices their connection being cut, short
+    # enough that two generations never live side by side for an hour.
+    hard-stop-after 5m
 
     # watashi v12.2.130ax: the cheapest handshake is the one that does not happen. The
     # default session cache is 20k entries with a 5 minute life, which a box

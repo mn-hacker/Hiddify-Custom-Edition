@@ -20,6 +20,10 @@ BIN="./warp-plus"
 PORT=3000
 PROXY="socks5h://127.0.0.1:$PORT"
 CONF="engine.conf"
+# watashi v12.2.130ay: the same path run.sh keeps its remembered endpoint at. Changing
+# the IP version has to drop it, or the old address is still there on the
+# next start and the new setting loses to it.
+PIN="cache/.watashi-endpoint"
 UNIT="hiddify-warp.service"
 JOB="node.job"
 JOBLOG="node.job.log"
@@ -253,6 +257,14 @@ function set_key() {
         echo "${key}=${value}" >>"$CONF"
     fi
     chmod 600 "$CONF" 2>/dev/null
+    # watashi v12.2.130ay: a remembered address of the old family would be handed to the
+    # engine beside the new -4 or -6 and would win, so the choice has to take
+    # the pin with it. Only IPV does this: the address is still the right one
+    # for a change of mode, country, dns or readiness url.
+    if [ "$key" = "IPV" ] && [ -f "$PIN" ]; then
+        rm -f "$PIN" 2>/dev/null
+        echo "- the remembered endpoint was dropped, the engine will look for one that matches"
+    fi
     echo "- $key is now $value"
 }
 
