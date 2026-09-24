@@ -1,3 +1,6 @@
+{# watashi v12.2.130bh: round bf read the WARP IPv4/IPv6 setting here and locked the #}
+{# outbound to one family. WARP went back to the v12.2.130.49 version, which #}
+{# has no such setting, so this file is the plain one again. #}
 {
   "outbounds": [
     {
@@ -18,16 +21,6 @@
       }
     },
     {
-      {% if ws_warp_ipv is defined and ws_warp_ipv == '4' %}
-      // watashi v12.2.130bf: the engine cannot decide this, only we can. Its -4
-      // flag picks the cloudflare address to dial; the tunnel behind it
-      // always holds a v4 and a v6 address, so a name sent through as a
-      // name comes back AAAA and the user leaves on IPv6. Resolved here,
-      // the tunnel is handed a literal IPv4 and has nothing to choose.
-      "domainStrategy": "UseIPv4",
-      {% elif ws_warp_ipv is defined and ws_warp_ipv == '6' %}
-      "domainStrategy": "UseIPv6",
-      {% endif %}
       "tag": "WARP",
       "protocol": "socks",
       "settings": {

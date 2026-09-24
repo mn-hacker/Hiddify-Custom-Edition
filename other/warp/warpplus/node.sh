@@ -1,4 +1,11 @@
 #!/bin/bash
+# watashi v12.2.130bh: this file is the one from v12.2.130.49, put back exactly as
+# it was. Everything done to WARP after that version was repair work on a
+# remembered cloudflare address, and it made the node slower and less
+# reliable than the thing it was repairing. The only feature lost with it is
+# forcing the exit to IPv4 or IPv6, which warp-plus cannot do anyway: its -4
+# only picks the address it dials, and the tunnel behind it always carries
+# both families.
 # watashi: node v12.2.129
 #
 # The one root door the Nodes page has.
@@ -20,10 +27,6 @@ BIN="./warp-plus"
 PORT=3000
 PROXY="socks5h://127.0.0.1:$PORT"
 CONF="engine.conf"
-# watashi v12.2.130ay: the same path run.sh keeps its remembered endpoint at. Changing
-# the IP version has to drop it, or the old address is still there on the
-# next start and the new setting loses to it.
-PIN="cache/.watashi-endpoint"
 UNIT="hiddify-warp.service"
 JOB="node.job"
 JOBLOG="node.job.log"
@@ -257,17 +260,6 @@ function set_key() {
         echo "${key}=${value}" >>"$CONF"
     fi
     chmod 600 "$CONF" 2>/dev/null
-    # watashi v12.2.130bg: nothing remembers a cloudflare address any more, so a change
-    # of family has nothing to drop. The file the old versions wrote is
-    # cleared away if it is still there.
-    rm -f "$PIN" 2>/dev/null
-    # watashi v12.2.130bf: the engine flag alone only chooses the cloudflare address to
-    # dial. The family the traffic leaves on is decided by the core, and the
-    # core reads it when the configuration is rendered.
-    if [ "$key" = "IPV" ] && [ "$value" != "auto" ]; then
-        echo "- apply the configuration once, so xray and sing-box send the traffic"
-        echo "  out of the tunnel on IPv$value as well"
-    fi
     echo "- $key is now $value"
 }
 

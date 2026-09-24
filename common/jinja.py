@@ -1,4 +1,7 @@
 #!/opt/hiddify-manager/.venv313/bin/python
+# watashi v12.2.130bh: round bf read the WARP IPv4/IPv6 setting here and locked the
+# outbound to one family. WARP went back to the v12.2.130.49 version, which
+# has no such setting, so this file is the plain one again.
 import base64
 import os
 import sys
@@ -50,33 +53,6 @@ with open("/opt/hiddify-manager/current.json") as f:
     configs = json.load(f)
     configs["chconfigs"] = {int(k): v for k, v in configs["chconfigs"].items()}
     configs["hconfigs"] = configs["chconfigs"][0]
-
-
-# watashi v12.2.130bf: the WARP node keeps its settings in a plain file, not in the
-# database, and one of them is something the core has to know about.
-#
-# -4 on the engine only chooses which cloudflare address is dialled. The
-# tunnel itself always carries a v4 and a v6 address - generateWireguardConfig
-# in warp-plus builds both, unconditionally - so a name resolved inside it
-# answers AAAA first and the traffic leaves on IPv6 even on a node set to
-# IPv4. Nothing in the engine can change that. The core can: it resolves the
-# name itself and hands the tunnel a literal address.
-def ws_warp_settings():
-    said = {"ws_warp_ipv": "auto", "ws_warp_mode": "warp"}
-    try:
-        with open("/opt/hiddify-manager/other/warp/warpplus/engine.conf") as f:
-            for line in f:
-                line = line.strip()
-                if line.startswith("IPV=") and line[4:] in ("auto", "4", "6"):
-                    said["ws_warp_ipv"] = line[4:]
-                elif line.startswith("MODE="):
-                    said["ws_warp_mode"] = line[5:]
-    except BaseException:
-        pass
-    return said
-
-
-configs.update(ws_warp_settings())
 
 
 def exec(command):
