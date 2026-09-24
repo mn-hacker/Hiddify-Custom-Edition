@@ -1120,22 +1120,39 @@ function hiddify-http-api(){
     cat $temp_file
     rm $temp_file
     if [ "$http_status" -ne 200 ];then
-        echo $http_status    
-        return 1$http_status
+        # watashi v12.2.130bi: "return 1$http_status" builds 1404 and bash
+        # keeps only the low byte of it, so the caller could be handed a 0.
+        echo $http_status
+        return 1
     fi
     return 0
 }
 
 function reload_all_configs(){
-    hiddify-http-api admin/all-configs/ > /opt/hiddify-manager/current.json
-    if [ "$?" != 0 ];then
-        hiddify-panel-cli all-configs > /opt/hiddify-manager/current.json
-        if [ $? != 0 ]; then 
-            return $?
+    # watashi v12.2.130bi: "hiddify-http-api ... > current.json" made bash
+    # truncate current.json before the function ran, and the very first thing
+    # that function does is read the api path and the api key out of that same
+    # file. So the fast API path could never succeed: it always read an empty
+    # file, always answered "invalid config file", and wrote that sentence
+    # into current.json on the way out. Worse, if the slow fallback also
+    # failed, the panel was left with a truncated or half written
+    # current.json, and every config rendered from it - which is where the
+    # user list for xray and sing-box comes from - was built out of nothing.
+    # The new list is assembled somewhere else, checked, and only then does it
+    # replace the file that is already in place.
+    local target=/opt/hiddify-manager/current.json
+    local tmp
+    tmp=$(mktemp /tmp/watashi-current.XXXXXX) || return 1
+    if ! hiddify-http-api admin/all-configs/ >"$tmp" 2>/dev/null || ! jq -e '.users' "$tmp" >/dev/null 2>&1; then
+        if ! hiddify-panel-cli all-configs >"$tmp" 2>/dev/null || ! jq -e '.users' "$tmp" >/dev/null 2>&1; then
+            echo "watashi: the panel returned no usable configuration, so $target was left untouched" >&2
+            rm -f "$tmp"
+            return 1
         fi
     fi
-    chmod 600 /opt/hiddify-manager/current.json
-    cat /opt/hiddify-manager/current.json
+    mv -f "$tmp" "$target" || { rm -f "$tmp"; return 1; }
+    chmod 600 "$target"
+    cat "$target"
 }
 
 
