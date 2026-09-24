@@ -43,6 +43,36 @@ if [ -n "$ws_sb_users_now" ]; then
     fi
 fi
 
+# watashi v12.2.130bj: a unit that reached StartLimitBurst is held down by
+# systemd itself. It answers "Start request repeated too quickly" and stays
+# in failed until someone runs reset-failed by hand. Those five starts are
+# not only crashes: since v12.2.116 every user save restarts this core, so
+# five saves inside five minutes were enough to park a perfectly healthy
+# core in failed, and nothing here ever cleared it. The limit is cleared
+# only when systemd says the core exited cleanly and its own validator still
+# accepts the config, so a real crash loop still lands in failed exactly the
+# way v12.2.106 wanted it to.
+ws_sb_prop() {
+	systemctl show hiddify-singbox.service -p "$1" --value 2>/dev/null
+}
+ws_sb_config_ok() {
+	/opt/hiddify-manager/singbox/sing-box check -C /opt/hiddify-manager/singbox/configs >/dev/null 2>&1
+}
+ws_sb_clear_start_limit() {
+	[ "$(ws_sb_prop Result)" == "start-limit-hit" ] || return 1
+	if [ "$(ws_sb_prop ExecMainStatus)" != "0" ]; then
+		echo "watashi: sing-box hit the systemd start limit after a failing exit, leaving it failed" >&2
+		return 1
+	fi
+	if ! ws_sb_config_ok; then
+		echo "watashi: sing-box hit the systemd start limit and its config is rejected, leaving it failed" >&2
+		return 1
+	fi
+	echo "watashi: sing-box was held down by the systemd start limit after clean restarts, clearing it" >&2
+	systemctl reset-failed hiddify-singbox.service 2>/dev/null || true
+	return 0
+}
+
 # Start singbox service
 if systemctl list-unit-files hiddify-singbox.service &>/dev/null; then
 	if systemctl is-active --quiet hiddify-singbox.service; then
@@ -82,7 +112,14 @@ if systemctl list-unit-files hiddify-singbox.service &>/dev/null; then
 			systemctl reload hiddify-singbox.service 2>/dev/null || systemctl restart hiddify-singbox.service
 		fi
 	else
-		systemctl start hiddify-singbox.service 2>/dev/null || true
+		# watashi v12.2.130bj: start on a unit inside its rate limit window
+		# does nothing at all, and the || true swallowed that in silence.
+		# The limit is cleared first and a failing start is reported.
+		ws_sb_clear_start_limit || true
+		if ! systemctl start hiddify-singbox.service 2>/tmp/watashi-singbox-start.log; then
+			echo "watashi: sing-box could not be started:" >&2
+			tail -3 /tmp/watashi-singbox-start.log >&2
+		fi
 	fi
 else
 	echo "hiddify-singbox.service not installed yet"
@@ -104,9 +141,25 @@ ws_sb_verify_started() {
 	done
 	state=$(systemctl is-active hiddify-singbox.service 2>/dev/null)
 	[ "$state" == "active" ] && return 0
+	# watashi v12.2.130bj: one recovery attempt when the only thing in the
+	# way is the start limit. Without it the core stayed down until an
+	# admin ran reset-failed by hand, and because the user digest is only
+	# written after a good start, every later apply walked into the same
+	# wall again.
+	if ws_sb_clear_start_limit; then
+		systemctl start hiddify-singbox.service 2>/dev/null || true
+		for i in 1 2 3 4 5 6 7 8 9 10; do
+			state=$(systemctl is-active hiddify-singbox.service 2>/dev/null)
+			[ "$state" == "active" ] && return 0
+			[ "$state" == "failed" ] && break
+			sleep 1
+		done
+		state=$(systemctl is-active hiddify-singbox.service 2>/dev/null)
+		[ "$state" == "active" ] && return 0
+	fi
 	echo "watashi: sing-box did not reach active (state: $state), last errors:" >&2
 	journalctl -u hiddify-singbox.service -n 30 --no-pager 2>/dev/null |
-		grep -Ei "fatal|error|panic" | tail -5 >&2
+		grep -Ei "fatal|error|panic|repeated too quickly" | tail -5 >&2
 	return 1
 }
 if ws_sb_verify_started; then

@@ -4,8 +4,10 @@
 {
   "outbounds": [
     {
+      {# watashi v12.2.130bq: this said UseIPv4v6, which asks xray for BOTH
+         families, so the only IPv4 switch made no difference at all. #}
       {%if hconfigs["only_ipv4"]%}
-      "domainStrategy":"UseIPv4v6",
+      "domainStrategy":"UseIPv4",
       {%endif%}
       "tag": "freedom",
       "protocol": "freedom",

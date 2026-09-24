@@ -18,7 +18,14 @@
     'tools':     {'geo': ['speedtest'],
                   'dom': ['ip.gs', 'ipinfo.io', 'freepik.com', 'flaticon.com', 'adobe.com', 'remini.com', 'giglio.com', 'homedepot.com', 'axieinfinity.com']}
 } %}
-{% set ws_presets = (hconfigs.get('warp_presets', 'ir') or 'ir').split(',') | map('trim') | reject('equalto', '') | list %}
+{# watashi v12.2.130bo: a key that was never written still means the local
+   sites group, but a key the admin emptied means no group at all. The old
+   "or 'ir'" treated those two as the same thing, so unticking the last
+   group switched the local sites back on behind the admin's back. The word
+   none is what the Nodes page writes for an empty pick. #}
+{% set ws_raw = hconfigs.get('warp_presets') %}
+{% set ws_raw = 'ir' if ws_raw is none else ws_raw | string %}
+{% set ws_presets = ws_raw.split(',') | map('trim') | reject('equalto', '') | reject('equalto', 'none') | list %}
 {% set ws_geo = [] %}
 {% set ws_dom = [] %}
 {% for ws_g in ws_presets if ws_g in ws_groups %}

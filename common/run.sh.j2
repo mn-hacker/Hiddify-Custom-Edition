@@ -207,3 +207,35 @@ rm -rf /etc/cron.d/hiddify_auto_update
 service cron reload >/dev/null 2>&1 || true
 {%endif%}
 
+# watashi v12.2.130bq: the only IPv4 switch is an "apply config" setting, but
+# the single place that really switched IPv6 off was the sysctl block in
+# common/install.sh, which reads a shell variable nothing ever exported and
+# only runs during a full install. So the switch changed nothing on the
+# machine and IP checking sites kept showing both addresses. This block runs
+# on every apply and puts the interfaces in the state the switch asks for,
+# in both directions. lo and warp are left alone exactly as install.sh does,
+# so ::1 and the WARP tunnel keep working.
+if [ "$MODE" != "docker" ]; then
+{% if hconfigs['only_ipv4'] %}
+    ws_v6_state=1
+    ws_v6_word="disabled"
+{% else %}
+    ws_v6_state=0
+    ws_v6_word="enabled"
+    sysctl -q -w net.ipv6.conf.all.disable_ipv6=0 2>/dev/null
+    sysctl -q -w net.ipv6.conf.default.disable_ipv6=0 2>/dev/null
+    sysctl -q -w net.ipv6.conf.lo.disable_ipv6=0 2>/dev/null
+{% endif %}
+    ws_v6_conf=""
+    for ws_if in $(ip link | awk -F': ' '$2 ~ /^[[:alnum:]]+$/ {print $2}'); do
+        case " warp lo " in
+            *" $ws_if "*) continue ;;
+        esac
+        sysctl -q -w "net.ipv6.conf.$ws_if.disable_ipv6=$ws_v6_state" 2>/dev/null
+        ws_v6_conf="${ws_v6_conf}net.ipv6.conf.$ws_if.disable_ipv6 = $ws_v6_state
+"
+    done
+    # kept so a reboot comes back in the same state as the panel switch
+    printf "%b" "$ws_v6_conf" >/etc/sysctl.d/hiddify-ipv6.conf
+    echo "watashi: IPv6 is $ws_v6_word on this server"
+fi

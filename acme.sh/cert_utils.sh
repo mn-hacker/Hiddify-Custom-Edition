@@ -363,6 +363,96 @@ function ws_install_cert() {
         --reloadcmd "$reload"
 }
 
+# watashi v12.2.130bk: hostnames handed out by a cdn, where the provider
+# terminates tls with its own certificate and owns the dns zone. Both acme
+# challenges are impossible on these names: http-01 would have to be served
+# by the cdn, and dns-01 would need a record in a zone we will never hold.
+# sacred3636.global.ssl.fastly.net is the example that started this: it
+# already serves a GlobalSign certificate for *.global.ssl.fastly.net, and
+# port 80 on it answers 400.
+ws_cdn_tls_suffixes=(
+    "global.ssl.fastly.net"
+    "freetls.fastly.net"
+    "fastly.net"
+    "cloudfront.net"
+    "workers.dev"
+    "pages.dev"
+    "b-cdn.net"
+    "azureedge.net"
+    "akamaized.net"
+    "cdn77.org"
+    "gcdn.co"
+)
+
+function ws_cdn_shared_host() {
+    local d
+    d=$(echo "$1" | tr 'A-Z' 'a-z')
+    local s
+    for s in "${ws_cdn_tls_suffixes[@]}"; do
+        [[ "$d" == *".$s" ]] && return 0
+        [ "$d" = "$s" ] && return 0
+    done
+    return 1
+}
+
+# watashi v12.2.130bk: true when the name resolves to this very server, which
+# is the only case where we are the one who answers the tls handshake.
+function ws_points_here() {
+    local d="$1" a aaaa
+    a=$(dig +short -t a "$d." 2>/dev/null | tail -1)
+    aaaa=$(dig +short -t aaaa "$d." 2>/dev/null | tail -1)
+    [ -n "$a" ] && [ "$a" = "$SERVER_IP" ] && return 0
+    [ -n "$aaaa" ] && [ "$aaaa" = "$SERVER_IPv6" ] && return 0
+    return 1
+}
+
+# watashi v12.2.130bk: days left on the certificate the remote endpoint really
+# serves, and only when a normal client would trust it. curl verifies the
+# chain and the hostname, so a self signed answer fails here as it should.
+function ws_trusted_tls_days() {
+    local d="$1" end e n
+    curl -s -o /dev/null --max-time "${WS_TLS_PROBE_TIMEOUT:-6}" "https://$d/" || return 1
+    end=$(echo | openssl s_client -servername "$d" -connect "$d:443" 2>/dev/null |
+        openssl x509 -noout -enddate 2>/dev/null | cut -d= -f2-)
+    [ -n "$end" ] || return 1
+    e=$(date -d "$end" +%s 2>/dev/null)
+    [ -n "$e" ] || return 1
+    n=$(date +%s)
+    echo $(((e - n) / 86400))
+}
+
+# watashi v12.2.130bk: one line of log, and at most one probe a day per name.
+# A known cdn hostname is answered from the suffix list with no network at
+# all. Anything that points at this server is ours and is never skipped.
+function ws_foreign_tls() {
+    local d="$1" cache verdict age days
+    [ "${WS_SKIP_FOREIGN_TLS:-1}" = "1" ] || return 1
+    if ws_cdn_shared_host "$d"; then
+        echo "watashi: $d is a shared cdn hostname, the provider owns its certificate, not asking an authority"
+        return 0
+    fi
+    ws_points_here "$d" && return 1
+    mkdir -p "$WS_STATE_DIR" 2>/dev/null
+    cache="$WS_STATE_DIR/foreigntls-$d"
+    if [ -f "$cache" ]; then
+        age=$(($(date +%s) - $(stat -c %Y "$cache" 2>/dev/null || echo 0)))
+        if [ "$age" -lt "${WS_FOREIGN_TLS_TTL:-86400}" ]; then
+            verdict=$(cat "$cache" 2>/dev/null)
+            [ "$verdict" = "yes" ] || return 1
+            echo "watashi: $d is served elsewhere with a trusted certificate, not asking an authority"
+            return 0
+        fi
+    fi
+    days=$(ws_trusted_tls_days "$d")
+    if [ -n "$days" ] && [ "$days" -gt 30 ] 2>/dev/null; then
+        echo yes >"$cache"
+        echo "watashi: $d is served elsewhere with a trusted certificate, $days days left, not asking an authority"
+        return 0
+    fi
+    echo no >"$cache"
+    return 1
+}
+
 function get_cert() {
     cd /opt/hiddify-manager/acme.sh/
     source ./lib/acme.sh.env
@@ -370,6 +460,16 @@ function get_cert() {
     DOMAIN=$1
     ssl_cert_path="$WS_SSL_DIR"
     local days_left=0
+
+    # watashi v12.2.130bk: a name whose tls belongs to someone else is skipped
+    # here, before the banner and before the ladder, so the install log gets
+    # one line instead of four authorities timing out twice each. The local
+    # self signed file is still kept, because haproxy loads a file per
+    # domain and would not start without one.
+    if ws_valid_domain "$DOMAIN" && ws_foreign_tls "$DOMAIN"; then
+        get_self_signed_cert "$DOMAIN" >/dev/null
+        return 0
+    fi
 
     echo "=========================================="
     echo "Getting SSL certificate for: $DOMAIN"

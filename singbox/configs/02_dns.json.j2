@@ -37,6 +37,8 @@
     ],
     "rules": [],
     "final": "cloudflare",
-    "strategy": "prefer_ipv4"
+    {# watashi v12.2.130bq: sing-box never read the only IPv4 switch, so it
+       kept accepting AAAA answers and users still went out over IPv6. #}
+    "strategy": "{% if hconfigs['only_ipv4'] %}ipv4_only{% else %}prefer_ipv4{% endif %}"
   }
 }

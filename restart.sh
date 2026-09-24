@@ -28,6 +28,11 @@ function restart_service() {
     s=${s%%.*}
     if systemctl is-enabled $s >/dev/null 2>&1 ; then
         before_stat=$(get_pretty_service_status $s 2>&1)
+        # watashi v12.2.130bj: restart on a unit that is sitting in failed
+        # inside its start limit window does nothing at all, so the menu
+        # said it restarted a core it never touched. reset-failed first,
+        # the same pair mieru got in v12.2.113 and core_manager in .125.
+        systemctl reset-failed $s 2>/dev/null || true
         systemctl restart $s
         ws_wait_active $s 30
         new_status=$(get_pretty_service_status $s 2>&1)
