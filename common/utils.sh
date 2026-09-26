@@ -1262,6 +1262,63 @@ sys.exit(0)
     return 0
 }
 
+# watashi v12.2.130ch: every server that upgrades still carries the retired
+# hiddify-cli service, its unit file, its folder and its user. systemd keeps
+# restarting a unit nobody ships any more, so it is stopped and removed here,
+# once, and a stamp keeps the next upgrade quiet. Everything is guarded: a
+# server that never had it simply writes the stamp and moves on. WS_ROOT,
+# WS_SYSTEMD_DIR and WS_SYSTEMD_LIB exist so the round CH test can drive this
+# against a throwaway tree instead of the real machine.
+WS_RETIRED_TEMPLATES="templates/a.html templates/fake.html templates/static.html templates/lte-master.html templates/master.html templates/admin-layout.html templates/flaskadmin-layout.html templates/donation.html templates/macros.html templates/admin.ht.old templates/admin-layout.html.b51 panel/commercial/templates/configc.html panel/commercial/templates/parent_dash.html panel/user/templates/new.html panel/user/templates/redirect_to_new_format.html panel/user/templates/home panel/admin/ProxyStatsAdmin.py panel/admin/templates/proxy_stats.html"
+
+function ws_retire_hiddify_cli() {
+    local root="${WS_ROOT:-/opt/hiddify-manager}"
+    local stamp="$root/log/system/.watashi-cli-retired"
+    [ -f "$stamp" ] && return 0
+    local did=0
+    if systemctl list-unit-files 2>/dev/null | grep -q '^hiddify-cli\.service'; then
+        systemctl stop hiddify-cli 2>/dev/null || true
+        systemctl disable hiddify-cli 2>/dev/null || true
+        did=1
+    fi
+    rm -f "${WS_SYSTEMD_DIR:-/etc/systemd/system}/hiddify-cli.service" \
+          "${WS_SYSTEMD_LIB:-/lib/systemd/system}/hiddify-cli.service" 2>/dev/null
+    systemctl daemon-reload 2>/dev/null || true
+    systemctl reset-failed hiddify-cli 2>/dev/null || true
+    if [ -d "$root/other/hiddify-cli" ]; then
+        rm -rf "$root/other/hiddify-cli"
+        did=1
+    fi
+    id hiddify-cli >/dev/null 2>&1 && userdel hiddify-cli 2>/dev/null
+    mkdir -p "$(dirname "$stamp")" 2>/dev/null
+    date -u +%FT%TZ >"$stamp" 2>/dev/null
+    [ "$did" = 1 ] && echo "watashi: the hiddify-cli service was retired and removed"
+    return 0
+}
+
+# watashi v12.2.130ch: pip installs the panel package but never deletes a file a
+# newer release stopped shipping, so the old flask-admin layouts would sit in
+# site-packages forever. They are named here and removed from wherever the
+# panel actually lives.
+function ws_drop_retired_templates() {
+    local root="${WS_ROOT:-/opt/hiddify-manager}" base gone=0 f where
+    # two places carry the same files: the installed package, and the source
+    # tree the next upgrade installs from. Cleaning only the first would let
+    # the very next update put every retired file straight back.
+    base=$(python -c 'import os,hiddifypanel;print(os.path.dirname(hiddifypanel.__file__))' 2>/dev/null)
+    for where in "$base" "$root/hiddify-panel/src/hiddifypanel"; do
+        [ -n "$where" ] && [ -d "$where" ] || continue
+        for f in $WS_RETIRED_TEMPLATES; do
+            if [ -e "$where/$f" ]; then
+                rm -rf "$where/$f" && gone=$((gone + 1))
+            fi
+        done
+    done
+    [ -e "$root/other/hiddify-cli" ] && rm -rf "$root/other/hiddify-cli" && gone=$((gone + 1))
+    [ "$gone" -gt 0 ] && echo "watashi: $gone retired files were removed"
+    return 0
+}
+
 function ws_install_panel_from_source() {
     local src="${1:-/opt/hiddify-manager/hiddify-panel/src}"
     if [ ! -f "$src/pyproject.toml" ] && [ ! -f "$src/setup.py" ]; then
@@ -1277,6 +1334,8 @@ function ws_install_panel_from_source() {
         pip install "$src" || return 1
     fi
     ws_heal_sqlalchemy_utils
+    ws_retire_hiddify_cli
+    ws_drop_retired_templates
     python -c "import hiddifypanel" >/dev/null 2>&1 \
         || { echo "watashi: the panel was installed but cannot be imported"; python -c "import hiddifypanel" 2>&1 | tail -n 25; return 1; }
     echo "watashi: the panel was installed from $src"

@@ -46,7 +46,7 @@ if [[ " $@ " == *" --check-only "* ]]; then
     # Phase 5: Start optional services if enabled
     systemctl start hiddify-warp 2>/dev/null || true
     systemctl start hiddify-ssh-liberty-bridge 2>/dev/null || true
-    systemctl start hiddify-cli 2>/dev/null || true
+    # watashi v12.2.130ch: hiddify-cli is retired
 
     
     # Start rathole if installed
@@ -145,7 +145,7 @@ function main() {
         install_run other/telegram $(hconfig "telegram_enable")
         install_run other/ssfaketls $(hconfig "ssfaketls_enable")
         install_run other/ssh $(hconfig "ssh_server_enable")
-        install_run other/hiddify-cli $(hconfig "hiddifycli_enable" "true")
+        # watashi v12.2.130ch: other/hiddify-cli is retired
         # watashi v12.2.103: mieru is served by mita, not by sing-box.
         install_run other/mieru $(hconfig "mieru_enable")
 

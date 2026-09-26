@@ -54,7 +54,7 @@ function main() {
     # Restart services and get their status (except hiddify-panel)
     for ss in other/**/*.service **/*.service wg-quick@warp mtproto-proxy.service mtproxy.service;do
         case "$ss" in
-            hiddify-panel*|other/hiddify-cli*|*hiddify-redis*|mariadb)
+            hiddify-panel*|*hiddify-redis*|mariadb)
                 continue
                 ;;
             wg-quick@warp)
@@ -70,10 +70,7 @@ function main() {
     done
     wait
 
-    for ss in hiddify-cli;do
-        restart_service $ss &
-    done
-    wait
+    # watashi v12.2.130ch: hiddify-cli is retired, nothing to restart here
     echo -e "----------------------------------------------------------------\n"
 }
 mkdir -p log/system/
