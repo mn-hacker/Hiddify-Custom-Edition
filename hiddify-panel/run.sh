@@ -68,7 +68,20 @@ if [ -f "../config.env" ]; then
         # echo "temporary disable removing config.env"
     fi
 fi
-hiddify-panel-cli init-db
+# watashi v12.2.130ca: init-db used to run with nobody looking at the result. When a
+# database migration threw, the panel was started anyway on a half migrated
+# database and the only trace was a traceback that scrolled past. The run is
+# kept now, and the failure is said out loud. The start is not blocked: a panel
+# that comes up on an older schema is still better than no panel at all, and
+# reload_all_configs downstream will stop the install with a real reason.
+ws_initdb_log=/opt/hiddify-manager/log/system/panel-init-db.log
+mkdir -p "$(dirname "$ws_initdb_log")" 2>/dev/null
+hiddify-panel-cli init-db 2>&1 | tee "$ws_initdb_log"
+ws_initdb_rc=${PIPESTATUS[0]}
+if [ "$ws_initdb_rc" != "0" ]; then
+    echo "watashi: hiddify-panel-cli init-db ended with code $ws_initdb_rc, so the database was not fully prepared. The whole run is in $ws_initdb_log" >&2
+    tail -n 30 "$ws_initdb_log" >&2
+fi
 
 systemctl start hiddify-panel.service
 systemctl restart hiddify-panel-background-tasks.service

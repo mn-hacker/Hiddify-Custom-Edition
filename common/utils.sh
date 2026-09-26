@@ -1140,12 +1140,21 @@ function reload_all_configs(){
     # user list for xray and sing-box comes from - was built out of nothing.
     # The new list is assembled somewhere else, checked, and only then does it
     # replace the file that is already in place.
+    # watashi v12.2.130ca: both calls used to end in 2>/dev/null, so the one thing that
+    # could explain the failure - the panel's own traceback - was destroyed,
+    # and then the message asked the owner to keep a log that did not exist.
+    # Two real faults hid behind this for a whole release.
     local target=/opt/hiddify-manager/current.json
+    local errlog=/opt/hiddify-manager/log/system/panel-configs.err.log
     local tmp
+    mkdir -p "$(dirname "$errlog")" 2>/dev/null
+    : >"$errlog" 2>/dev/null
     tmp=$(mktemp /tmp/watashi-current.XXXXXX) || return 1
-    if ! hiddify-http-api admin/all-configs/ >"$tmp" 2>/dev/null || ! jq -e '.users' "$tmp" >/dev/null 2>&1; then
-        if ! hiddify-panel-cli all-configs >"$tmp" 2>/dev/null || ! jq -e '.users' "$tmp" >/dev/null 2>&1; then
+    if ! hiddify-http-api admin/all-configs/ >"$tmp" 2>>"$errlog" || ! jq -e '.users' "$tmp" >/dev/null 2>&1; then
+        if ! hiddify-panel-cli all-configs >"$tmp" 2>>"$errlog" || ! jq -e '.users' "$tmp" >/dev/null 2>&1; then
             echo "watashi: the panel returned no usable configuration, so $target was left untouched" >&2
+            echo "watashi: this is what the panel said, the whole of it is in $errlog" >&2
+            tail -n 30 "$errlog" >&2
             rm -f "$tmp"
             return 1
         fi
@@ -1220,6 +1229,39 @@ function get_public_ipv6() {
 # bootstrap. The panel then did not match the manager around it, which
 # is how a fresh server ended up wearing the upstream theme. One
 # function now, used by all of them.
+# watashi v12.2.130ca: an old sqlalchemy_utils that can no longer be imported.
+#
+# v12.2.54 stopped asking for sqlalchemy-utils because nothing here imports it,
+# but it was never removed from venvs that already had it. Once pip answered
+# "sqlalchemy<3.0.0" with 2.1, which deleted orm.attributes.ScalarAttributeImpl,
+# that leftover copy broke - and flask-admin imports it under "except
+# ImportError", which does not catch an AttributeError. The panel then could not
+# be imported at all and hiddify-panel.service spun in a restart loop.
+#
+# pyproject now pins sqlalchemy below 2.1, which is the real fix. This is the
+# second layer, for the day something else drags 2.1 back in: a package the
+# panel does not use must not be able to stop the panel from starting.
+function ws_heal_sqlalchemy_utils() {
+    python -c "
+import importlib, sys
+try:
+    importlib.import_module('sqlalchemy_utils')
+except ImportError:
+    sys.exit(0)
+except BaseException:
+    sys.exit(7)
+sys.exit(0)
+" 2>/dev/null
+    [ "$?" == "7" ] || return 0
+    echo "watashi: sqlalchemy_utils in this venv can no longer be imported. The panel does not use it, so it is being removed."
+    if command -v uv >/dev/null 2>&1; then
+        uv pip uninstall sqlalchemy-utils >/dev/null 2>&1 || true
+    else
+        pip uninstall -y sqlalchemy-utils >/dev/null 2>&1 || true
+    fi
+    return 0
+}
+
 function ws_install_panel_from_source() {
     local src="${1:-/opt/hiddify-manager/hiddify-panel/src}"
     if [ ! -f "$src/pyproject.toml" ] && [ ! -f "$src/setup.py" ]; then
@@ -1234,8 +1276,9 @@ function ws_install_panel_from_source() {
         pip install -U --force-reinstall --no-deps "$src" || return 1
         pip install "$src" || return 1
     fi
+    ws_heal_sqlalchemy_utils
     python -c "import hiddifypanel" >/dev/null 2>&1 \
-        || { echo "watashi: the panel was installed but cannot be imported"; return 1; }
+        || { echo "watashi: the panel was installed but cannot be imported"; python -c "import hiddifypanel" 2>&1 | tail -n 25; return 1; }
     echo "watashi: the panel was installed from $src"
 }
 
