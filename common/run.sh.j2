@@ -185,6 +185,17 @@ ws_hop_apply
 ws_hop_clear
 {%endif%}
 
+{# watashi v12.2.130bz: every port this box listens on is reserved from the
+   ephemeral range here. The list is built from the same hconfigs and the
+   same internal_port_* the cores are configured with, so the kernel and the
+   configs cannot drift apart. #}
+WS_RESERVED="9000 {{hconfigs.get('wireguard_port','')}} {{hconfigs.get('ssh_server_port','')}} {{hconfigs.get('shadowsocks2022_port','')}} {{hconfigs.get('amnezia_port','')}} {{hconfigs.get('naive_port','')}} {{hconfigs.get('shadowtls_port','')}} {{hconfigs.get('special_port','')}} {{hconfigs.get('mieru_port','')}} {{hconfigs.get('mieru_tcp_ports','')}} {{hconfigs.get('mieru_udp_ports','')}} {{hconfigs.get('reality_port','')}} {{hconfigs.get('tuic_port','')}} {{hconfigs.get('hysteria_port','')}} {{hconfigs.get('anytls_port','')}} {{hconfigs.get('snell_port','')}}"
+{% for d in domains %}
+WS_RESERVED="$WS_RESERVED {{d['internal_port_hysteria2']}} {{d['internal_port_tuic']}} {{d['internal_port_anytls']}} {{d['internal_port_snell']}} {{d['internal_port_mieru']}} {{d['internal_port_naive']}} {{d['internal_port_amnezia']}} {{d['internal_port_special']}}"
+{% endfor %}
+export WS_RESERVED
+ws_reserve_ports
+
 # watashi v12.2.115: every port of this run is in WATASHI_ALLOW by now,
 # so the copies the old code left in INPUT can go. Only a port that the
 # chain already serves is folded away, never a rule added by hand.

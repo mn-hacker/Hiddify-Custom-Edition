@@ -1238,3 +1238,26 @@ function ws_install_panel_from_source() {
         || { echo "watashi: the panel was installed but cannot be imported"; return 1; }
     echo "watashi: the panel was installed from $src"
 }
+
+# watashi v12.2.130bz: the panel draws every service port at random from
+# 11000-60000 (hutils/random.py) and common/sysctl.conf hands the kernel the
+# very same range as net.ipv4.ip_local_port_range, so an outgoing connection
+# of apt, curl or acme.sh can be sitting on a service port at the exact
+# moment a core starts. That is how a clean install ended with
+# hiddify-singbox failed on "listen tcp 0.0.0.0:15118: bind: address already
+# in use" while nothing held that port a second later. The ports we listen on
+# are handed to net.ipv4.ip_local_reserved_ports, the knob that takes them
+# out of the ephemeral pool, so the kernel can never lend one out again.
+function ws_reserve_ports() {
+    local ports list file="/etc/sysctl.d/hiddify-reserved.conf" count
+    ports=$(printf '%s\n' $WS_RESERVED | grep -E '^[0-9]+$' | awk '$1 > 1024 && $1 < 65536' | sort -n -u)
+    [ -n "$ports" ] || return 0
+    list=$(printf '%s,' $ports)
+    list=${list%,}
+    count=$(printf '%s\n' $ports | wc -l)
+    if [ ! -f "$file" ] || ! grep -qx "net.ipv4.ip_local_reserved_ports = $list" "$file"; then
+        printf '# written by hiddify-manager, watashi v12.2.130bz. do not edit by hand.\nnet.ipv4.ip_local_reserved_ports = %s\n' "$list" >"$file"
+        echo "watashi: $count service ports were taken out of the ephemeral range"
+    fi
+    sysctl -q -w "net.ipv4.ip_local_reserved_ports=$list" 2>/dev/null || true
+}

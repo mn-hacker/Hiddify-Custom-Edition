@@ -157,6 +157,23 @@ ws_sb_verify_started() {
 		state=$(systemctl is-active hiddify-singbox.service 2>/dev/null)
 		[ "$state" == "active" ] && return 0
 	fi
+	# watashi v12.2.130bz: an ephemeral socket holding one of our ports is
+	# gone within seconds, but the five starts systemd allows are spent in
+	# under half a minute, so the core stayed failed for good over a clash
+	# that had already ended. When the journal names that clash the start is
+	# tried again with room to breathe.
+	if journalctl -u hiddify-singbox.service -n 30 --no-pager 2>/dev/null | grep -qi 'address already in use'; then
+		local try
+		for try in 1 2 3; do
+			echo "watashi: a port sing-box needs was held by something else, trying again in 10s ($try of 3)" >&2
+			sleep 10
+			ws_sb_clear_start_limit || true
+			systemctl start hiddify-singbox.service 2>/dev/null || true
+			sleep 3
+			state=$(systemctl is-active hiddify-singbox.service 2>/dev/null)
+			[ "$state" == "active" ] && return 0
+		done
+	fi
 	echo "watashi: sing-box did not reach active (state: $state), last errors:" >&2
 	journalctl -u hiddify-singbox.service -n 30 --no-pager 2>/dev/null |
 		grep -Ei "fatal|error|panic|repeated too quickly" | tail -5 >&2
