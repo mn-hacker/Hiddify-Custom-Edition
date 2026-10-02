@@ -3,6 +3,15 @@ activate_python_venv
 install_package wireguard libev-dev libevdev2 default-libmysqlclient-dev build-essential pkg-config ssh
 
 useradd -m hiddify-panel -s /bin/bash >/dev/null 2>&1
+# watashi v12.2.130cr: useradd -m creates the home only for a new account. An
+# account that already existed without one left /home/hiddify-panel missing,
+# and the venv lines written into its .bashrc further down failed.
+if [ ! -d /home/hiddify-panel ]; then
+    mkdir -p /home/hiddify-panel
+    cp -n /etc/skel/. /home/hiddify-panel/ -r 2>/dev/null || true
+fi
+touch /home/hiddify-panel/.bashrc
+chown -R hiddify-panel:hiddify-panel /home/hiddify-panel 2>/dev/null || true
 usermod -aG hiddify-common hiddify-panel
 
 # watashi v12.2.123: the panel writes panel.log through loguru with rotation and gz

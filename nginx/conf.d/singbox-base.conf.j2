@@ -1,6 +1,19 @@
+{#- watashi v12.2.130cr: "http2 on;" only exists from nginx 1.25.1. An older
+    nginx (1.18 on ubuntu 22.04, 1.24 on 24.04, which is what a box gets when
+    nginx was already there or nginx.org could not be reached) stops at
+    'unknown directive "http2"', and hiddify-nginx restarts forever. The older
+    spelling, http2 as a listen parameter, is understood by every version
+    (1.25.1+ only prints a deprecation notice), so it is used whenever the
+    version is lower or cannot be read. -#}
+{%- set ws_ngx_v = exec("${WS_NGINX_BIN:-/usr/sbin/nginx} -v 2>&1 | grep -oE '[0-9]+\\.[0-9]+\\.[0-9]+' | head -n 1").strip() -%}
+{%- set ws_ngx_p = (ws_ngx_v if ws_ngx_v else '0.0.0').split('.') -%}
+{%- set ws_h2_on = (ws_ngx_p[0]|int) * 1000000 + (ws_ngx_p[1]|int) * 1000 + (ws_ngx_p[2]|int) >= 1025001 -%}
+{%- set ws_h2_listen = '' if ws_h2_on else ' http2' -%}
 server {
-    listen unix:/opt/hiddify-manager/nginx/run/grpc-singbox.sock proxy_protocol;
+    listen unix:/opt/hiddify-manager/nginx/run/grpc-singbox.sock proxy_protocol{{ ws_h2_listen }};
+{% if ws_h2_on %}
     http2 on;
+{% endif %}
     set_real_ip_from unix:;
     real_ip_header proxy_protocol;
 
