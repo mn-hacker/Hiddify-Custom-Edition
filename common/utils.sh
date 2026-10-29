@@ -282,40 +282,123 @@ function is_installed_package() {
 # ============================================================
 
 APT_LOCK_FILE="/tmp/hiddify_apt.lock"
-MIN_RAM_MB=2048
+# watashi v12.3.31b: the swap used to be a fixed 2G for anything under 2048MB
+# of RAM. The size now follows the RAM (rounded to the nearest GB, since a
+# "2GB" box reports ~1950MB): 1GB or less gets 2GB, 2/3/4GB get the same
+# amount of swap, and above 4GB nothing is made. A box that already has
+# MIN_SWAP_MB of swap of its own (from the provider, say) is left alone.
 MIN_SWAP_MB=512
-SWAP_SIZE="2G"
+MAX_SWAP_RAM_GB=4
+SWAP_FILE="/swapfile"
 
 check_system_resources() {
-    local total_ram=$(free -m | awk '/^Mem:/{print $2}')
-    local total_swap=$(free -m | awk '/^Swap:/{print $2}')
-    
-    echo "System Resources: RAM=${total_ram}MB, Swap=${total_swap}MB"
-    
-    if [ "$total_ram" -lt "$MIN_RAM_MB" ] && [ "$total_swap" -lt "$MIN_SWAP_MB" ]; then
-        warning "Low RAM detected (${total_ram}MB). Creating swap file..."
-        create_swap_file
+    local total_ram total_swap ram_gb swap_mb
+    # /proc/meminfo is never translated, the output of free is
+    total_ram=$(awk '/^MemTotal:/{printf "%d", $2/1024}' /proc/meminfo 2>/dev/null)
+    total_swap=$(awk '/^SwapTotal:/{printf "%d", $2/1024}' /proc/meminfo 2>/dev/null)
+    total_ram=${total_ram:-0}
+    total_swap=${total_swap:-0}
+    ram_gb=$(((total_ram + 511) / 1024))
+
+    echo "System Resources: RAM=${total_ram}MB (~${ram_gb}GB), Swap=${total_swap}MB"
+
+    # a container cannot own a swap file, and apply_users never needs one
+    if [ "$MODE" == "docker" ] || [ "$MODE" == "apply_users" ]; then
+        return 0
+    fi
+
+    if [ "$ram_gb" -gt "$MAX_SWAP_RAM_GB" ] || [ "$total_swap" -ge "$MIN_SWAP_MB" ]; then
+        return 0
+    fi
+
+    if [ "$ram_gb" -le 1 ]; then
+        swap_mb=2048
+    else
+        swap_mb=$((ram_gb * 1024))
+    fi
+
+    warning "Low RAM detected (${total_ram}MB). Creating a ${swap_mb}MB swap file..."
+    create_swap_file "$swap_mb" || warning "Swap could not be created, the install goes on without it."
+}
+
+ws_swap_fstab() {
+    if ! grep -qE "^[[:space:]]*${SWAP_FILE}[[:space:]]" /etc/fstab; then
+        echo "${SWAP_FILE} none swap sw 0 0" >>/etc/fstab
     fi
 }
 
+# btrfs refuses a copy-on-write swap file, so the file is emptied and marked
+# no-cow before a single byte goes into it.
+ws_swap_prepare_file() {
+    rm -f "$SWAP_FILE"
+    if [ "$(stat -f -c %T / 2>/dev/null)" == "btrfs" ]; then
+        truncate -s 0 "$SWAP_FILE"
+        chattr +C "$SWAP_FILE" 2>/dev/null
+    fi
+}
+
+ws_swap_write_dd() {
+    ws_swap_prepare_file
+    dd if=/dev/zero of="$SWAP_FILE" bs=1M count="$1" status=none
+}
+
+ws_swap_enable() {
+    chmod 600 "$SWAP_FILE"
+    mkswap "$SWAP_FILE" >/dev/null 2>&1 && swapon "$SWAP_FILE" 2>/dev/null
+}
+
 create_swap_file() {
-    if [ -f /swapfile ]; then
-        echo "Swap file already exists"
+    local swap_mb=${1:-2048}
+    local free_mb
+
+    # already switched on: nothing to do
+    if swapon --show=NAME --noheadings 2>/dev/null | grep -qxF "$SWAP_FILE"; then
+        echo "Swap file ${SWAP_FILE} is already active"
         return 0
     fi
-    
-    echo "Creating ${SWAP_SIZE} swap file..."
-    fallocate -l ${SWAP_SIZE} /swapfile 2>/dev/null || dd if=/dev/zero of=/swapfile bs=1M count=1024 status=progress
-    chmod 600 /swapfile
-    mkswap /swapfile
-    swapon /swapfile
-    
-    # Add to fstab if not already there
-    if ! grep -q '/swapfile' /etc/fstab; then
-        echo '/swapfile none swap sw 0 0' >> /etc/fstab
+
+    # left behind by an earlier run but never switched on
+    if [ -f "$SWAP_FILE" ]; then
+        chmod 600 "$SWAP_FILE"
+        if swapon "$SWAP_FILE" 2>/dev/null; then
+            ws_swap_fstab
+            success "Existing swap file activated"
+            return 0
+        fi
+        echo "The old ${SWAP_FILE} could not be switched on, it is made again"
+        rm -f "$SWAP_FILE"
     fi
-    
-    success "Swap file created and activated"
+
+    # keep at least 1GB of the disk for the system itself
+    free_mb=$(df -Pm / 2>/dev/null | awk 'NR==2{print $4}')
+    free_mb=${free_mb:-0}
+    if [ $((free_mb - 1024)) -lt "$swap_mb" ]; then
+        swap_mb=$((free_mb - 1024))
+    fi
+    if [ "$swap_mb" -lt 256 ]; then
+        warning "Not enough free disk space (${free_mb}MB) for a swap file"
+        return 1
+    fi
+
+    echo "Creating ${swap_mb}MB swap file..."
+    ws_swap_prepare_file
+    if ! fallocate -l "${swap_mb}M" "$SWAP_FILE" 2>/dev/null; then
+        ws_swap_write_dd "$swap_mb" || { rm -f "$SWAP_FILE"; return 1; }
+    fi
+
+    # fallocate leaves holes on some filesystems and swapon refuses them,
+    # dd writes every block, so it is the second try
+    if ! ws_swap_enable; then
+        ws_swap_write_dd "$swap_mb" || { rm -f "$SWAP_FILE"; return 1; }
+        if ! ws_swap_enable; then
+            rm -f "$SWAP_FILE"
+            error "swapon failed (the virtualization may not allow swap)"
+            return 1
+        fi
+    fi
+
+    ws_swap_fstab
+    success "Swap file of ${swap_mb}MB created and activated"
 }
 
 # ============================================================
