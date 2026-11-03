@@ -129,7 +129,7 @@ function update_panel() {
         ;;
         develop|dev)
             # Use the latest commit from GitHub
-            latest=$(get_commit_version Hiddify-Panel)
+            latest=$(get_dev_version Hiddify-Custom-Edition)  # watashi dev-channel
             activate_python_venv
             warning "DEVELOP: watashi panel version current=$current_panel_version latest=$latest"
             if [[ "$current_panel_version" != "$latest" ]]; then
@@ -236,11 +236,11 @@ function update_config() {
             return 0
         ;;
         develop|dev)
-            local latest=$(get_commit_version hiddify-manager)
+            local latest=$(get_dev_version Hiddify-Custom-Edition)  # watashi dev-channel
             echo "DEVELOP: Current Config Version=$current_config_version -- Latest=$latest"
             if [[ "$force" == "true" || "$latest" != "$current_config_version" ]]; then
                 update_progress "Updating..." "Watashi Config from $current_config_version to $latest" 60
-                update_from_github "hiddify-manager.tar.gz" "https://github.com/mn-hacker/Hiddify-Custom-Edition/archive/refs/heads/dev.tar.gz" $latest
+                update_from_github "hiddify-manager.zip" "https://github.com/mn-hacker/Hiddify-Custom-Edition/releases/download/v${latest}/hiddify-manager.zip" $latest  # watashi dev-channel: release zip has submodules; branch tarball does not
                 
                 update_progress "Updated..." "Watashi Config to $latest" 100
                 return 0

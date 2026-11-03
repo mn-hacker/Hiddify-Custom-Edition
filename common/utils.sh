@@ -56,6 +56,25 @@ function get_pre_release_version() {
     echo ${VERSION:-""}
 }
 
+function get_dev_version() {
+    # watashi dev-channel: find latest tag that contains 'dev'
+    local response=$(curl -sL "https://api.github.com/repos/mn-hacker/$1/tags" 2>/dev/null)
+    VERSION=""
+
+    if echo "$response" | jq -e 'type == "array"' >/dev/null 2>&1; then
+        VERSION=$(echo "$response" | jq -r '.[].name' 2>/dev/null | grep -E 'dev' | head -1)
+    fi
+
+    if [ -z "$VERSION" ] || [ "$VERSION" == "null" ]; then
+        response=$(curl -sL "https://api.github.com/repos/mn-hacker/$1/releases" 2>/dev/null)
+        if echo "$response" | jq -e 'type == "array"' >/dev/null 2>&1; then
+            VERSION=$(echo "$response" | jq -r '[.[] | select(.prerelease == true) | select(.tag_name | contains("dev"))] | sort_by(.created_at) | last | .tag_name' 2>/dev/null)
+        fi
+    fi
+    VERSION=${VERSION/#v/}
+    echo ${VERSION:-""}
+}
+
 function get_release_version() {
     # Use tags API instead of releases API - find latest tag NOT containing 'b' (stable)
     local response=$(curl -sL "https://api.github.com/repos/mn-hacker/$1/tags" 2>/dev/null)

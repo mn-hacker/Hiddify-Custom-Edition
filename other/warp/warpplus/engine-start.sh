@@ -1,27 +1,29 @@
 #!/bin/bash
-# watashi: warp v12.2.128
+# watashi v12.2.130: warp-plus launcher for hiddify-warp.service
 #
-# The command systemd runs. It only reads engine.args, one argument per line,
-# which run.sh renders from the panel settings. The service therefore never
-# needs the panel database at boot time: if the database is not ready yet,
-# the engine still starts with the last known settings.
+# This script is what the systemd unit actually runs (ExecStart).
+# run.sh builds engine.args (one argument per line) and then calls
+# "systemctl restart hiddify-warp.service", which brings us here.
+# We read those args and exec the binary in place of this shell so
+# systemd tracks the right PID and the unit stops cleanly.
 
-cd "$(dirname -- "$0")" || exit 1
+cd /opt/hiddify-manager/other/warp/warpplus || exit 1
 
-ARGS=()
-if [ -f engine.args ]; then
-    while IFS= read -r line; do
-        [ -z "$line" ] && continue
-        case "$line" in
-        "#"*) continue ;;
-        esac
-        ARGS+=("$line")
-    done <engine.args
+ARGS_FILE="engine.args"
+
+if [ ! -f "$ARGS_FILE" ]; then
+    echo "warp: engine.args not found — run.sh must run before the service starts." >&2
+    exit 1
 fi
 
-if [ ${#ARGS[@]} -eq 0 ]; then
-    # a safe default that still honours the panel contract: socks on 3000
-    ARGS=("-b" "127.0.0.1:3000" "--cache-dir" "/opt/hiddify-manager/other/warp/warpplus/cache")
+if [ ! -x "./warp-plus" ]; then
+    echo "warp: ./warp-plus is missing or not executable." >&2
+    exit 1
 fi
 
+# Read one argument per line into an array.
+# mapfile preserves spaces inside argument values correctly.
+mapfile -t ARGS < "$ARGS_FILE"
+
+# exec replaces this shell with warp-plus, so systemd owns the right PID.
 exec ./warp-plus "${ARGS[@]}"

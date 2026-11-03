@@ -184,7 +184,19 @@ function build_args() {
         echo "${COUNTRY:-AT}" >>"$out"
         ;;
     esac
+    # watashi v12.2.130: hconfig reads current.json which is only
+    # regenerated on apply_configs. After a restore the database has
+    # the right key but current.json is still stale. ws_after_restore()
+    # writes the sidecar warp-key.conf so the engine inherits the
+    # correct key without waiting for the next apply.
     key=$(hconfig warp_plus_code)
+    if [ -z "$key" ] || [ "$key" = "-" ]; then
+        sidecar="$(pwd)/warp-key.conf"
+        if [ -f "$sidecar" ]; then
+            key=$(head -1 "$sidecar" 2>/dev/null | tr -d '[:space:]')
+            [ -n "$key" ] && echo "- WARP: key loaded from post-restore sidecar." >&2
+        fi
+    fi
     if [ -n "$key" ] && [ "$key" != "-" ]; then
         echo "-k" >>"$out"
         echo "$key" >>"$out"
@@ -275,7 +287,28 @@ function ws_can_leave_alone() {
     warp_trace
 }
 
+
+# watashi v12.2.130: cache housekeeping.
+# warp-plus accumulates registration blobs in its cache directory. On a server
+# that has been running for months the cache can reach hundreds of MB. Keep only
+# the most recent files; the engine re-registers on the next start if it needs
+# anything that was pruned.
+function ws_prune_cache() {
+    local max_files=20  # keep at most this many files per type
+    local cache_dir="$(pwd)/$CACHE"
+    [ -d "$cache_dir" ] || return 0
+    # prune .bin and .json files independently, keeping the newest ones
+    for ext in bin json; do
+        local files_to_remove
+        files_to_remove=$(find "$cache_dir" -maxdepth 1 -name "*.${ext}" -type f             | sort -t/ -k1 | head -n -${max_files})
+        if [ -n "$files_to_remove" ]; then
+            echo "$files_to_remove" | xargs rm -f 2>/dev/null
+        fi
+    done
+}
+
 function bring_up() {
+    ws_prune_cache  # keep the cache dir from growing into RAM
     build_args engine.args.new
     if ws_can_leave_alone; then
         rm -f engine.args.new

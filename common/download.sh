@@ -45,8 +45,16 @@ elif [[ "$branch" == "beta" ]]; then
         base_url="https://raw.githubusercontent.com/mn-hacker/Hiddify-Custom-Edition/refs/heads/main/"
     fi
 elif [[ "$branch" == "dev" ]]; then
-    # If input is 'dev', use dev branch
-    base_url="https://raw.githubusercontent.com/mn-hacker/Hiddify-Custom-Edition/refs/heads/dev/"
+    # watashi dev-channel: use latest dev tag release zip (like beta), not a branch
+    # (the repo has no dev branch; branch tarballs also lack submodules)
+    dev_tag=$(curl -sL "https://api.github.com/repos/mn-hacker/Hiddify-Custom-Edition/tags" | jq -r '([.[].name | select(contains("dev"))] | first) // empty' 2>/dev/null)
+    if [[ -n "$dev_tag" ]]; then
+        echo "Found latest dev release: $dev_tag"
+        base_url="https://raw.githubusercontent.com/mn-hacker/Hiddify-Custom-Edition/refs/tags/$dev_tag/"
+    else
+        echo "No dev release found yet, falling back to main"
+        base_url="https://raw.githubusercontent.com/mn-hacker/Hiddify-Custom-Edition/refs/heads/main/"
+    fi
 else
     # Otherwise, use main branch
     base_url="https://raw.githubusercontent.com/mn-hacker/Hiddify-Custom-Edition/refs/heads/main/"

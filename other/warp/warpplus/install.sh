@@ -109,9 +109,105 @@ function install_pinned() {
     return 0
 }
 
+
+# watashi v12.2.130: custom warp source.
+# If WATASHI_WARP_URL is set in the environment OR a warp-source.conf file
+# exists next to this script, the engine is downloaded from there first.
+# This is how a Watashi-Warp fork replaces the upstream binary without
+# touching packages.lock or core_registry.conf.
+#
+# warp-source.conf format (one value per line):
+#   URL_AARCH64=https://github.com/mn-hacker/Watashi-Warp/releases/download/v1.0.0/warp-plus_linux-arm64.zip
+#   URL_AMD64=https://github.com/mn-hacker/Watashi-Warp/releases/download/v1.0.0/warp-plus_linux-amd64.zip
+#   SHA256_AARCH64=<hash>  (optional; skip verification if absent)
+#   SHA256_AMD64=<hash>    (optional)
+
+function ws_custom_url() {
+    local arch
+    arch=$(detect_arch)
+    local key="URL_${arch^^}"
+    # env var takes priority
+    local env_var="WATASHI_WARP_URL_${arch^^}"
+    local via_env="${!env_var}"
+    if [ -n "$via_env" ]; then
+        printf '%s' "$via_env"
+        return 0
+    fi
+    # fall back to the config file
+    local conf="$(dirname -- "$0")/warp-source.conf"
+    [ -f "$conf" ] || return 1
+    local url
+    url=$(grep -E "^${key}=" "$conf" | tail -1 | cut -d= -f2- | tr -d '[:space:]')
+    [ -n "$url" ] && printf '%s' "$url" && return 0
+    return 1
+}
+
+function ws_custom_sha256() {
+    local arch
+    arch=$(detect_arch)
+    local key="SHA256_${arch^^}"
+    local conf="$(dirname -- "$0")/warp-source.conf"
+    [ -f "$conf" ] || return 1
+    local h
+    h=$(grep -E "^${key}=" "$conf" | tail -1 | cut -d= -f2- | tr -d '[:space:]')
+    [ -n "$h" ] && printf '%s' "$h" && return 0
+    return 1
+}
+
+function install_custom() {
+    local url sha256 tmp dl_hash
+    url=$(ws_custom_url) || return 1
+    echo "- WARP: custom source configured: $url"
+    tmp=$(mktemp -d) || return 1
+    local archive="$tmp/warp-plus.zip"
+    if ! curl -fsSL -o "$archive" "$url"; then
+        error "- WARP: download from custom source failed."
+        rm -rf "$tmp"
+        return 1
+    fi
+    # hash check is optional for custom builds
+    sha256=$(ws_custom_sha256) || true
+    if [ -n "$sha256" ]; then
+        dl_hash=$(sha256sum "$archive" | awk '{print $1}')
+        if [ "$dl_hash" != "$sha256" ]; then
+            error "- WARP: custom source hash mismatch ($dl_hash vs $sha256)."
+            rm -rf "$tmp"
+            return 1
+        fi
+        echo "- WARP: custom source hash verified."
+    else
+        warning "- WARP: no SHA256 in warp-source.conf, skipping hash check."
+    fi
+    if ! unzip -o -q "$archive" -d "$tmp/work"; then
+        error "- WARP: could not unpack the custom warp package."
+        rm -rf "$tmp"
+        return 1
+    fi
+    local found
+    found=$(find "$tmp/work" -type f \( -name 'warp-plus' -o -name 'watashi-warp' \) -print -quit 2>/dev/null)
+    if [ -z "$found" ]; then
+        error "- WARP: no warp-plus/watashi-warp binary inside the custom package."
+        rm -rf "$tmp"
+        return 1
+    fi
+    [ -f "$BIN" ] && cp -f "$BIN" "$BIN.previous" 2>/dev/null
+    install -m 755 "$found" "$BIN"
+    rm -rf "$tmp"
+    if ! engine_works; then
+        error "- WARP: the custom binary does not run on this machine."
+        [ -f "$BIN.previous" ] && cp -f "$BIN.previous" "$BIN"
+        return 1
+    fi
+    success "- WARP: custom engine installed: $(engine_version)"
+    return 0
+}
+
 # 1) the engine
+# watashi v12.2.130: try the custom Watashi-Warp source first, then packages.lock.
 if engine_works; then
     echo "- WARP engine is already installed: $(engine_version)"
+elif install_custom; then
+    success "- Installed the Watashi-Warp engine: $(engine_version)"
 elif install_pinned; then
     success "- Installed the WARP engine: $(engine_version)"
 else
