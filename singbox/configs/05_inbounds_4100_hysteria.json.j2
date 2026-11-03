@@ -21,8 +21,21 @@
 				{# watashi v12.2.99: sniff, sniff_override_destination and domain_strategy
 				   are gone from inbounds in sing-box 1.13.0+; 03_routing.json.j2 carries
 				   the sniff and resolve rule actions that replace them. #}
-								"up_mbps": {{ chconfigs[d['child_id']]['hysteria_up_mbps'] }},
-				"down_mbps": {{ chconfigs[d['child_id']]['hysteria_down_mbps'] }},
+				{# watashi v12.3.34dev: up_mbps and down_mbps are optional in Hysteria2;
+				   when the DB has no value the field is None/empty and Jinja2 renders
+				   that as the literal string "None" (not JSON null), which makes the
+				   config unparseable. sing-box check then rejects the whole file and the
+				   inbound is never loaded — that is why Hysteria2 never connected.
+				   The client code already has ws_mbps() that omits the field for
+				   non-positive values; the server template now does the same with
+				   an int() | default(0) guard so the field only appears when it
+				   carries a real positive integer. #}
+				{%- set hy2_up = chconfigs[d['child_id']].get('hysteria_up_mbps') %}
+				{%- set hy2_down = chconfigs[d['child_id']].get('hysteria_down_mbps') %}
+				{%- set hy2_up_int = hy2_up | int(0) if hy2_up else 0 %}
+				{%- set hy2_down_int = hy2_down | int(0) if hy2_down else 0 %}
+				{%- if hy2_up_int > 0 %}"up_mbps": {{ hy2_up_int }},{%- endif %}
+				{%- if hy2_down_int > 0 %}"down_mbps": {{ hy2_down_int }},{%- endif %}
 				{% if chconfigs[d['child_id']]['hysteria_obfs_enable'] %}
 				"obfs": {
 					"type": "salamander",
