@@ -1,5 +1,5 @@
 #!/bin/bash
-# watashi v12.2.130bh: this file is the one from v12.2.130.49, put back exactly as
+# watashi v12.3.33dev: this file is the one from v12.2.130.49, put back exactly as
 # it was. Everything done to WARP after that version was repair work on a
 # remembered cloudflare address, and it made the node slower and less
 # reliable than the thing it was repairing. The only feature lost with it is
@@ -71,11 +71,22 @@ if [ ! -f "$CONF" ]; then
         echo "# SCAN=1 lets the engine find a reachable endpoint by itself."
         echo "SCAN=1"
         echo "DNS=1.1.1.1"
+        echo "# DNS_MODE: which DNS server warp-plus uses for resolving domains."
+        echo "# cloudflare=1.1.1.1 (default, through warp), google=8.8.8.8,"
+        echo "# system=server default resolver."
+        echo "DNS_MODE=cloudflare"
         echo "# TEST_URL is how the engine decides it is ready. It is fetched"
         echo "# through the tunnel in its first seconds, when a TLS handshake"
         echo "# is often still too slow, so a plain HTTP address by IP is used."
         echo "# Measured: an https address here never lets the proxy open."
         echo "TEST_URL=http://1.1.1.1"
+        echo "# ── watchdog tunables ────────────────────────────────────────"
+        echo "# WS_WD_INTERVAL: seconds between healthchecks (default 300 = 5 min)."
+        echo "WS_WD_INTERVAL=300"
+        echo "# WS_WD_THRESHOLD: failed checks before rotating the endpoint (default 2)."
+        echo "WS_WD_THRESHOLD=2"
+        echo "# WS_WD_GRACE: seconds to wait after start before first check (default 60)."
+        echo "WS_WD_GRACE=60"
     } >"$CONF"
     chmod 600 "$CONF" 2>/dev/null
 fi
@@ -85,8 +96,23 @@ COUNTRY=AT
 IPV=auto
 SCAN=1
 DNS=1.1.1.1
+DNS_MODE=cloudflare
 TEST_URL=http://1.1.1.1
+WS_WD_INTERVAL=300
+WS_WD_THRESHOLD=2
+WS_WD_GRACE=60
 source "$CONF"
+
+# watashi v12.3.33dev: Smart DNS — DNS_MODE drives the actual --dns argument.
+# cloudflare = 1.1.1.1 (through warp), google = 8.8.8.8, system = server default.
+case "${DNS_MODE:-cloudflare}" in
+    cloudflare) DNS="1.1.1.1" ;;
+    google)     DNS="8.8.8.8" ;;
+    system)     DNS=$(grep -m1 '^nameserver' /etc/resolv.conf 2>/dev/null | awk '{print $2}' || echo "1.1.1.1") ;;
+    *)          DNS="${DNS:-1.1.1.1}" ;;
+esac
+# Export so watchdog.sh can read them from engine.conf directly
+export WS_WD_INTERVAL WS_WD_THRESHOLD WS_WD_GRACE
 
 # Servers that already have an engine.conf from an earlier round do not
 # have TEST_URL in it, and that single missing line is what kept the proxy
