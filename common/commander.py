@@ -5,6 +5,7 @@ import os
 from strenum import StrEnum
 import subprocess
 import re
+import shutil  # watashi v12.3.38dev: finds systemd-run for the long jobs
 
 HIDDIFY_DIR = '/opt/hiddify-manager/'
 
@@ -43,6 +44,64 @@ def run(cmd: list[str]):
     subprocess.run(cmd, shell=False, check=True)
 
 
+# watashi v12.3.38dev: install, apply, update and restart-services all stop or
+# restart hiddify-panel on their way. Started straight from here they lived in
+# the panel's own cgroup (the panel runs this file through sudo), so that stop
+# took them down too: the update died halfway, nothing started the panel
+# again, and the install was cut off right after its "Finished" line. Each of
+# them now runs as its own transient systemd unit that a panel stop or restart
+# cannot reach. The unit name is fixed per log file, so systemd itself refuses
+# a second copy while one is still running, and the very last line of the log
+# tells the result page how the job really ended.
+JOB_LOGS = {
+    'install': 'log/system/0-install.log',  # apply writes here too
+    'update': 'log/system/update.log',
+    'restart': 'log/system/restart.log',
+}
+# sudo has already reduced the environment to a safe set; these are the parts
+# of it the scripts got before, a transient unit would start without them.
+JOB_ENV = ('PATH', 'HOME', 'USER', 'LOGNAME', 'SHELL', 'MAIL', 'TERM', 'TZ',
+           'LANG', 'LANGUAGE', 'SUDO_USER', 'SUDO_UID', 'SUDO_GID', 'SUDO_COMMAND')
+JOB_ENV_PREFIX = ('LC_', 'HIDDIFY_')
+# "$@" is the job itself, so none of its arguments ever passes through a shell.
+JOB_WRAP = ('name=$1; log=$2; shift 2; "$@"; rc=$?; '
+            'if [ "$rc" -eq 0 ]; then end=done; else end=failed; fi; '
+            'printf "\\nwatashi-job: %s %s (code %s)\\n" "$name" "$end" "$rc" >>"$log"; '
+            'exit "$rc"')
+
+
+def job_unit(name: str) -> str:
+    return f'watashi-job-{name}.service'
+
+
+def job_running(name: str) -> bool:
+    try:
+        return subprocess.run(['systemctl', 'is-active', '--quiet', job_unit(name)],
+                              capture_output=True).returncode == 0
+    except Exception:
+        return False
+
+
+def run_job(name: str, cmd: list[str]):
+    log = os.path.join(HIDDIFY_DIR, JOB_LOGS[name])
+    os.makedirs(os.path.dirname(log), exist_ok=True)
+    job = ['/bin/bash', '-c', JOB_WRAP, 'watashi-job', name, log, *cmd]
+    launcher = shutil.which('systemd-run')
+    if not launcher or not os.path.isdir('/run/systemd/system'):
+        # no systemd to hand the job to (docker): it runs right here, as before
+        run(job)
+        return
+    if job_running(name):
+        print(f'the {name} job is already running ({job_unit(name)}), it is not started twice')
+        raise SystemExit(3)
+    launch = [launcher, '--quiet', '--collect', f'--unit={job_unit(name)}',
+              f'--description=Watashi {name} job', '-p', f'WorkingDirectory={HIDDIFY_DIR}']
+    for key, value in os.environ.items():
+        if (key in JOB_ENV or key.startswith(JOB_ENV_PREFIX)) and '\n' not in value:
+            launch.append(f'--setenv={key}={value}')
+    run([*launch, *job])
+
+
 @click.group(chain=True)
 def cli():
     pass
@@ -57,13 +116,13 @@ def id():
 @cli.command('apply')
 def apply():
     cmd = [Command.apply.value, '--no-gui']
-    run(cmd)
+    run_job('install', cmd)  # watashi v12.3.38dev: same log and lock as install
 
 
 @cli.command('install')
 def install():
     cmd = [Command.install.value, '--no-gui']
-    run(cmd)
+    run_job('install', cmd)  # watashi v12.3.38dev
 
 
 # @cli.command('reinstall')
@@ -75,13 +134,13 @@ def install():
 @cli.command('update')
 def update():
     cmd = [Command.update.value, '--no-gui']
-    run(cmd)
+    run_job('update', cmd)  # watashi v12.3.38dev
 
 
 @cli.command('restart-services')
 def restart_services():
     cmd = [Command.restart_services.value, '--no-gui']
-    run(cmd)
+    run_job('restart', cmd)  # watashi v12.3.38dev
 
 
 @cli.command('status')
@@ -330,6 +389,14 @@ def truncate(file: str):
 
     # Ensure directory exists
     os.makedirs(log_dir, exist_ok=True)
+
+    # watashi v12.3.38dev: a job that is still running keeps writing to this
+    # file (a second click on the same button). Emptying it would only cut off
+    # what that job already wrote, and the page would show half a log.
+    for name, owned in JOB_LOGS.items():
+        if os.path.basename(owned) == f"{file}.log" and job_running(name):
+            print(f"{file}.log belongs to the {name} job, which is still running, so it is left as it is")
+            return
 
     # Truncate
     with open(file_path, 'w') as f:
