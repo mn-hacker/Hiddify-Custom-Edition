@@ -88,6 +88,8 @@ function ws_install_panel_source() {
         return 2
     fi
     uv pip install "$src" || return 1
+    # watashi v12.3.35dev: same guard as ws_install_panel_from_source
+    type ws_heal_celery_redis >/dev/null 2>&1 && ws_heal_celery_redis
     if ! python -c "import hiddifypanel" >/dev/null 2>&1; then
         echo "the panel did not import on the first try, installing it again"
         uv pip install --force-reinstall "$src" || return 1
@@ -313,7 +315,11 @@ function post_update_tasks() {
       systemctl restart hiddify-redis.service 2>/dev/null || true
       sleep 1
       systemctl restart hiddify-panel.service 2>/dev/null || true
+      # watashi v12.3.35dev: the unit now has a start limit; one that was parked
+      # in failed would ignore this restart without reset-failed.
+      systemctl reset-failed hiddify-panel-background-tasks.service 2>/dev/null || true
       systemctl restart hiddify-panel-background-tasks.service 2>/dev/null || true
+      type ws_check_background_tasks >/dev/null 2>&1 && ws_check_background_tasks
       
       cd /opt/hiddify-manager/hiddify-panel
       if [ "$CREATE_EASYSETUP_LINK" == "true" ];then

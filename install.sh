@@ -35,6 +35,8 @@ if [[ " $@ " == *" --check-only "* ]]; then
     sleep 1
     
     # Phase 3: Start background tasks (requires panel and redis)
+    # watashi v12.3.35dev: reset-failed, the unit has a start limit now
+    systemctl reset-failed hiddify-panel-background-tasks 2>/dev/null || true
     systemctl start hiddify-panel-background-tasks 2>/dev/null || true
     
     # Phase 4: Start proxy services

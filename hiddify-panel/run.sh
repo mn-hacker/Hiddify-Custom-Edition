@@ -84,5 +84,8 @@ if [ "$ws_initdb_rc" != "0" ]; then
 fi
 
 systemctl start hiddify-panel.service
+# watashi v12.3.35dev: the unit has a start limit now, a parked one would
+# ignore the restart below without reset-failed.
+systemctl reset-failed hiddify-panel-background-tasks.service 2>/dev/null || true
 systemctl restart hiddify-panel-background-tasks.service
 

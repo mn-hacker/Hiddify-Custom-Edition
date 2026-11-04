@@ -27,6 +27,10 @@ if ! ws_awg_ready; then
     apt-get install -y amneziawg amneziawg-tools >/dev/null 2>&1
 fi
 
+# watashi v12.3.35dev: every run, not only on the first install. ws_awg_ready only
+# looks for the tools, which install fine even when the kernel module failed.
+ws_awg_heal_dkms
+
 # watashi v12.2.130u: nothing else on this box serves amnezia, so if the tools are
 # missing the script stops here and says so plainly, without taking any
 # other protocol down with it.

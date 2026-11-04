@@ -1364,6 +1364,66 @@ sys.exit(0)
     return 0
 }
 
+# watashi v12.3.35dev: pyproject pinned redis==5.2.0 but let celery float, so
+# a fresh install got celery 5.6.3 + kombu 5.7.0, whose redis transport raises
+# VersionMismatch on redis-py < 6.1.0. The background worker died ~10s after
+# every start and systemd brought it back forever: 100% CPU on a 1-vCPU VPS
+# and no usage counting, backups or notifications. pyproject now asks for
+# redis>=6.4.0,<9.0.0 and celery[redis], which is the real fix.
+#
+# This is the second layer, for any venv that ends up mismatched anyway (an
+# old wheel cache, a hand install). It asks kombu itself: a connect to port 1
+# raises VersionMismatch before any socket is opened, any other error means
+# the versions are fine. No redis server is needed and it takes ~0.3s.
+function ws_heal_celery_redis() {
+    python -c "
+import sys
+try:
+    from kombu import Connection
+    from kombu.exceptions import VersionMismatch
+except BaseException:
+    sys.exit(0)
+try:
+    Connection('redis://127.0.0.1:1/0', connect_timeout=1, transport_options={'max_retries': 0}).connect()
+except VersionMismatch as e:
+    print(e)
+    sys.exit(7)
+except BaseException:
+    pass
+sys.exit(0)
+" 2>/dev/null
+    [ "$?" == "7" ] || return 0
+    echo "watashi: kombu refuses the redis-py in this venv, so the background worker would crash-loop. Upgrading redis-py."
+    if command -v uv >/dev/null 2>&1; then
+        uv pip install "redis>=6.4.0,<9.0.0" || true
+    else
+        pip install "redis>=6.4.0,<9.0.0" || true
+    fi
+    return 0
+}
+
+# watashi v12.3.35dev: the crash loop above went unnoticed because nothing
+# looked at the worker after an update. Called after it is (re)started: waits
+# long enough for one full crash cycle (~10s to die + 5s RestartSec), then
+# reports a restart or a non-active state with the tail of its error log.
+# It only warns, an install must never fail because of it.
+function ws_check_background_tasks() {
+    local unit=hiddify-panel-background-tasks
+    local err=/opt/hiddify-manager/log/system/hiddify_panel_background_tasks.err.log
+    systemctl is-enabled $unit >/dev/null 2>&1 || return 0
+    local before=$(systemctl show $unit -p NRestarts --value 2>/dev/null)
+    sleep "${1:-20}"
+    local state=$(systemctl is-active $unit 2>/dev/null)
+    local after=$(systemctl show $unit -p NRestarts --value 2>/dev/null)
+    if [ "$state" == "active" ] && [ "${before:-0}" == "${after:-0}" ]; then
+        echo "watashi: $unit is running and stayed up"
+        return 0
+    fi
+    echo "watashi: WARNING $unit is '$state' and restarted $(( ${after:-0} - ${before:-0} )) time(s) since the update." >&2
+    [ -f "$err" ] && tail -n 15 "$err" >&2
+    return 0
+}
+
 # watashi v12.2.130ch: every server that upgrades still carries the retired
 # hiddify-cli service, its unit file, its folder and its user. systemd keeps
 # restarting a unit nobody ships any more, so it is stopped and removed here,
@@ -1436,6 +1496,7 @@ function ws_install_panel_from_source() {
         pip install "$src" || return 1
     fi
     ws_heal_sqlalchemy_utils
+    ws_heal_celery_redis
     ws_retire_hiddify_cli
     ws_drop_retired_templates
     python -c "import hiddifypanel" >/dev/null 2>&1 \
