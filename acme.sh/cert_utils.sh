@@ -22,6 +22,13 @@ WS_SSL_DIR="${WS_SSL_DIR:-/opt/hiddify-manager/ssl}"
 WS_ACME_LOG="${WS_ACME_LOG:-/opt/hiddify-manager/log/system/acme.log}"
 WS_STATE_DIR="${WS_STATE_DIR:-$WS_ACME_HOME/lib/data/watashi}"
 WS_RETRY_HOURS="${WS_RETRY_HOURS:-6}"
+# watashi v12.3.39dev: one number for "time to renew". A certificate is kept while it
+# has at least this many days left and is asked for again below that, so a
+# 90 day certificate is renewed on its 29th last day. The foreign check below
+# uses the same number, so both sides agree on what "still good" means.
+WS_RENEW_DAYS="${WS_RENEW_DAYS:-30}"
+# watashi v12.3.39dev: the nginx part that opens the challenge path.
+WS_CHALLENGE_CONF="${WS_CHALLENGE_CONF:-/opt/hiddify-manager/nginx/parts/acme.conf}"
 # watashi v12.2.130ax: this said 2048, so every certificate on every watashi server was
 # RSA. An RSA 2048 signature costs the cpu ten to twenty times what an
 # ecdsa P-256 signature costs, and haproxy signs once per tls handshake.
@@ -138,19 +145,50 @@ function ws_ca_account_ready() {
         fi
         eab_args=(--eab-kid "$EAB_KID" --eab-hmac-key "$EAB_HMAC_KEY")
     fi
+    # watashi v12.3.39dev: run.sh asks for every domain at once, so on a fresh server
+    # (a restore) every domain registered the same account at the same moment,
+    # one shared key and nonce, and one of them lost and fell down the whole
+    # ladder to a self signed certificate. One registration at a time; the
+    # ones that waited find the marker and go on.
+    local lockfd rc=1
+    exec {lockfd}>"$WS_STATE_DIR/account.lock"
+    flock -w 300 "$lockfd" 2>/dev/null
+    if [ -f "$marker" ]; then
+        exec {lockfd}>&-
+        return 0
+    fi
     echo "Registering an ACME account with $ca as $email..."
     if acme.sh --register-account --server "$ca" -m "$email" "${eab_args[@]}" --log "$WS_ACME_LOG" >/dev/null 2>&1; then
         date >"$marker"
-        return 0
+        rc=0
+    else
+        echo "Could not register an account with $ca."
     fi
-    echo "Could not register an account with $ca."
-    return 1
+    exec {lockfd}>&-
+    return $rc
 }
 
+# watashi v12.3.39dev: run.sh asks for every domain at the same time, and every one of
+# those requests emptied acme.conf when it ended. The first domain to finish
+# took the challenge path away from every domain still waiting for its
+# authority, and those then failed on a 404 that had nothing to do with
+# them: a second domain on the same server could lose its certificate to the
+# first one. Each request that needs the path now leaves its pid in
+# challenge-holders, and the path is only closed by the last one to leave.
+# nginx is reloaded only when the file really changes.
 function ws_http_challenge_prepare() {
-    mkdir -p "$WS_ACME_HOME/www/.well-known/acme-challenge"
-    echo "location /.well-known/acme-challenge {root $WS_ACME_HOME/www/;}" >/opt/hiddify-manager/nginx/parts/acme.conf
-    systemctl reload hiddify-nginx 2>/dev/null || systemctl restart hiddify-nginx 2>/dev/null || true
+    local me="${BASHPID:-$$}"
+    local holders="$WS_STATE_DIR/challenge-holders"
+    local want="location /.well-known/acme-challenge {root $WS_ACME_HOME/www/;}"
+    mkdir -p "$WS_ACME_HOME/www/.well-known/acme-challenge" "$holders" 2>/dev/null
+    (
+        flock -w 60 9 || true
+        echo "$me" >"$holders/$me"
+        if [ "$(cat "$WS_CHALLENGE_CONF" 2>/dev/null)" != "$want" ]; then
+            echo "$want" >"$WS_CHALLENGE_CONF"
+            systemctl reload hiddify-nginx 2>/dev/null || systemctl restart hiddify-nginx 2>/dev/null || true
+        fi
+    ) 9>"$WS_STATE_DIR/challenge.lock"
 }
 
 # watashi v12.2.130h: asking a CA to fetch a file from us while no web server is
@@ -162,7 +200,10 @@ function ws_challenge_reachable() {
     # server that was serving the file perfectly well. The real name is used now,
     # locally and then over the public address.
     local domain="$1"
-    local probe="watashi-check-$$"
+    # watashi v12.3.39dev: $$ is the same number in every request run.sh starts at once,
+    # so one request deleted the probe file of another and called a healthy
+    # port 80 dead, and then restarted nginx under everybody's feet.
+    local probe="watashi-check-${BASHPID:-$$}-$RANDOM"
     local dir="$WS_ACME_HOME/www/.well-known/acme-challenge"
     local url="/.well-known/acme-challenge/$probe"
     mkdir -p "$dir" 2>/dev/null || true
@@ -190,9 +231,29 @@ function ws_port80_report() {
     echo "  listening on 80: $(ss -ltnp 2>/dev/null | grep -c ':80 ')"
 }
 
+# watashi v12.3.39dev: leaves the challenge path open while any other request still
+# holds it. A holder whose process is gone (killed, crashed) does not count.
 function ws_http_challenge_cleanup() {
-    echo "" >/opt/hiddify-manager/nginx/parts/acme.conf
-    systemctl reload hiddify-nginx 2>/dev/null || true
+    local me="${BASHPID:-$$}"
+    local holders="$WS_STATE_DIR/challenge-holders"
+    mkdir -p "$holders" 2>/dev/null
+    (
+        flock -w 60 9 || true
+        rm -f "$holders/$me" 2>/dev/null
+        local f pid
+        for f in "$holders"/*; do
+            [ -e "$f" ] || continue
+            pid=$(basename "$f")
+            if [[ "$pid" =~ ^[0-9]+$ ]] && kill -0 "$pid" 2>/dev/null; then
+                exit 0
+            fi
+            rm -f "$f" 2>/dev/null
+        done
+        if [ -n "$(tr -d '[:space:]' <"$WS_CHALLENGE_CONF" 2>/dev/null)" ]; then
+            echo "" >"$WS_CHALLENGE_CONF"
+            systemctl reload hiddify-nginx 2>/dev/null || true
+        fi
+    ) 9>"$WS_STATE_DIR/challenge.lock"
 }
 
 # watashi: apply_configs runs this script every time. without a cooldown a
@@ -274,6 +335,12 @@ function try_get_cert_with_ca() {
     fi
 
     local args=(--issue -d "$DOMAIN" --server "$CA_SERVER" --keylength "$WS_KEYLENGTH" --log "$WS_ACME_LOG")
+    # watashi v12.3.39dev: asked for by hand from the domain card. acme.sh keeps its own
+    # idea of when a certificate is due, and without --force it answers "not
+    # yet" for a certificate this server may not even be serving.
+    if [ "${WS_SSL_REISSUE:-0}" = "1" ]; then
+        args+=(--force)
+    fi
     if [ "$CHALLENGE" = "cloudflare-dns" ]; then
         local token
         token=$(ws_cf_token)
@@ -312,6 +379,15 @@ function try_get_cert_with_ca() {
             echo "✓ Success with $CA_DESC!"
             return 0
         elif [ $result -eq 2 ]; then
+            # watashi v12.3.39dev: "not due yet" means the store already holds a certificate
+            # that is still good, while ssl/ does not have it (the folder was
+            # emptied, or an install step failed). That one is installed as it
+            # is, instead of spending one of the five duplicates a week the
+            # authority allows on a copy of it.
+            if ws_store_cert_good "$DOMAIN"; then
+                echo "The acme.sh store already holds a good certificate for $DOMAIN, installing that one."
+                return 0
+            fi
             # Already issued, renew it with the same CA this time
             echo "Certificate already exists, attempting renewal with $CA_DESC..."
             # watashi v12.2.130ax: the store that matches WS_KEYLENGTH is tried first now.
@@ -395,15 +471,138 @@ function ws_cdn_shared_host() {
     return 1
 }
 
+# watashi v12.3.39dev: small facts about a certificate file, used by every decision
+# below instead of each place guessing on its own.
+#
+# "from an authority": the issuer is not the certificate itself and it has
+# not expired. The chain is deliberately not verified against the local CA
+# bundle: an old server with an old bundle would call a perfectly good
+# certificate untrusted and ask for a new one every single day.
+function ws_cert_real() {
+    local crt="$1" issuer subject
+    [ -s "$crt" ] || return 1
+    issuer=$(openssl x509 -issuer -noout -in "$crt" 2>/dev/null | sed 's/issuer=//')
+    subject=$(openssl x509 -subject -noout -in "$crt" 2>/dev/null | sed 's/subject=//')
+    [ -n "$issuer" ] && [ "$issuer" != "$subject" ] || return 1
+    openssl x509 -checkend 0 -noout -in "$crt" >/dev/null 2>&1
+}
+
+# the certificate is written for this name (or a wildcard that covers it)
+function ws_cert_covers() {
+    openssl x509 -in "$1" -noout -checkhost "$2" 2>/dev/null | grep -q "does match"
+}
+
+# the key file belongs to the certificate. haproxy refuses to start with a
+# pair that does not match, and with it every bind of the server goes down.
+function ws_cert_key_match() {
+    local a b
+    a=$(openssl x509 -in "$1" -noout -pubkey 2>/dev/null)
+    b=$(openssl pkey -in "$2" -pubout 2>/dev/null)
+    [ -n "$a" ] && [ "$a" = "$b" ]
+}
+
+# whole days left, negative once expired, empty when the file is unreadable
+function ws_cert_days() {
+    local end e
+    end=$(openssl x509 -enddate -noout -in "$1" 2>/dev/null | cut -d= -f2-)
+    [ -n "$end" ] || return 1
+    e=$(date -d "$end" +%s 2>/dev/null) || return 1
+    echo $(((e - $(date +%s)) / 86400))
+}
+
+# the store acme.sh would install from holds a certificate that needs nothing
+function ws_store_cert_good() {
+    local d="$1" dir days
+    [ "${WS_CERT_REKEY:-0}" = "1" ] && return 1
+    if [ ${#WS_ACME_ECC[@]} -gt 0 ]; then
+        dir="$WS_ACME_HOME/lib/certs/${d}_ecc"
+    else
+        dir="$WS_ACME_HOME/lib/certs/$d"
+    fi
+    [ -s "$dir/fullchain.cer" ] && [ -s "$dir/$d.key" ] || return 1
+    ws_cert_real "$dir/fullchain.cer" || return 1
+    ws_cert_covers "$dir/fullchain.cer" "$d" || return 1
+    ws_cert_key_match "$dir/fullchain.cer" "$dir/$d.key" || return 1
+    days=$(ws_cert_days "$dir/fullchain.cer")
+    [ -n "$days" ] && [ "$days" -ge "$WS_RENEW_DAYS" ] 2>/dev/null
+}
+
+# watashi v12.3.39dev: the line a program reads back. The domain card reads it to tell
+# the admin how the request ended: ok, kept, failed, busy, foreign, cdn,
+# cooldown, nodns, toolong or invalid, with an optional reason after it.
+function ws_cert_result() {
+    WS_CERT_RESULT="$2"
+    echo "watashi-cert: $1 $2${3:+ $3}"
+}
+
+# watashi v12.3.39dev: SERVER_IP and SERVER_IPv6 come from install.sh and from nowhere
+# else. The daily timer (run.sh) and the panel (get_cert.sh) start without
+# them, so ws_points_here compared every dns answer with an empty string and
+# every domain of the server looked foreign. That is how a server restored
+# from a backup, whose domains still pointed at the old machine for a while,
+# kept its self signed certificates after the records were fixed: nothing
+# outside install.sh could see that the domain pointed here now.
+#
+# This collects every address the server answers on: what install.sh
+# exported, every global address of an interface, and the public address
+# as the outside sees it (behind a nat that one is on no interface). The
+# public lookup asks an outside service, so it is kept for six hours, and
+# for ten minutes when it found nothing.
+function ws_server_addrs() {
+    if [ -n "${WS_SERVER_ADDRS:-}" ]; then
+        echo "$WS_SERVER_ADDRS"
+        return 0
+    fi
+    local list cache="$WS_STATE_DIR/public-ips" age ttl
+    list="${SERVER_IP:-} ${SERVER_IPv6:-}"
+    if command -v ip >/dev/null 2>&1; then
+        list="$list $(ip -o addr show scope global 2>/dev/null | awk '{sub(/\/.*/, "", $4); print $4}' | tr '\n' ' ')"
+    fi
+    mkdir -p "$WS_STATE_DIR" 2>/dev/null
+    ttl="${WS_PUBLIC_IP_TTL:-21600}"
+    [ -s "$cache" ] || ttl=600
+    age=$(($(date +%s) - $(stat -c %Y "$cache" 2>/dev/null || echo 0)))
+    if [ ! -f "$cache" ] || [ "$age" -ge "$ttl" ]; then
+        # a subshell: both helpers in utils.sh leave $ip and $services behind
+        (get_public_ip; get_public_ipv6) 2>/dev/null >"$cache.new"
+        mv -f "$cache.new" "$cache" 2>/dev/null
+    fi
+    list="$list $(tr '\n' ' ' <"$cache" 2>/dev/null)"
+    WS_SERVER_ADDRS=$(echo "$list" | tr ' ' '\n' | tr 'A-Z' 'a-z' | grep -E '^[0-9a-f.:]+$' | grep -E '[.:]' | sort -u | tr '\n' ' ')
+    export WS_SERVER_ADDRS
+    echo "$WS_SERVER_ADDRS"
+}
+
+# every A and AAAA answer of the name, one per line, cname lines dropped
+function ws_domain_addrs() {
+    { dig +short -t a "$1." 2>/dev/null; dig +short -t aaaa "$1." 2>/dev/null; } |
+        tr 'A-Z' 'a-z' | grep -E '^([0-9]{1,3}\.){3}[0-9]{1,3}$|^[0-9a-f]*:[0-9a-f:.]*$' | sort -u
+}
+
 # watashi v12.2.130bk: true when the name resolves to this very server, which
 # is the only case where we are the one who answers the tls handshake.
+# watashi v12.3.39dev: every answer counts now, against every address of this server.
+# The old test read the last line of each answer only, so a cname, or a
+# second record, decided alone.
 function ws_points_here() {
-    local d="$1" a aaaa
-    a=$(dig +short -t a "$d." 2>/dev/null | tail -1)
-    aaaa=$(dig +short -t aaaa "$d." 2>/dev/null | tail -1)
-    [ -n "$a" ] && [ "$a" = "$SERVER_IP" ] && return 0
-    [ -n "$aaaa" ] && [ "$aaaa" = "$SERVER_IPv6" ] && return 0
+    local d="$1" mine ip
+    mine=" $(ws_server_addrs) "
+    for ip in $(ws_domain_addrs "$d"); do
+        [[ "$mine" == *" $ip "* ]] && return 0
+    done
     return 1
+}
+
+# watashi v12.3.39dev: the certificate the name answers with out there is the very one
+# in ssl/. Then it is this server answering, reached through a relay, or on
+# an address no lookup above could see (a floating ip), and never foreign.
+function ws_served_is_ours() {
+    local d="$1" crt="$WS_SSL_DIR/$1.crt" here there
+    [ -s "$crt" ] || return 1
+    here=$(openssl x509 -in "$crt" -noout -fingerprint -sha256 2>/dev/null)
+    there=$(echo | timeout 10 openssl s_client -servername "$d" -connect "$d:443" 2>/dev/null |
+        openssl x509 -noout -fingerprint -sha256 2>/dev/null)
+    [ -n "$here" ] && [ "$here" = "$there" ]
 }
 
 # watashi v12.2.130bk: days left on the certificate the remote endpoint really
@@ -412,7 +611,8 @@ function ws_points_here() {
 function ws_trusted_tls_days() {
     local d="$1" end e n
     curl -s -o /dev/null --max-time "${WS_TLS_PROBE_TIMEOUT:-6}" "https://$d/" || return 1
-    end=$(echo | openssl s_client -servername "$d" -connect "$d:443" 2>/dev/null |
+    # watashi v12.3.39dev: time limited, a host that answers curl can still stall here
+    end=$(echo | timeout 10 openssl s_client -servername "$d" -connect "$d:443" 2>/dev/null |
         openssl x509 -noout -enddate 2>/dev/null | cut -d= -f2-)
     [ -n "$end" ] || return 1
     e=$(date -d "$end" +%s 2>/dev/null)
@@ -429,37 +629,111 @@ function ws_foreign_tls() {
     [ "${WS_SKIP_FOREIGN_TLS:-1}" = "1" ] || return 1
     if ws_cdn_shared_host "$d"; then
         echo "watashi: $d is a shared cdn hostname, the provider owns its certificate, not asking an authority"
+        ws_cert_result "$d" cdn
         return 0
     fi
-    ws_points_here "$d" && return 1
+    # watashi v12.3.39dev: the button on the domain card means "ask now", whatever an
+    # earlier probe concluded.
+    [ "${WS_SSL_REISSUE:-0}" = "1" ] && return 1
     mkdir -p "$WS_STATE_DIR" 2>/dev/null
     cache="$WS_STATE_DIR/foreigntls-$d"
-    if [ -f "$cache" ]; then
+    if ws_points_here "$d"; then
+        rm -f "$cache" 2>/dev/null
+        return 1
+    fi
+    # watashi v12.3.39dev: a "yes" was kept for a whole day, and the timer runs once a
+    # day, so a record fixed in the morning could wait two days. Saving the
+    # domain in the panel (WS_SSL_FORCE) always probes again now, and a kept
+    # answer lasts six hours.
+    if [ "${WS_SSL_FORCE:-0}" != "1" ] && [ -f "$cache" ]; then
         age=$(($(date +%s) - $(stat -c %Y "$cache" 2>/dev/null || echo 0)))
-        if [ "$age" -lt "${WS_FOREIGN_TLS_TTL:-86400}" ]; then
+        if [ "$age" -lt "${WS_FOREIGN_TLS_TTL:-21600}" ]; then
             verdict=$(cat "$cache" 2>/dev/null)
             [ "$verdict" = "yes" ] || return 1
             echo "watashi: $d is served elsewhere with a trusted certificate, not asking an authority"
+            ws_cert_result "$d" foreign
             return 0
         fi
     fi
     days=$(ws_trusted_tls_days "$d")
-    if [ -n "$days" ] && [ "$days" -gt 30 ] 2>/dev/null; then
+    if [ -n "$days" ] && [ "$days" -ge "$WS_RENEW_DAYS" ] 2>/dev/null; then
+        if ws_served_is_ours "$d"; then
+            echo no >"$cache"
+            return 1
+        fi
         echo yes >"$cache"
-        echo "watashi: $d is served elsewhere with a trusted certificate, $days days left, not asking an authority"
+        echo "watashi: $d is served elsewhere ($(ws_domain_addrs "$d" | xargs)) with a trusted certificate, $days days left, not asking an authority"
+        ws_cert_result "$d" foreign
         return 0
     fi
     echo no >"$cache"
     return 1
 }
 
+# watashi v12.3.39dev: one request per domain at a time. The daily timer, a save in the
+# panel and the button on the domain card can all reach the same domain at
+# once, and two acme.sh runs on one domain fight over its store and its
+# challenge files. A deliberate request (WS_SSL_FORCE, or the button) waits
+# for the one already running; a scheduled one leaves the domain to it.
 function get_cert() {
+    local d="$1" fd="" rc
+    ws_server_addrs >/dev/null
+    if ws_valid_domain "$d"; then
+        mkdir -p "$WS_STATE_DIR/locks" 2>/dev/null
+        if exec {fd}>"$WS_STATE_DIR/locks/$d.lock"; then
+            if ! flock -n "$fd"; then
+                if [ "${WS_SSL_FORCE:-0}" = "1" ] || [ "${WS_SSL_REISSUE:-0}" = "1" ]; then
+                    echo "Another certificate request for $d is running, waiting for it to finish..."
+                    if ! flock -w "${WS_LOCK_WAIT:-1800}" "$fd"; then
+                        echo "The other request for $d is still running, giving up."
+                        ws_cert_result "$d" busy
+                        exec {fd}>&-
+                        return 3
+                    fi
+                else
+                    echo "watashi: another certificate request for $d is running, leaving $d to it"
+                    ws_cert_result "$d" busy
+                    exec {fd}>&-
+                    return 0
+                fi
+            fi
+        else
+            fd=""
+        fi
+    fi
+    ws_get_cert_now "$@"
+    rc=$?
+    [ -n "$fd" ] && exec {fd}>&-
+    return $rc
+}
+
+# watashi v12.3.39dev: what an authority would see. The challenge path is asked for
+# over the public name only, never through 127.0.0.1, so the answer comes
+# from whatever machine the domain points at.
+function ws_challenge_public() {
+    local domain="$1" code
+    local probe="watashi-check-${BASHPID:-$$}-$RANDOM"
+    local dir="$WS_ACME_HOME/www/.well-known/acme-challenge"
+    mkdir -p "$dir" 2>/dev/null || true
+    echo "watashi" >"$dir/$probe" 2>/dev/null || return 1
+    code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 8 \
+        "http://$domain/.well-known/acme-challenge/$probe" 2>/dev/null)
+    rm -f "$dir/$probe" 2>/dev/null
+    [ "$code" = "200" ]
+}
+
+function ws_get_cert_now() {
     cd /opt/hiddify-manager/acme.sh/
     source ./lib/acme.sh.env
 
     DOMAIN=$1
     ssl_cert_path="$WS_SSL_DIR"
     local days_left=0
+    local crt="$ssl_cert_path/$DOMAIN.crt"
+    local key="$ssl_cert_path/$DOMAIN.crt.key"
+    # watashi v12.3.39dev: read back by get_cert.sh once this returns
+    WS_CERT_WAS_REAL=0
+    WS_CERT_RESULT=""
 
     # watashi v12.2.130bk: a name whose tls belongs to someone else is skipped
     # here, before the banner and before the ladder, so the install log gets
@@ -473,56 +747,79 @@ function get_cert() {
 
     echo "=========================================="
     echo "Getting SSL certificate for: $DOMAIN"
+    if [ "${WS_SSL_REISSUE:-0}" = "1" ]; then
+        echo "Asked for by hand: a new certificate is requested even if the current one is still valid."
+    fi
     echo "=========================================="
 
     # watashi: never hand a script name or a wildcard to a certificate authority
     if ! ws_valid_domain "$DOMAIN"; then
         echo "ERROR: '$DOMAIN' is not a domain name, nothing to do."
+        ws_cert_result "$DOMAIN" invalid
         return 1
     fi
 
-    # Check if we already have a valid certificate (not expiring within 30 days)
-    # Skip self-signed certs (they have very long validity or issuer == subject)
-    if [ -f "$ssl_cert_path/$DOMAIN.crt" ] && [ -f "$ssl_cert_path/$DOMAIN.crt.key" ]; then
-        local issuer=$(openssl x509 -issuer -noout -in "$ssl_cert_path/$DOMAIN.crt" 2>/dev/null | sed 's/issuer=//')
-        local subject=$(openssl x509 -subject -noout -in "$ssl_cert_path/$DOMAIN.crt" 2>/dev/null | sed 's/subject=//')
-        local expire_date=$(openssl x509 -enddate -noout -in "$ssl_cert_path/$DOMAIN.crt" 2>/dev/null | cut -d= -f2-)
-
-        if [ -n "$expire_date" ] && [ "$issuer" != "$subject" ]; then
-            local expire_epoch=$(date -d "$expire_date" +%s 2>/dev/null)
-            local now_epoch=$(date +%s)
-            days_left=$(((expire_epoch - now_epoch) / 86400))
+    # Check if we already have a valid certificate (not expiring within WS_RENEW_DAYS days)
+    # watashi v12.3.39dev: kept only while it comes from an authority, has not expired,
+    # is written for this name and its key file belongs to it. Only the first
+    # of those was ever tested: a pair that does not match takes haproxy down,
+    # and a certificate for another name is refused by every client, and both
+    # were kept here as "valid".
+    if [ -f "$crt" ] && [ -f "$key" ]; then
+        local why=""
+        if ! ws_cert_real "$crt"; then
+            why="self-signed or expired"
+        elif ! ws_cert_covers "$crt" "$DOMAIN"; then
+            why="written for another name"
+        elif ! ws_cert_key_match "$crt" "$key"; then
+            why="not the pair of its key file"
+        fi
+        if [ -z "$why" ]; then
+            WS_CERT_WAS_REAL=1
+            days_left=$(ws_cert_days "$crt")
+            days_left=${days_left:-0}
 
             # Skip only if cert is from a real CA (validity < 400 days) and still valid
             # watashi v12.2.130ax: WS_CERT_REKEY=1 says the key itself is wrong, not the
             # expiry date, so a certificate that is still valid for months has
             # to be asked for again anyway. Only the one time rsa to ec
-            # migration sets it; the panel button still stops here, so nobody
-            # can burn an authority quota by clicking twice.
-            if [ "$days_left" -gt 30 ] && [ "$days_left" -lt 400 ] && [ "${WS_CERT_REKEY:-0}" != "1" ]; then
+            # migration sets it.
+            # watashi v12.3.39dev: WS_SSL_REISSUE=1 is the button on the domain card. It is
+            # there for the case this test cannot see: a certificate that looks
+            # fine on disk while the clients still cannot use the domain. The
+            # renewal starts below WS_RENEW_DAYS (30) now, so on the 29th day.
+            if [ "$days_left" -ge "$WS_RENEW_DAYS" ] && [ "$days_left" -lt 400 ] &&
+                [ "${WS_CERT_REKEY:-0}" != "1" ] && [ "${WS_SSL_REISSUE:-0}" != "1" ]; then
                 echo "✓ Existing certificate is valid for $days_left more days, skipping renewal."
+                ws_cert_result "$DOMAIN" kept "$days_left"
                 return 0
-            elif [ "$days_left" -le 30 ]; then
+            elif [ "${WS_SSL_REISSUE:-0}" = "1" ] || [ "${WS_CERT_REKEY:-0}" = "1" ]; then
+                echo "The current certificate still has $days_left days, it is replaced anyway."
+            elif [ "$days_left" -lt "$WS_RENEW_DAYS" ]; then
                 echo "Certificate expires in $days_left days, attempting renewal..."
             else
-                echo "The certificate on disk is self-signed, asking an authority for a real one."
+                echo "The certificate on disk claims $days_left more days than any authority issues, asking for a real one."
             fi
         else
-            echo "There is no certificate from an authority yet, asking for one now."
+            echo "The certificate on disk is $why, asking an authority for a real one."
         fi
+    else
+        echo "There is no certificate for $DOMAIN yet, asking for one now."
     fi
 
     # Check domain length (Let's Encrypt limit is 64 chars)
     if [ ${#DOMAIN} -gt 64 ]; then
         echo "ERROR: Domain name too long (${#DOMAIN} > 64 chars)"
         bash generate_self_signed_cert.sh $DOMAIN
+        ws_cert_result "$DOMAIN" toolong
         return 1
     fi
 
     # watashi: do not ask the same failing domain again on every apply_configs
-    if ws_cooldown_active "$DOMAIN" && [ -f "$ssl_cert_path/$DOMAIN.crt" ]; then
+    if ws_cooldown_active "$DOMAIN" && [ -f "$crt" ]; then
         echo "The last attempt for $DOMAIN failed less than $WS_RETRY_HOURS hours ago, keeping the current certificate."
         echo "Use the button in the panel, or WS_SSL_FORCE=1, to try again right now."
+        ws_cert_result "$DOMAIN" cooldown
         return 0
     fi
 
@@ -530,23 +827,51 @@ function get_cert() {
     cf_token=$(ws_cf_token)
 
     # Verify DNS resolution
-    DOMAIN_IP=$(dig +short -t a $DOMAIN. | head -1)
-    DOMAIN_IPv6=$(dig +short -t aaaa $DOMAIN. | head -1)
-    echo "DNS Resolution: $DOMAIN -> IPv4=$DOMAIN_IP, IPv6=$DOMAIN_IPv6"
-    echo "Server IPs: IPv4=$SERVER_IP, IPv6=$SERVER_IPv6"
+    # watashi v12.3.39dev: every record of the domain and every address of this server,
+    # where the old lines showed one of each and called them "the" address.
+    local found dns_note="" skip_http=0
+    found=$(ws_domain_addrs "$DOMAIN" | xargs)
+    echo "DNS Resolution: $DOMAIN -> ${found:-nothing}"
+    echo "Server IPs: $(ws_server_addrs | xargs)"
 
-    if [[ -z "$DOMAIN_IP" && -z "$DOMAIN_IPv6" ]]; then
+    if [ -z "$found" ]; then
         # watashi: the dns challenge does not need the domain to point anywhere
         if [ -z "$cf_token" ]; then
             error "ERROR: Domain $DOMAIN does not resolve to any IP!"
             bash generate_self_signed_cert.sh $DOMAIN
+            ws_cert_result "$DOMAIN" nodns
             return 1
         fi
         echo "WARNING: $DOMAIN does not resolve yet, trying the Cloudflare dns challenge anyway."
-    fi
-
-    if [[ -n "$DOMAIN_IP$DOMAIN_IPv6" && "$SERVER_IP" != "$DOMAIN_IP" && "$SERVER_IPv6" != "$DOMAIN_IPv6" ]]; then
-        echo "WARNING: Domain IP doesn't match server IP. The http challenge may fail."
+        dns_note="dns-none"
+        skip_http=1
+    elif ! ws_points_here "$DOMAIN"; then
+        echo "WARNING: none of these addresses belongs to this server."
+        dns_note="dns-elsewhere"
+        # watashi v12.3.39dev: a relay passes port 80 on to this server, and then the
+        # authority can still read the challenge. When the machine at that
+        # address does not hand out our files (a server restored from a
+        # backup while the records still point at the old one), every
+        # authority would fail the same way, one after the other, minutes
+        # each, and spend the failed validation quota of the account too.
+        ws_http_challenge_prepare
+        if ws_challenge_public "$DOMAIN"; then
+            echo "The machine at that address passes the challenge path on to this server, so the http challenge can work."
+        else
+            echo "The machine at that address does not serve the challenge files of this server, so no authority can check the domain over http."
+            echo "Point the domain at this server (or let the relay pass port 80 on), then ask again."
+            skip_http=1
+        fi
+    else
+        local stray="" one mine
+        mine=" $(ws_server_addrs) "
+        for one in $found; do
+            [[ "$mine" == *" $one "* ]] || stray="$stray $one"
+        done
+        if [ -n "$stray" ]; then
+            echo "WARNING: these addresses of $DOMAIN are not on this server:$stray. An authority that picks one of them fails the http challenge."
+            dns_note="dns-mixed"
+        fi
     fi
 
     # watashi v12.2.130: these copies used to be written inside ssl/ as .crt.bk and
@@ -569,15 +894,22 @@ function get_cert() {
     if [ -n "$cf_token" ]; then
         challenges+=("cloudflare-dns")
     fi
-    challenges+=("http")
+    # watashi v12.3.39dev: left out when nobody out there can hand our files to the authority
+    if [ "$skip_http" != "1" ]; then
+        challenges+=("http")
+    fi
 
     local cert_obtained=0
     local winner=""
+    # watashi v12.3.39dev: counts the requests really sent; with none (no challenge
+    # could work) there is no limit to protect, so no cooldown either.
+    local asked=0
     local challenge ca_info ca_server ca_desc
     for challenge in "${challenges[@]}"; do
         for ca_info in "${CA_SERVERS[@]}"; do
             IFS='|' read -r ca_server ca_desc <<<"$ca_info"
 
+            asked=$((asked + 1))
             if try_get_cert_with_ca "$DOMAIN" "$ca_server" "$ca_desc" "$challenge"; then
                 cert_obtained=1
                 winner="$ca_desc over $challenge"
@@ -593,25 +925,41 @@ function get_cert() {
     done
 
     if [ $cert_obtained -eq 1 ]; then
-        if ws_install_cert "$DOMAIN"; then
+        # watashi v12.3.39dev: checked before it counts. A pair that does not match would
+        # take haproxy down, so it is put back exactly like a failed install.
+        if ws_install_cert "$DOMAIN" && ws_cert_key_match "$crt" "$key" && ws_cert_covers "$crt" "$DOMAIN"; then
             echo "✓ Certificate installed successfully!"
             rm -f "$ws_ssl_bk/$DOMAIN.crt.bk" "$ws_ssl_bk/$DOMAIN.crt.key.bk"
             ws_cooldown_clear "$DOMAIN"
+            rm -f "$WS_STATE_DIR/foreigntls-$DOMAIN" 2>/dev/null
         else
             echo "ERROR: Failed to install certificate, restoring backup..."
             [ -f "$ws_ssl_bk/$DOMAIN.crt.bk" ] && mv "$ws_ssl_bk/$DOMAIN.crt.bk" "$ssl_cert_path/$DOMAIN.crt"
             [ -f "$ws_ssl_bk/$DOMAIN.crt.key.bk" ] && mv "$ws_ssl_bk/$DOMAIN.crt.key.bk" "$ssl_cert_path/$DOMAIN.crt.key"
             cert_obtained=0
             winner=""
+            dns_note="install"
         fi
     fi
 
     if [ $cert_obtained -eq 0 ]; then
-        echo "ERROR: All CA providers failed! Generating self-signed certificate..."
+        # watashi v12.3.39dev: with nothing sent, "all failed" pointed at the wrong culprit
+        if [ "$asked" -gt 0 ]; then
+            echo "ERROR: All CA providers failed! Generating self-signed certificate..."
+        else
+            echo "ERROR: no authority could be asked (see above), the domain keeps its current or a self-signed certificate."
+        fi
         [ -f "$ws_ssl_bk/$DOMAIN.crt.bk" ] && mv "$ws_ssl_bk/$DOMAIN.crt.bk" "$ssl_cert_path/$DOMAIN.crt"
         [ -f "$ws_ssl_bk/$DOMAIN.crt.key.bk" ] && mv "$ws_ssl_bk/$DOMAIN.crt.key.bk" "$ssl_cert_path/$DOMAIN.crt.key"
         bash generate_self_signed_cert.sh $DOMAIN
-        ws_cooldown_mark "$DOMAIN"
+        # watashi v12.3.39dev: the cooldown is kept for the times an authority was asked.
+        # A request that was never sent must not hold the next run back for
+        # hours once the records are fixed.
+        if [ "$asked" -gt 0 ]; then
+            ws_cooldown_mark "$DOMAIN"
+        else
+            echo "No authority was asked, so the next run tries again without waiting."
+        fi
     fi
 
     # Secure permissions
@@ -623,9 +971,21 @@ function get_cert() {
     systemctl reload hiddify-haproxy 2>/dev/null || true
 
     echo "watashi: $DOMAIN got its certificate from ${winner:-a self signed fallback} (previous certificate had $days_left days left)"
+    if [ $cert_obtained -eq 1 ]; then
+        ws_cert_result "$DOMAIN" ok "$(ws_cert_days "$crt")"
+    else
+        # dns-elsewhere, dns-none, dns-mixed, install, or ca when nothing else explains it
+        case "$dns_note" in
+        dns-mixed | '') dns_note="ca" ;;
+        esac
+        ws_cert_result "$DOMAIN" failed "$dns_note"
+    fi
     echo "=========================================="
     echo "SSL certificate process completed for $DOMAIN"
     echo "=========================================="
+    # watashi v12.3.39dev: a failure says so now. run.sh ignores it, its rsa migration
+    # was already written to expect it, and the panel job reads it.
+    [ $cert_obtained -eq 1 ]
 }
 
 function get_self_signed_cert() {
@@ -666,8 +1026,13 @@ function get_self_signed_cert() {
         generate_new_cert=1
     else
         # Check if the private key is valid
-        if ! openssl rsa -check -in "$private_key" >/dev/null && ! openssl ec -check -in "$private_key" >/dev/null; then
+        if ! openssl rsa -check -in "$private_key" >/dev/null 2>&1 && ! openssl ec -check -in "$private_key" >/dev/null 2>&1; then
             echo "Private key $d ($private_key) is invalid. Generating a new certificate."
+            generate_new_cert=1
+        # watashi v12.3.39dev: a valid key that belongs to another certificate is just as
+        # fatal: haproxy reads the pair together and refuses to start on it.
+        elif [ -f "$certificate" ] && ! ws_cert_key_match "$certificate" "$private_key"; then
+            echo "Private key $d ($private_key) does not belong to its certificate. Generating a new certificate."
             generate_new_cert=1
         fi
     fi

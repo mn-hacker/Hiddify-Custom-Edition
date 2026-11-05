@@ -68,6 +68,9 @@ JOB_WRAP = ('name=$1; log=$2; shift 2; "$@"; rc=$?; '
             'if [ "$rc" -eq 0 ]; then end=done; else end=failed; fi; '
             'printf "\\nwatashi-job: %s %s (code %s)\\n" "$name" "$end" "$rc" >>"$log"; '
             'exit "$rc"')
+# watashi v12.3.39dev: the same, for a script that only prints and keeps no log of its
+# own (acme.sh/get_cert.sh): everything it says goes into the job log.
+JOB_WRAP_CAPTURE = JOB_WRAP.replace('"$@"; rc=$?;', '"$@" >>"$log" 2>&1 </dev/null; rc=$?;', 1)
 
 
 def job_unit(name: str) -> str:
@@ -82,13 +85,19 @@ def job_running(name: str) -> bool:
         return False
 
 
-def run_job(name: str, cmd: list[str]):
-    log = os.path.join(HIDDIFY_DIR, JOB_LOGS[name])
+def run_job(name: str, cmd: list[str], log: str = '', capture: bool = False, detach: bool = False):
+    # watashi v12.3.39dev: log, capture and detach serve the certificate jobs: one log
+    # per domain, written by the job itself, and never waited for.
+    log = os.path.join(HIDDIFY_DIR, log or JOB_LOGS[name])
     os.makedirs(os.path.dirname(log), exist_ok=True)
-    job = ['/bin/bash', '-c', JOB_WRAP, 'watashi-job', name, log, *cmd]
+    job = ['/bin/bash', '-c', JOB_WRAP_CAPTURE if capture else JOB_WRAP, 'watashi-job', name, log, *cmd]
     launcher = shutil.which('systemd-run')
     if not launcher or not os.path.isdir('/run/systemd/system'):
         # no systemd to hand the job to (docker): it runs right here, as before
+        if detach:
+            subprocess.Popen(job, cwd=HIDDIFY_DIR, start_new_session=True, stdin=subprocess.DEVNULL,
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            return
         run(job)
         return
     if job_running(name):
@@ -204,14 +213,40 @@ def is_domain_valid(d):
     return bool(re.match(pattern, d))
 
 
+# watashi v12.3.39dev: a certificate request is a job of its own now, one per domain.
+# It ran inside the panel's cgroup before, so restarting the panel cut it off
+# halfway, and it printed into the panel journal, where the admin never saw
+# it. Each domain has its own unit and its own log, which the domain card
+# reads back, and systemd refuses a second request for a domain whose first
+# one is still running.
+CERT_JOB_LOG = 'log/system/cert-{}.log'
+CERT_DOMAIN = re.compile(r'^(?=.{1,253}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$')
+
+
 @cli.command('get-cert')
 @click.option('--domain', '-d', type=str, help='The domain that needs certificate', required=True)
-def get_cert(domain: str):
+@click.option('--force', is_flag=True, default=False,
+              help='Ask for a new certificate even when the current one is still valid')
+def get_cert(domain: str, force: bool):
     if not domain:
         return
     assert is_domain_valid(domain), f"Error: Invalid domain passed to the get_cert command: {domain}"
-    cmd = [Command.get_cert.value, domain]
-    run(cmd)
+    assert CERT_DOMAIN.match(domain), f"Error: Invalid domain passed to the get_cert command: {domain}"
+    name = f'cert-{domain}'
+    if job_running(name):
+        print(f'a certificate request for {domain} is already running ({job_unit(name)})')
+        raise SystemExit(3)
+    log = CERT_JOB_LOG.format(domain)
+    path = os.path.join(HIDDIFY_DIR, log)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, 'w') as fh:
+        fh.write('watashi-cert: {} start{}\n'.format(domain, ' force' if force else ''))
+    # watashi v12.3.39dev: through bash, so a copy that lost its exec bit (a zip
+    # made on windows) still runs instead of failing with code 126.
+    cmd = ['/bin/bash', Command.get_cert.value, domain]
+    if force:
+        cmd.append('--force')
+    run_job(name, cmd, log=log, capture=True, detach=True)
 
 
 @cli.command('update-usage')

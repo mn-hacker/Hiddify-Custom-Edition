@@ -17,10 +17,18 @@ domains=$(cat ../current.json | jq -r --argjson m "[$WS_MODES]" '.domains[] | se
 # Cleanup erroneous certificate file if it exists
 rm -f ../ssl/cert_utils.sh.crt ../ssl/cert_utils.sh.crt.key
 
+# watashi v12.3.39dev: the addresses of this server are looked up once, here, and
+# every request below inherits them. The timer starts this file without the
+# SERVER_IP that install.sh exports, which made every domain look foreign.
+ws_server_addrs >/dev/null
+
 for d in $domains; do
     get_cert $d &
 done
 wait
+# watashi v12.3.39dev: every request closes the challenge path only when it is the last
+# one using it. This closes it for good once all of them are done.
+ws_http_challenge_cleanup
 
 domains=$(cat ../current.json | jq -r '.domains[] | select(.mode | IN("fake")) | .domain')
 for d in $domains; do
@@ -33,7 +41,10 @@ wait
 # empty folder passes the literal glob and creates junk, and which replaced a
 # real expired certificate with a fake one without saying so.
 for d in $(cat ../current.json | jq -r '.domains[] | .domain'); do
-    if [ -f "../ssl/$d.crt" ] && openssl x509 -checkend 0 -noout -in "../ssl/$d.crt" >/dev/null 2>&1; then
+    # watashi v12.3.39dev: a pair whose key does not match counts as missing, haproxy
+    # would not start with it.
+    if [ -f "../ssl/$d.crt" ] && openssl x509 -checkend 0 -noout -in "../ssl/$d.crt" >/dev/null 2>&1 &&
+        ws_cert_key_match "../ssl/$d.crt" "../ssl/$d.crt.key"; then
         continue
     fi
     get_self_signed_cert $d &
