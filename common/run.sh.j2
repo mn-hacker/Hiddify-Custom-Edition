@@ -111,6 +111,11 @@ allow_port "tcp" {{port}} #panel ports
   allow_port "udp" {{port}}
 {%endfor%}
 
+{# watashi v12.3.41dev: the ports of the hand built inbounds (advanced mode).
+   The script opens the ones that serve and closes the ones it opened for an
+   inbound that stopped serving; an apply of the Inbounds page alone runs it too. #}
+bash /opt/watashi-manager/xray/custom_ports.sh
+
 # Check if PasswordAuthentication is enabled
 if ! grep -rxq "PasswordAuthentication.*no" /etc/ssh/sshd*; then
   chmod a+r /etc/ssh/sshd*
@@ -193,6 +198,10 @@ ws_hop_clear
 WS_RESERVED="9000 {{hconfigs.get('wireguard_port','')}} {{hconfigs.get('ssh_server_port','')}} {{hconfigs.get('shadowsocks2022_port','')}} {{hconfigs.get('amnezia_port','')}} {{hconfigs.get('naive_port','')}} {{hconfigs.get('shadowtls_port','')}} {{hconfigs.get('special_port','')}} {{hconfigs.get('mieru_port','')}} {{hconfigs.get('mieru_tcp_ports','')}} {{hconfigs.get('mieru_udp_ports','')}} {{hconfigs.get('reality_port','')}} {{hconfigs.get('tuic_port','')}} {{hconfigs.get('hysteria_port','')}} {{hconfigs.get('anytls_port','')}} {{hconfigs.get('snell_port','')}}"
 {% for d in domains %}
 WS_RESERVED="$WS_RESERVED {{d['internal_port_hysteria2']}} {{d['internal_port_tuic']}} {{d['internal_port_anytls']}} {{d['internal_port_snell']}} {{d['internal_port_mieru']}} {{d['internal_port_naive']}} {{d['internal_port_amnezia']}} {{d['internal_port_special']}}"
+{% endfor %}
+{# watashi v12.3.41dev: and the ports of the hand built inbounds #}
+{% for ci in (custom_inbounds | default([])) if ci['active'] %}
+WS_RESERVED="$WS_RESERVED {{ ci['port'] }}"
 {% endfor %}
 export WS_RESERVED
 ws_reserve_ports

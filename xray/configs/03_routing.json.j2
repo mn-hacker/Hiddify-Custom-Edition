@@ -161,6 +161,18 @@
         {// Block BitTorrent protocol
           "type": "field", "outboundTag": "blackhole", "protocol": ["bittorrent"]
         },
+        {# watashi v12.3.41dev: where the traffic of a hand built inbound (advanced
+           mode) goes when no rule above took it. Every block rule and site list
+           above applies to those inbounds exactly as to the panel's own; only this
+           last step can be chosen per inbound. WARP is left out while it is off. #}
+        {% for ci in (custom_inbounds | default([])) if ci['active'] and ci['outbound'] in ('direct', 'warp') %}
+        {% if ci['outbound'] == 'direct' or hconfigs['warp_mode'] != 'disable' %}
+        {
+          "type": "field", "inboundTag": ["{{ ci['tag'] }}"],
+          "outboundTag": {% if ci['outbound'] == 'warp' %}"WARP"{% else %}"freedom"{% endif %}
+        },
+        {% endif %}
+        {% endfor %}
         {
           "type": "field",
           "port": "0-65535",

@@ -35,12 +35,20 @@ chown watashi-panel:root /opt/watashi-manager/log/xray_access.log 2>/dev/null ||
 
 if [ "$MODE" != "apply_users" ]; then
     
+    # watashi v12.3.41dev: the hand built inbounds of the advanced mode are
+    # checked before xray restarts and once more after it did (xray/custom_guard.sh).
+    # Whatever xray refuses is taken out of their file, so the panel's own
+    # inbounds start no matter what was built by hand. Without such inbounds
+    # both calls return at once.
+    bash /opt/watashi-manager/xray/custom_guard.sh pre
+    WS_SINCE=$(date +%s)
     # xray run -test -confdir configs
     echo "Ignoring xray test"
     if [[ $? == 0 ]]; then
         systemctl restart watashi-xray.service
         systemctl start watashi-xray.service
         #systemctl status watashi-xray.service --no-pager
+        bash /opt/watashi-manager/xray/custom_guard.sh post "$WS_SINCE"
     else
         echo "Error in Xray Config!!!! do not reload xray service"
         sleep 60

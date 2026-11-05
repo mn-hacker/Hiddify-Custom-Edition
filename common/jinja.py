@@ -161,5 +161,10 @@ if __name__ == "__main__":
             # template too, so it has to be re-rendered when users change.
             start_path + "other/mieru/"
         )
+    elif len(sys.argv) > 1 and sys.argv[1] == "xray":
+        # watashi v12.3.41dev: the Inbounds page applies its rows by rendering
+        # the xray configs alone (xray/custom_apply.sh) instead of every config
+        # of the server.
+        render_j2_templates(start_path + "xray/")
     else:
         render_j2_templates(start_path)

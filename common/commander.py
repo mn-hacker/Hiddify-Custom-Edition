@@ -58,6 +58,7 @@ JOB_LOGS = {
     'install': 'log/system/0-install.log',  # apply writes here too
     'update': 'log/system/update.log',
     'restart': 'log/system/restart.log',
+    'custom': 'log/system/custom-inbounds.log',  # watashi v12.3.41dev: the Inbounds page
 }
 # sudo has already reduced the environment to a safe set; these are the parts
 # of it the scripts got before, a transient unit would start without them.
@@ -408,6 +409,107 @@ def node(action: str, key: str, value: str):
         assert WS_NODE_VALUE_RE.match(value or ''), f"Error: Invalid value passed to the node command"
         cmd.extend([key, value])
     run(cmd)
+
+
+# watashi v12.3.41dev: the Inbounds page of the advanced mode.
+#   test    a candidate file of hand built inbounds (stdin) is tried with the
+#           real xray binary next to every other xray config of this server,
+#           before the panel keeps the row
+#   apply   the saved rows are put on the server (xray/custom_apply.sh), as a job
+#           of its own; a second apply while one runs asks it for another round
+#   status  how the last apply ended, whether one runs, and the end of its log
+WS_CUSTOM_ACTIONS = ('test', 'apply', 'retry', 'status')
+WS_CUSTOM_FILE = '05_inbounds_90_custom.json'
+WS_CUSTOM_TAG_RE = re.compile(r'^custom-[0-9]{1,9}$')
+WS_CUSTOM_CERT_RE = re.compile(r'^/opt/watashi-manager/ssl/[A-Za-z0-9._-]{1,253}$')
+WS_CUSTOM_MAX = 262144
+WS_CUSTOM_STATUS = os.path.join(WATASHI_DIR, 'log/custom_inbounds.status')
+WS_CUSTOM_PENDING = os.path.join(WATASHI_DIR, 'log/custom_inbounds.pending')
+
+
+def ws_custom_candidate(text: str) -> dict:
+    """The candidate, checked again here: the panel is not trusted to have."""
+    import json
+    assert len(text) <= WS_CUSTOM_MAX, "Error: the candidate is too large"
+    data = json.loads(text)
+    assert isinstance(data, dict) and set(data) <= {'inbounds'}, "Error: the candidate is not an inbounds file"
+    inbounds = data.get('inbounds') or []
+    assert isinstance(inbounds, list) and len(inbounds) <= 100, "Error: the candidate has too many inbounds"
+
+    def walk(node):
+        if isinstance(node, dict):
+            for key, value in node.items():
+                assert key != 'fallbacks', "Error: fallbacks are not allowed in a hand built inbound"
+                if key in ('certificateFile', 'keyFile'):
+                    assert isinstance(value, str) and WS_CUSTOM_CERT_RE.match(value) and '..' not in value, \
+                        "Error: a certificate of a hand built inbound has to be one of the panel's certificates"
+                walk(value)
+        elif isinstance(node, list):
+            for value in node:
+                walk(value)
+
+    for inbound in inbounds:
+        assert isinstance(inbound, dict), "Error: an inbound is not an object"
+        assert WS_CUSTOM_TAG_RE.match(str(inbound.get('tag', ''))), "Error: a hand built inbound is tagged custom-<number>"
+        walk(inbound)
+    return data
+
+
+@cli.command('custom-inbounds')
+@click.option('--action', '-a', type=str, help='test, apply, retry or status', required=True)
+def custom_inbounds(action: str):
+    import json
+    import tempfile
+    import glob
+    assert action in WS_CUSTOM_ACTIONS, f"Error: {action} is not an action of custom-inbounds"
+    if action == 'test':
+        data = ws_custom_candidate(click.get_text_stream('stdin').read(WS_CUSTOM_MAX + 1))
+        configs = os.path.join(WATASHI_DIR, 'xray/configs')
+        with tempfile.TemporaryDirectory(prefix='watashi-custom-') as tmp:
+            for one in glob.glob(os.path.join(configs, '*.json')):
+                if os.path.basename(one) != WS_CUSTOM_FILE:
+                    shutil.copy(one, tmp)
+            with open(os.path.join(tmp, WS_CUSTOM_FILE), 'w') as handle:
+                json.dump(data, handle)
+            done = subprocess.run([os.path.join(WATASHI_DIR, 'xray/bin/xray'), 'run', '-test', '-confdir', tmp],
+                                  capture_output=True, text=True, timeout=60)
+        print((done.stdout or '') + (done.stderr or ''))
+        raise SystemExit(0 if done.returncode == 0 else 1)
+    if action in ('apply', 'retry'):
+        # retry: the inbounds the last apply took out get another chance
+        # (the "Try again" of the Inbounds page), see xray/custom_apply.sh
+        if job_running('install') or job_running('update'):
+            print('an install, apply or update is running; it puts the inbounds on the server as well')
+            raise SystemExit(4)
+        if job_running('custom'):
+            # the running job looks for this file when it is done and goes again
+            with open(WS_CUSTOM_PENDING, 'w') as handle:
+                handle.write('retry' if action == 'retry' else '1')
+            print('an apply of the inbounds is running, it goes once more when it is done')
+            return
+        # one log per apply, so the page shows this one and the file never grows
+        log = os.path.join(WATASHI_DIR, JOB_LOGS['custom'])
+        os.makedirs(os.path.dirname(log), exist_ok=True)
+        with open(log, 'w') as handle:
+            handle.write('')
+        run_job('custom', ['bash', os.path.join(WATASHI_DIR, 'xray/custom_apply.sh')] + (['--retry'] if action == 'retry' else []),
+                capture=True, detach=True)
+        print('started')
+        return
+    # status
+    out = {'running': job_running('custom'), 'busy': job_running('install') or job_running('update'),
+           'status': {}, 'log': ''}
+    try:
+        with open(WS_CUSTOM_STATUS) as handle:
+            out['status'] = json.load(handle)
+    except (OSError, ValueError):
+        pass
+    try:
+        with open(os.path.join(WATASHI_DIR, JOB_LOGS['custom']), errors='replace') as handle:
+            out['log'] = ''.join(handle.readlines()[-60:])
+    except OSError:
+        pass
+    print(json.dumps(out))
 
 
 @cli.command('truncate')

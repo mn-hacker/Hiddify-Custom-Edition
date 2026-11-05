@@ -1,0 +1,36 @@
+{# watashi v12.3.41dev: the inbounds built by hand on the Inbounds page (advanced mode).
+   Every row arrives from the panel as finished xray JSON (hutils/proxy/custom.py,
+   build_xray_inbound) with a marker where the users go, so this file does one
+   thing: it puts the users of the panel in. Their label is uuid@custom.watashi.cyou,
+   the one the panel's xray driver uses for these inbounds when it adds or
+   removes a user while xray runs and when it reads their traffic.
+   xray/run.sh takes an inbound out again when xray will not take it, so a broken
+   row never takes the panel's own inbounds down with it.
+   A Shadowsocks inbound needs at least one user to start at all, so with no
+   user it is left out until there is one. #}
+{% set ws_rows = [] %}
+{% for ci in (custom_inbounds | default([])) if ci['active'] and ci['inbound_json'] %}
+{% if ci['protocol'] != 'shadowsocks' or users %}{% set ws_x = ws_rows.append(ci) %}{% endif %}
+{% endfor %}
+{
+{% if ws_rows %}
+  "inbounds": [
+  {% for ci in ws_rows %}
+    {% set ws_clients = [] %}
+    {% for u in users %}
+      {% set ws_email = u['uuid'] ~ '@custom.watashi.cyou' %}
+      {% if ci['protocol'] == 'vless' %}
+        {% set ws_x = ws_clients.append({'id': u['uuid'], 'email': ws_email, 'flow': ci['flow'] or ''}) %}
+      {% elif ci['protocol'] == 'vmess' %}
+        {% set ws_x = ws_clients.append({'id': u['uuid'], 'email': ws_email}) %}
+      {% elif ci['protocol'] == 'trojan' %}
+        {% set ws_x = ws_clients.append({'password': u['uuid'], 'email': ws_email}) %}
+      {% else %}
+        {% set ws_x = ws_clients.append({'password': u['uuid'], 'method': ci['ss_method'] or 'chacha20-ietf-poly1305', 'email': ws_email}) %}
+      {% endif %}
+    {% endfor %}
+    {{ ci['inbound_json'] | replace('"@@WS_CLIENTS@@"', ws_clients | tojson) }}{% if not loop.last %},{% endif %}
+  {% endfor %}
+  ]
+{% endif %}
+}
