@@ -1,6 +1,7 @@
-source /opt/hiddify-manager/common/utils.sh
-source /opt/hiddify-manager/common/package_manager.sh
-# latest= #$(get_release_version hiddify-sing-box)
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
+source /opt/watashi-manager/common/utils.sh
+source /opt/watashi-manager/common/package_manager.sh
+# latest= #$(get_release_version watashi-sing-box)
 version="" #use specific version if needed otherwise it will use the latest
 mkdir -p bin run
 
@@ -21,7 +22,7 @@ if [ "$?" == "0"  ] || ! is_installed ./bin/xray; then
         rm -rf bin/.new
         exit 1
     fi
-    systemctl stop hiddify-xray.service > /dev/null 2>&1
+    systemctl stop watashi-xray.service > /dev/null 2>&1
     if [ -f bin/xray ]; then
         cp -f bin/xray bin/xray.previous 2>/dev/null || true
     fi
@@ -30,13 +31,13 @@ if [ "$?" == "0"  ] || ! is_installed ./bin/xray; then
     rm -rf bin/.new
     chown root:root bin/xray || exit 2
     chmod +x bin/xray || exit 3
-    ln -sf /opt/hiddify-manager/xray/bin/xray /usr/bin/xray
+    ln -sf /opt/watashi-manager/xray/bin/xray /usr/bin/xray
     set_installed_version xray "$version" "$(detect_arch)"
 fi
 
 # Enable service
-ln -sf $(pwd)/hiddify-xray.service /etc/systemd/system/hiddify-xray.service 2>/dev/null
-systemctl enable hiddify-xray.service 2>/dev/null
+ln -sf $(pwd)/watashi-xray.service /etc/systemd/system/watashi-xray.service 2>/dev/null
+systemctl enable watashi-xray.service 2>/dev/null
 
 # Download enhanced geo files from Iran-v2ray-rules for full adblock support
 # These files include: category-ads-all, phishing, malware, category-gambling, nsfw, social media sites

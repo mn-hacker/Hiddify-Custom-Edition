@@ -1,12 +1,13 @@
-source /opt/hiddify-manager/common/utils.sh
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
+source /opt/watashi-manager/common/utils.sh
 install_package socat
 remove_package certbot
 
-mkdir -p /opt/hiddify-manager/acme.sh/lib/
+mkdir -p /opt/watashi-manager/acme.sh/lib/
 if ! is_installed ./lib/acme.sh; then
-    curl -s -L https://get.acme.sh | sh -s -- home /opt/hiddify-manager/acme.sh/lib \
-    --config-home /opt/hiddify-manager/acme.sh/lib/data \
-    --cert-home /opt/hiddify-manager/acme.sh/lib/certs --nocron
+    curl -s -L https://get.acme.sh | sh -s -- home /opt/watashi-manager/acme.sh/lib \
+    --config-home /opt/watashi-manager/acme.sh/lib/data \
+    --cert-home /opt/watashi-manager/acme.sh/lib/certs --nocron
     
     sed -i 's|_sleep_overload_retry_sec=$_retryafter|_sleep_overload_retry_sec=$_retryafter; if [ "$_retryafter" -gt 20 ] 2>/dev/null;then return 10; fi|g' lib/acme.sh
 fi
@@ -29,4 +30,4 @@ fi
 cp -f watashi-cert-renew.service watashi-cert-renew.timer /etc/systemd/system/ 2>/dev/null
 systemctl daemon-reload 2>/dev/null
 systemctl enable --now watashi-cert-renew.timer 2>/dev/null
-systemctl reload hiddify-haproxy
+systemctl reload watashi-haproxy

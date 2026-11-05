@@ -1,3 +1,4 @@
+{# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only) #}
 {# Speedtest and static paths must come BEFORE general panel paths #}
 {%if hconfigs['speed_test']%}
 /{{hconfigs['proxy_path_client']}}/speedtest/ nginx_dispatcher_http_h2
@@ -6,9 +7,9 @@
 /{{hconfigs['proxy_path_admin']}}/static/ nginx_dispatcher_http_h2
 /{{hconfigs['proxy_path']}}/static/ nginx_dispatcher_http_h2
 
-/{{hconfigs['proxy_path_client']}}/ hiddifypanel
-/{{hconfigs['proxy_path_admin']}}/ hiddifypanel
-/{{hconfigs['proxy_path']}}/ hiddifypanel
+/{{hconfigs['proxy_path_client']}}/ watashipanel
+/{{hconfigs['proxy_path_admin']}}/ watashipanel
+/{{hconfigs['proxy_path']}}/ watashipanel
 
 {%if hconfigs['tcp_enable']%}
 /{{ hconfigs['path_vmess'] }}{{ hconfigs['path_tcp'] }} vmesst

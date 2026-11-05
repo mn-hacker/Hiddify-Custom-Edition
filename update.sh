@@ -1,4 +1,5 @@
 #!/bin/bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 # Watashi v12.2.37 : only the words on screen changed here
 cd $(dirname -- "$0")
 source ./common/utils.sh
@@ -34,35 +35,33 @@ function main() {
     local current_config_version=$(get_installed_config_version)
     local current_panel_version=$(get_installed_panel_version)
 
-    # if [[ $package_mode == "release" ]] && [[ $current_config_version == *"dev"* || ! $current_panel_version == 10* || ! $current_panel_version == 9* ]]; then
-    #     bash common/downgrade.sh
-    #     return 0
-    # fi
+    # watashi v12.3.40dev: an old commented-out call to common/downgrade.sh stood here; that
+    # script (an unused upstream downgrade that took the panel from PyPI) was removed.
 
     rm -rf sniproxy caddy
     update_progress "Watashi Updater" "Creating a backup" 5
     echo "Creating a backup ..."
-    ./hiddify-panel/backup.sh
+    ./watashi-panel/backup.sh
 
-    update_script="https://raw.githubusercontent.com/mn-hacker/Hiddify-Custom-Edition/refs/heads/main/common/download.sh"
+    update_script="https://raw.githubusercontent.com/mn-hacker/Watashi-Manager/refs/heads/main/common/download.sh"
     case "$package_mode" in
     develop)
         # watashi dev-channel: use get_dev_version (get_commit_version returns empty;
         # the dev branch does not exist, so its download.sh cannot be fetched)
-        latest_manager=$(get_dev_version Hiddify-Custom-Edition)
+        latest_manager=$(get_dev_version Watashi-Manager)
         latest_panel=$latest_manager
-        update_script="https://raw.githubusercontent.com/mn-hacker/Hiddify-Custom-Edition/refs/heads/main/common/download.sh"
+        update_script="https://raw.githubusercontent.com/mn-hacker/Watashi-Manager/refs/heads/main/common/download.sh"
         ;;
     beta)
-        # Use tags instead of releases for beta - only check Hiddify-Manager
-        latest_manager=$(get_pre_release_version Hiddify-Manager)
+        # Use tags instead of releases for beta - only check Watashi-Manager
+        latest_manager=$(get_pre_release_version Watashi-Manager)
         latest_panel=$latest_manager
-        update_script="https://raw.githubusercontent.com/mn-hacker/Hiddify-Custom-Edition/refs/heads/main/common/download.sh"
+        update_script="https://raw.githubusercontent.com/mn-hacker/Watashi-Manager/refs/heads/main/common/download.sh"
         ;;
     release)
-        latest_manager=$(get_release_version Hiddify-Manager)
+        latest_manager=$(get_release_version Watashi-Manager)
         latest_panel=$latest_manager
-        update_script="https://raw.githubusercontent.com/mn-hacker/Hiddify-Custom-Edition/refs/heads/main/common/download.sh"
+        update_script="https://raw.githubusercontent.com/mn-hacker/Watashi-Manager/refs/heads/main/common/download.sh"
         ;;
     esac
 
@@ -78,8 +77,8 @@ function main() {
     finish_progress "Updating..."
 
 }
-if [[ "$HIDDIFY_DISABLE_UPDATE" == "1" || "$HIDDIFY_DISABLE_UPDATE" == "true" ]];then
-    error "Updating is disabled because env variable HIDDIFY_DISABLE_UPDATE == $HIDDIFY_DISABLE_UPDATE"
+if [[ "$WATASHI_DISABLE_UPDATE" == "1" || "$WATASHI_DISABLE_UPDATE" == "true" ]];then
+    error "Updating is disabled because env variable WATASHI_DISABLE_UPDATE == $WATASHI_DISABLE_UPDATE"
     exit 9
 elif [[ " $@ " == *" --no-gui "* ]]; then
     set -- "${@/--no-gui/}"
@@ -97,10 +96,10 @@ else
     error_code=$?
     if [[ $error_code != "0" ]]; then
         # echo less -r -P"Installation Failed! Press q to exit" +G "$log_file"
-        msg_with_hiddify "Installation Failed! code=$error_code"
+        msg_with_watashi "Installation Failed! code=$error_code"
     else
-        msg_with_hiddify "The update has successfully completed."
-        check_hiddify_panel $@ |& tee -a $LOG_FILE
+        msg_with_watashi "The update has successfully completed."
+        check_watashi_panel $@ |& tee -a $LOG_FILE
     fi
 fi
 exit $error_code

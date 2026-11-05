@@ -1,14 +1,15 @@
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 # ln -sf $(pwd)/haproxy.cfg /etc/haproxy/haproxy.cfg
 
 # REALITY_SERVER_NAMES_HAPROXY=$(echo "$REALITY_SERVER_NAMES" | sed 's/,/ || /g')
 # sed -i "s|REALITY_SERVER_NAMES|server $REALITY_SERVER_NAMES_HAPROXY|g" haproxy.cfg
 
 #
-source /opt/hiddify-manager/common/utils.sh
+source /opt/watashi-manager/common/utils.sh
 
 chmod 600 *.cfg*
-# systemctl reload hiddify-haproxy
-systemctl stop hiddify-haproxy
+# systemctl reload watashi-haproxy
+systemctl stop watashi-haproxy
 # watashi v12.2.130: this used to name one wrong file, cert_utils.sh.crt, because
 # that is the one that broke a panel once. haproxy reads the whole folder,
 # so every other shape of leftover did the same thing later: .crt.bk pairs,
@@ -16,8 +17,8 @@ systemctl stop hiddify-haproxy
 # sweep below is general, and then every remaining pair is checked before
 # haproxy is asked to start. This is the ssl repair script we used to run by
 # hand, now part of the start itself.
-ws_ssl_dir=/opt/hiddify-manager/ssl
-ws_ssl_bk=/opt/hiddify-manager/log/ssl-backup
+ws_ssl_dir=/opt/watashi-manager/ssl
+ws_ssl_bk=/opt/watashi-manager/log/ssl-backup
 mkdir -p "$ws_ssl_bk" 2>/dev/null || true
 shopt -s nullglob
 # anything that is not a plain <domain>.crt or <domain>.crt.key is not for haproxy
@@ -53,4 +54,4 @@ for f in "$ws_ssl_dir"/*.crt.key; do
                             mv -f "$f" "$ws_ssl_bk/" 2>/dev/null || rm -f "$f"; }
 done
 shopt -u nullglob
-systemctl start hiddify-haproxy
+systemctl start watashi-haproxy

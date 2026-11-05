@@ -1,5 +1,6 @@
 #!/bin/bash
-# Remove deprecated components from Hiddify Manager
+# Remove deprecated components from Watashi Manager
+# watashi v12.3.40dev: the old-name units (sniproxy, ip-limiter) are cleaned by common/watashi_legacy.sh now
 # This script is called during installation to clean up old/unused services
 
 echo "Cleaning up deprecated components..."
@@ -11,11 +12,9 @@ rm -f /etc/apt/sources.list.d/speedtest*.list 2>/dev/null
 # ShadowTLS
 systemctl stop --now shadowtls >/dev/null 2>&1
 systemctl disable shadowtls >/dev/null 2>&1
-rm -rf /opt/hiddify-manager/other/shadowtls/
+rm -rf /opt/watashi-manager/other/shadowtls/
 
 # sniproxy (replaced by HAProxy)
-systemctl stop --now hiddify-sniproxy >/dev/null 2>&1
-systemctl disable hiddify-sniproxy >/dev/null 2>&1
 pkill -9 sniproxy >/dev/null 2>&1
 
 # Trojan-go (replaced by Xray trojan)
@@ -33,11 +32,5 @@ systemctl disable clash >/dev/null 2>&1
 # Monitoring/Netdata
 systemctl stop --now netdata >/dev/null 2>&1
 systemctl disable netdata >/dev/null 2>&1
-
-# IP-Limiter (replaced by HWID limit)
-systemctl stop --now hiddify-ip-limiter >/dev/null 2>&1
-systemctl disable hiddify-ip-limiter >/dev/null 2>&1
-rm -f /etc/systemd/system/hiddify-ip-limiter.service
-rm -rf /opt/hiddify-manager/other/hiddify-ip-limiter/
 
 echo "Deprecated components cleanup completed."

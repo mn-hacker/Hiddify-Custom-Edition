@@ -1,0 +1,32 @@
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
+[Unit]
+Description=watashi panel
+After=network-online.target mariadb.service watashi-redis.service
+Wants=network-online.target
+# watashi: panel resilience v12.2.46 - a hard Requires took the panel down
+# with mariadb or redis and left it down, and a unit stopped that way is
+# not restarted by Restart=. After= above still keeps the boot order.
+Wants=mariadb.service watashi-redis.service
+# never let the default start limit (5 starts / 10 s) park the panel in failed
+StartLimitIntervalSec=0
+StartLimitBurst=0
+
+[Service]
+Type=simple
+User=watashi-panel
+WorkingDirectory=/opt/watashi-manager/watashi-panel/
+Environment="LANG=C.UTF-8"
+ExecStart=/opt/watashi-manager/.venv313/bin/python /opt/watashi-manager/watashi-panel/app.py
+ExecReload=/bin/bash -c 'test -n "$MAINPID" && kill -HUP $MAINPID || true'
+RestartSec=5
+TimeoutStopSec=20
+#ExecStop=/bin/bash -c "/bin/kill -INT $(/usr/bin/pgrep -f 'watashipanel')||echo 'nothing to kill'"
+ExecStop=/bin/bash -c 'test -n "$MAINPID" && kill -INT $MAINPID || true'
+Restart=always
+StandardOutput=file:/opt/watashi-manager/log/system/watashi_panel.out.log
+StandardError=file:/opt/watashi-manager/log/system/watashi_panel.err.log
+[Install]
+WantedBy=multi-user.target
+
+
+#lsof | awk -v pattern="/watashipanel/" '$9 ~ pattern {print $2}'| sort -u| xargs echo kill

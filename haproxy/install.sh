@@ -1,9 +1,11 @@
-source /opt/hiddify-manager/common/utils.sh
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
+source /opt/watashi-manager/common/utils.sh
 rm -rf *.template
+# watashi v12.3.40dev: the lines that stopped the sniproxy unit of the oldest
+# upstream releases were dropped. That unit only ever existed under the old
+# name, and common/watashi_legacy.sh removes every unit of that name. A stray
+# sniproxy daemon would still sit on the ports haproxy needs, so it goes.
 if is_installed sniproxy; then
-    # systemctl kill hiddify-sniproxy > /dev/null 2>&1
-    systemctl stop hiddify-sniproxy >/dev/null 2>&1
-    systemctl disable hiddify-sniproxy >/dev/null 2>&1
     pkill -9 sniproxy >/dev/null 2>&1
 fi
 
@@ -33,5 +35,5 @@ systemctl kill haproxy >/dev/null 2>&1
 systemctl stop haproxy >/dev/null 2>&1
 systemctl disable haproxy >/dev/null 2>&1
 
-ln -sf $(pwd)/hiddify-haproxy.service /etc/systemd/system/hiddify-haproxy.service
-systemctl enable hiddify-haproxy.service
+ln -sf $(pwd)/watashi-haproxy.service /etc/systemd/system/watashi-haproxy.service
+systemctl enable watashi-haproxy.service

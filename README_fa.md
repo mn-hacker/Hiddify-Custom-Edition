@@ -1,10 +1,11 @@
+<!-- watashi v12.3.40dev: the old project name was taken out of this file; the credit line to the upstream engine stays -->
 <div align="center">
 
 <img src="assets/watashi-banner.svg?v=3" alt="Watashi Manager" width="880">
 
-[![Release](https://img.shields.io/github/v/release/mn-hacker/Hiddify-Custom-Edition?style=for-the-badge&color=7c3aed&label=RELEASE)](https://github.com/mn-hacker/Hiddify-Custom-Edition/releases)
-[![Last commit](https://img.shields.io/github/last-commit/mn-hacker/Hiddify-Custom-Edition?style=for-the-badge&color=f59e0b&label=LAST%20COMMIT)](https://github.com/mn-hacker/Hiddify-Custom-Edition/commits)
-[![Stars](https://img.shields.io/github/stars/mn-hacker/Hiddify-Custom-Edition?style=for-the-badge&color=22d3ee)](https://github.com/mn-hacker/Hiddify-Custom-Edition/stargazers)
+[![Release](https://img.shields.io/github/v/release/mn-hacker/Watashi-Manager?style=for-the-badge&color=7c3aed&label=RELEASE)](https://github.com/mn-hacker/Watashi-Manager/releases)
+[![Last commit](https://img.shields.io/github/last-commit/mn-hacker/Watashi-Manager?style=for-the-badge&color=f59e0b&label=LAST%20COMMIT)](https://github.com/mn-hacker/Watashi-Manager/commits)
+[![Stars](https://img.shields.io/github/stars/mn-hacker/Watashi-Manager?style=for-the-badge&color=22d3ee)](https://github.com/mn-hacker/Watashi-Manager/stargazers)
 [![License](https://img.shields.io/badge/LICENSE-GPL--3.0-10b981?style=for-the-badge)](LICENSE)
 
 [![Xray](https://img.shields.io/badge/Xray--core-26.2.2-3b82f6?style=for-the-badge)](https://github.com/XTLS/Xray-core)
@@ -166,10 +167,10 @@
 
 | کانال | دستور |
 | :-- | :-- |
-| **نسخهٔ پایدار** | <code>bash <(curl -Ls https://raw.githubusercontent.com/mn-hacker/Hiddify-Custom-Edition/main/common/download.sh)</code> |
-| **نسخهٔ بتا** | <code>bash <(curl -Ls https://raw.githubusercontent.com/mn-hacker/Hiddify-Custom-Edition/main/common/download.sh) beta</code> |
-| **بروزرسانی** | <code>cd /opt/hiddify-manager && bash update.sh</code> |
-| **حذف کامل** | <code>cd /opt/hiddify-manager && bash uninstall.sh</code> |
+| **نسخهٔ پایدار** | <code>bash <(curl -Ls https://raw.githubusercontent.com/mn-hacker/Watashi-Manager/main/common/download.sh)</code> |
+| **نسخهٔ بتا** | <code>bash <(curl -Ls https://raw.githubusercontent.com/mn-hacker/Watashi-Manager/main/common/download.sh) beta</code> |
+| **بروزرسانی** | <code>cd /opt/watashi-manager && bash update.sh</code> |
+| **حذف کامل** | <code>cd /opt/watashi-manager && bash uninstall.sh</code> |
 
 <div dir="rtl" align="right">
 
@@ -188,7 +189,7 @@
 </div>
 
 ```bash
-cd /opt/hiddify-manager && bash menu.sh
+cd /opt/watashi-manager && bash menu.sh
 ```
 
 ---
@@ -200,13 +201,12 @@ cd /opt/hiddify-manager && bash menu.sh
 </div>
 
 ```text
-Hiddify-Custom-Edition/
-├─ hiddify-panel/     ← پنل وب (Flask) + تم واتاشی
+Watashi-Manager/
+├─ watashi-panel/     ← پنل وب (Flask) + تم واتاشی
 ├─ xray/              ← کانفیگ و سرویس Xray-core
 ├─ singbox/           ← کانفیگ و سرویس sing-box
 ├─ haproxy/           ← توزیع ترافیک و TLS
 ├─ nginx/             ← سرویس وب و دامنه‌ها
-├─ hiddify-cli/       ← کلاینت خط فرمان
 ├─ common/            ← اسکریپت‌های مشترک و نصب
 ├─ operations/        ← پشتیبان‌گیری و عملیات دوره‌ای
 ├─ Theme/             ← طرح‌ها و قالب‌های تم
@@ -220,7 +220,7 @@ Hiddify-Custom-Edition/
 
 ## مسیر پیش‌رو
 
-- [ ] تغییر نام سرویس‌ها از `hiddify-*` به `watashi-*` با حفظ سازگاری.
+- [x] همهٔ سرویس‌ها، پوشه‌ها، پکیج، دیتابیس و کاربر سیستم حالا نام `watashi-*` دارند (v12.3.40dev)؛ سروری که آپدیت شود خودکار منتقل می‌شود.
 - [ ] صفحهٔ مدیریت برای شخصی‌سازی صفحهٔ کاربر و قالب‌های متعدد.
 - [ ] بازطراحی مانده: پشتیبان‌گیری، دامنه‌ها، پراکسی‌ها، تنطیمات و تانل.
 - [ ] بروزرسانی مداوم xray، sing-box و haproxy.
@@ -238,7 +238,7 @@ Hiddify-Custom-Edition/
 | :-- | :-- |
 | کانال تلگرام | [Watashi Manager](https://t.me/Watashi_Manager) |
 | سازنده | [シングル (MNHACKER)](https://t.me/MNHACKER) |
-| گزارش ایراد | [GitHub Issues](https://github.com/mn-hacker/Hiddify-Custom-Edition/issues) |
+| گزارش ایراد | [GitHub Issues](https://github.com/mn-hacker/Watashi-Manager/issues) |
 
 ## قدردانی
 

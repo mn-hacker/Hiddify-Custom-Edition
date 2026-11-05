@@ -1,4 +1,5 @@
-#!/opt/hiddify-manager/.venv313/bin/python
+#!/opt/watashi-manager/.venv313/bin/python
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 from urllib.parse import urlparse
 import click
 import os
@@ -7,36 +8,36 @@ import subprocess
 import re
 import shutil  # watashi v12.3.38dev: finds systemd-run for the long jobs
 
-HIDDIFY_DIR = '/opt/hiddify-manager/'
+WATASHI_DIR = '/opt/watashi-manager/'
 
 
 class Command(StrEnum):
     '''The value of each command refers to the command shell file'''
-    apply = os.path.join(HIDDIFY_DIR, 'apply_configs.sh')
-    install = os.path.join(HIDDIFY_DIR, 'install.sh')
-    # reinstall = os.path.join(HIDDIFY_DIR,'reinstall.sh')
-    update = os.path.join(HIDDIFY_DIR, 'update.sh')
-    status = os.path.join(HIDDIFY_DIR, 'status.sh')
-    restart_services = os.path.join(HIDDIFY_DIR, 'restart.sh')
-    temporary_short_link = os.path.join(HIDDIFY_DIR, 'nginx/add2shortlink.sh')
+    apply = os.path.join(WATASHI_DIR, 'apply_configs.sh')
+    install = os.path.join(WATASHI_DIR, 'install.sh')
+    # reinstall = os.path.join(WATASHI_DIR,'reinstall.sh')
+    update = os.path.join(WATASHI_DIR, 'update.sh')
+    status = os.path.join(WATASHI_DIR, 'status.sh')
+    restart_services = os.path.join(WATASHI_DIR, 'restart.sh')
+    temporary_short_link = os.path.join(WATASHI_DIR, 'nginx/add2shortlink.sh')
     temporary_access = os.path.join(
-        HIDDIFY_DIR, 'hiddify-panel/temporary_access.sh')
-    update_usage = os.path.join(HIDDIFY_DIR, 'hiddify-panel/update_usage.sh')
-    get_cert = os.path.join(HIDDIFY_DIR, 'acme.sh/get_cert.sh')
+        WATASHI_DIR, 'watashi-panel/temporary_access.sh')
+    update_usage = os.path.join(WATASHI_DIR, 'watashi-panel/update_usage.sh')
+    get_cert = os.path.join(WATASHI_DIR, 'acme.sh/get_cert.sh')
     # watashi v12.2.51: the core page needs one root path, and this is it
-    core = os.path.join(HIDDIFY_DIR, 'common/core_manager.sh')
+    core = os.path.join(WATASHI_DIR, 'common/core_manager.sh')
     # apply-users command is actually "install.sh apply_users"
-    apply_users = os.path.join(HIDDIFY_DIR, 'install.sh')
-    install_rathole = os.path.join(HIDDIFY_DIR, 'other/rathole/install_rathole.sh')
-    uninstall_rathole = os.path.join(HIDDIFY_DIR, 'other/rathole/uninstall_rathole.sh')
-    create_tunnel = os.path.join(HIDDIFY_DIR, 'other/rathole/create_tunnel.sh')
-    delete_tunnel = os.path.join(HIDDIFY_DIR, 'other/rathole/delete_tunnel.sh')
-    control_tunnel = os.path.join(HIDDIFY_DIR, 'other/rathole/control_tunnel.sh')
+    apply_users = os.path.join(WATASHI_DIR, 'install.sh')
+    install_rathole = os.path.join(WATASHI_DIR, 'other/rathole/install_rathole.sh')
+    uninstall_rathole = os.path.join(WATASHI_DIR, 'other/rathole/uninstall_rathole.sh')
+    create_tunnel = os.path.join(WATASHI_DIR, 'other/rathole/create_tunnel.sh')
+    delete_tunnel = os.path.join(WATASHI_DIR, 'other/rathole/delete_tunnel.sh')
+    control_tunnel = os.path.join(WATASHI_DIR, 'other/rathole/control_tunnel.sh')
     # watashi v12.2.129: the only root door the nodes page has
-    node = os.path.join(HIDDIFY_DIR, 'other/warp/node.sh')
+    node = os.path.join(WATASHI_DIR, 'other/warp/node.sh')
     # watashi v12.2.130an: everything the panel needs in order to say where the
     # amnezia packets stop, read in one place.
-    amnezia_status = os.path.join(HIDDIFY_DIR, 'other/amnezia/status.sh')
+    amnezia_status = os.path.join(WATASHI_DIR, 'other/amnezia/status.sh')
     id = 'id'
 
 
@@ -45,7 +46,7 @@ def run(cmd: list[str]):
 
 
 # watashi v12.3.38dev: install, apply, update and restart-services all stop or
-# restart hiddify-panel on their way. Started straight from here they lived in
+# restart watashi-panel on their way. Started straight from here they lived in
 # the panel's own cgroup (the panel runs this file through sudo), so that stop
 # took them down too: the update died halfway, nothing started the panel
 # again, and the install was cut off right after its "Finished" line. Each of
@@ -62,7 +63,7 @@ JOB_LOGS = {
 # of it the scripts got before, a transient unit would start without them.
 JOB_ENV = ('PATH', 'HOME', 'USER', 'LOGNAME', 'SHELL', 'MAIL', 'TERM', 'TZ',
            'LANG', 'LANGUAGE', 'SUDO_USER', 'SUDO_UID', 'SUDO_GID', 'SUDO_COMMAND')
-JOB_ENV_PREFIX = ('LC_', 'HIDDIFY_')
+JOB_ENV_PREFIX = ('LC_', 'WATASHI_')
 # "$@" is the job itself, so none of its arguments ever passes through a shell.
 JOB_WRAP = ('name=$1; log=$2; shift 2; "$@"; rc=$?; '
             'if [ "$rc" -eq 0 ]; then end=done; else end=failed; fi; '
@@ -88,14 +89,14 @@ def job_running(name: str) -> bool:
 def run_job(name: str, cmd: list[str], log: str = '', capture: bool = False, detach: bool = False):
     # watashi v12.3.39dev: log, capture and detach serve the certificate jobs: one log
     # per domain, written by the job itself, and never waited for.
-    log = os.path.join(HIDDIFY_DIR, log or JOB_LOGS[name])
+    log = os.path.join(WATASHI_DIR, log or JOB_LOGS[name])
     os.makedirs(os.path.dirname(log), exist_ok=True)
     job = ['/bin/bash', '-c', JOB_WRAP_CAPTURE if capture else JOB_WRAP, 'watashi-job', name, log, *cmd]
     launcher = shutil.which('systemd-run')
     if not launcher or not os.path.isdir('/run/systemd/system'):
         # no systemd to hand the job to (docker): it runs right here, as before
         if detach:
-            subprocess.Popen(job, cwd=HIDDIFY_DIR, start_new_session=True, stdin=subprocess.DEVNULL,
+            subprocess.Popen(job, cwd=WATASHI_DIR, start_new_session=True, stdin=subprocess.DEVNULL,
                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             return
         run(job)
@@ -104,7 +105,7 @@ def run_job(name: str, cmd: list[str], log: str = '', capture: bool = False, det
         print(f'the {name} job is already running ({job_unit(name)}), it is not started twice')
         raise SystemExit(3)
     launch = [launcher, '--quiet', '--collect', f'--unit={job_unit(name)}',
-              f'--description=Watashi {name} job', '-p', f'WorkingDirectory={HIDDIFY_DIR}']
+              f'--description=Watashi {name} job', '-p', f'WorkingDirectory={WATASHI_DIR}']
     for key, value in os.environ.items():
         if (key in JOB_ENV or key.startswith(JOB_ENV_PREFIX)) and '\n' not in value:
             launch.append(f'--setenv={key}={value}')
@@ -237,7 +238,7 @@ def get_cert(domain: str, force: bool):
         print(f'a certificate request for {domain} is already running ({job_unit(name)})')
         raise SystemExit(3)
     log = CERT_JOB_LOG.format(domain)
-    path = os.path.join(HIDDIFY_DIR, log)
+    path = os.path.join(WATASHI_DIR, log)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, 'w') as fh:
         fh.write('watashi-cert: {} start{}\n'.format(domain, ' force' if force else ''))
@@ -278,7 +279,7 @@ def ws_tunnel_transfer(tool: str, nic: str) -> str:
 
 @cli.command('update-wg-usage')
 def update_wg_usage():
-    print(ws_tunnel_transfer('wg', 'hiddifywg'))
+    print(ws_tunnel_transfer('wg', 'watashiwg'))
 
 
 @cli.command('update-awg-usage')
@@ -413,12 +414,12 @@ def node(action: str, key: str, value: str):
 @click.option('--file', '-f', type=str, help='The log file to truncate', required=True)
 def truncate(file: str):
     # Security check: only allow files in log/system/
-    log_dir = os.path.join(HIDDIFY_DIR, 'log/system')
+    log_dir = os.path.join(WATASHI_DIR, 'log/system')
     file_path = os.path.join(log_dir, f"{file}.log")
     
     # Resolve absolute path and ensure it starts with log_dir
     # Note: realpath resolves symlinks, abspath doesn't. 
-    # Since we construct the path using HIDDIFY_DIR/log/system, it should be safe unless file contains ..
+    # Since we construct the path using WATASHI_DIR/log/system, it should be safe unless file contains ..
     if ".." in file or "/" in file:
         raise Exception("Access denied")
 
@@ -437,10 +438,10 @@ def truncate(file: str):
     with open(file_path, 'w') as f:
         f.write("")
     
-    # Set permissions so hiddify-panel can write to it
+    # Set permissions so watashi-panel can write to it
     import shutil
     try:
-        shutil.chown(file_path, user='hiddify-panel', group='hiddify-panel')
+        shutil.chown(file_path, user='watashi-panel', group='watashi-panel')
     except Exception as e:
         print(f"Failed to chown {file_path}: {e}")
 
@@ -448,13 +449,13 @@ def truncate(file: str):
 # ============================================================
 # Connection-limit firewall enforcement
 # ============================================================
-# The hiddify-panel process is unprivileged and cannot touch the firewall, so it
+# The watashi-panel process is unprivileged and cannot touch the firewall, so it
 # writes the set of IPs that must be blocked to a handoff file and asks us (root,
 # via sudo) to reconcile a dedicated iptables/ip6tables chain with that list.
 # This is the step that actually drops traffic from over-limit clients (works
 # for every protocol: xray, singbox, wireguard, ...).
-CONNLIMIT_CHAIN = "HIDDIFY_CONNLIMIT"
-CONNLIMIT_FILE = os.path.join(HIDDIFY_DIR, 'log/connlimit_blocked_ips.txt')
+CONNLIMIT_CHAIN = "WATASHI_CONNLIMIT"
+CONNLIMIT_FILE = os.path.join(WATASHI_DIR, 'log/connlimit_blocked_ips.txt')
 
 
 def _connlimit_sync_one(binary: str, desired: set):

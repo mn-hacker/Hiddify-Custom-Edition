@@ -1,12 +1,13 @@
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 [Unit]
 Description=Watashi certificate renewal
-After=network-online.target hiddify-nginx.service
+After=network-online.target watashi-nginx.service
 Wants=network-online.target
 
 [Service]
 Type=oneshot
-WorkingDirectory=/opt/hiddify-manager/acme.sh
-ExecStart=/bin/bash /opt/hiddify-manager/acme.sh/run.sh
+WorkingDirectory=/opt/watashi-manager/acme.sh
+ExecStart=/bin/bash /opt/watashi-manager/acme.sh/run.sh
 TimeoutStartSec=1800
 Nice=10
 

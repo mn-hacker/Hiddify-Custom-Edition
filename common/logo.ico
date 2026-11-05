@@ -1,6 +1,7 @@
 #!/bin/bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 # Watashi v12.2.37 - the mark we print when a run ends well
-WS_TUI_FILE="/opt/hiddify-manager/common/watashi_tui.sh"
+WS_TUI_FILE="/opt/watashi-manager/common/watashi_tui.sh"
 if [ ! -f "$WS_TUI_FILE" ]; then
     WS_TUI_FILE="$(dirname "$0")/watashi_tui.sh"
 fi

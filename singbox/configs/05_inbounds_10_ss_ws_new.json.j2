@@ -1,3 +1,4 @@
+{# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only) #}
 {
     {% if (hconfigs['shadowsocks2022_enable'] or hconfigs['ssfaketls_enable'] or hconfigs['shadowtls_enable']) and hconfigs['ws_enable'] %}
     // 	"inbounds": [
@@ -8,7 +9,7 @@
     // 			"settings": {
     // 				"clients":[
     //                  {% for u in users %}
-    //    			        {"password": "{{ u['uuid'] }}", "email": "{{ u['uuid'] }}@hiddify.com","method": "Chacha20-IETF-Poly1305"},
+    //    			        {"password": "{{ u['uuid'] }}", "email": "{{ u['uuid'] }}@watashi.cyou","method": "Chacha20-IETF-Poly1305"},
     //				    {% endfor%}
     // 				]
     // 			  },

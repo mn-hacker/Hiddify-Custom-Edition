@@ -1,3 +1,4 @@
+{# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only) #}
 location /{{ hconfigs['proxy_path_client'] }}/generate_204 {
   return 204;
 }
@@ -61,30 +62,30 @@ location /{{ hconfigs['proxy_path_client'] }}/speedtest/ {
   proxy_pass          http://localhost:438/;
 }
 location /{{ hconfigs['proxy_path'] }}/static {
-  include /opt/hiddify-manager/nginx/parts/proxy_to_static.conf;
+  include /opt/watashi-manager/nginx/parts/proxy_to_static.conf;
 }
 location /{{ hconfigs['proxy_path_client'] }}/static {
-  include /opt/hiddify-manager/nginx/parts/proxy_to_static.conf;
+  include /opt/watashi-manager/nginx/parts/proxy_to_static.conf;
 }
 location /{{ hconfigs['proxy_path_admin'] }}/static {
-  include /opt/hiddify-manager/nginx/parts/proxy_to_static.conf;
+  include /opt/watashi-manager/nginx/parts/proxy_to_static.conf;
 }
 
 
 
 #Backward Compatibility
 location /{{ hconfigs['proxy_path'] }}/ {
-  include /opt/hiddify-manager/nginx/parts/proxy_to_panel.conf;
+  include /opt/watashi-manager/nginx/parts/proxy_to_panel.conf;
 }
 
 location /{{ hconfigs['proxy_path_client'] }}/ {
-  include /opt/hiddify-manager/nginx/parts/proxy_to_panel.conf;
+  include /opt/watashi-manager/nginx/parts/proxy_to_panel.conf;
 }
 
 location /{{ hconfigs['proxy_path_admin'] }}/ {
   # Fix nginx: 403 request entity is too large (backup file)
   client_max_body_size 10M;
-  include /opt/hiddify-manager/nginx/parts/proxy_to_panel.conf;
+  include /opt/watashi-manager/nginx/parts/proxy_to_panel.conf;
 }
 
 location /{{ hconfigs['proxy_path_admin'] }}/proxy-stats/ {

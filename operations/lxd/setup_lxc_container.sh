@@ -1,11 +1,12 @@
 #!/bin/bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 NOCOLOR='\033[0m'
 
 DEBUG=0
-LXC_CONTAINER_NAME="Hiddify-on-LXC"
+LXC_CONTAINER_NAME="Watashi-on-LXC"
 LXC_IMAGE="ubuntu:22.04"
 
 # You may change any of the variables below, to change the port bound on your public/host IP.
@@ -86,14 +87,17 @@ setup_container() {
     lxc exec $LXC_CONTAINER_NAME -- apt-get update
     lxc exec $LXC_CONTAINER_NAME -- apt-get install -y apt-transport-https ca-certificates curl wget gnupg-agent software-properties-common git jq
   
+    # watashi v12.3.40dev: the container used to fetch the installer from the
+    # short link of the project this one was forked from; it gets this
+    # project's own fresh-install script now.
     if [ $DEBUG -eq 1 ]; then
-      lxc exec $LXC_CONTAINER_NAME -- bash -x -c "cd /opt && export CREATE_EASYSETUP_LINK='true'; sleep 5; curl https://i.hiddify.com/release|bash -x -s -- --no-gui; exit 0"
+      lxc exec $LXC_CONTAINER_NAME -- bash -x -c "cd /opt && export CREATE_EASYSETUP_LINK='true'; sleep 5; curl -fsSL https://raw.githubusercontent.com/mn-hacker/Watashi-Manager/main/common/download_install.sh|bash -x -s -- --no-gui; exit 0"
     else
-      lxc exec $LXC_CONTAINER_NAME -- bash -c "cd /opt && export CREATE_EASYSETUP_LINK='true'; sleep 5;curl https://i.hiddify.com/release|bash -s -- --no-gui; exit 0"
+      lxc exec $LXC_CONTAINER_NAME -- bash -c "cd /opt && export CREATE_EASYSETUP_LINK='true'; sleep 5;curl -fsSL https://raw.githubusercontent.com/mn-hacker/Watashi-Manager/main/common/download_install.sh|bash -s -- --no-gui; exit 0"
     fi
   else
     echo -e "Container $LXC_CONTAINER_NAME already exists.\n"
-    echo "1. If you want to remap your Hiddify Manager's container ports to your pubic IP use the command:"
+    echo "1. If you want to remap your Watashi Manager's container ports to your pubic IP use the command:"
     echo -e "${GREEN}bash ${DIR_PATH}utils/lxc_ports_to_host.sh${NOCOLOR}\n"
     echo "2. If you want to delete a previously made container use the command:"
     echo -e "${GREEN}lxc delete $LXC_CONTAINER_NAME --force${NOCOLOR}" 
@@ -139,10 +143,10 @@ verify_container
 
 # Prints admin links
 echo -e "\n\n\nYour admin links are printed. The ones that start with \`https\` should be preferred"
-lxc exec $LXC_CONTAINER_NAME -- bash -c "cat /opt/hiddify-manager/current.json | jq -r '.panel_links[]'"
+lxc exec $LXC_CONTAINER_NAME -- bash -c "cat /opt/watashi-manager/current.json | jq -r '.panel_links[]'"
 
 echo -e "\n\nIf you need TUI or shell for your container try:"
 echo "${GREEN}lxc shell $LXC_CONTAINER_NAME${NOCOLOR}"
 
-echo -e "${RED}WARNING!${NOCOLOR}\nCurrently your LXC container has no open ports on your host OS. For container ports to be seen you need to run ${GREEN}bash ${DIR_PATH}utils/lxc_ports_to_host.sh${NOCOLOR} each time that a new port is used by Hiddify Manager inside the container."
+echo -e "${RED}WARNING!${NOCOLOR}\nCurrently your LXC container has no open ports on your host OS. For container ports to be seen you need to run ${GREEN}bash ${DIR_PATH}utils/lxc_ports_to_host.sh${NOCOLOR} each time that a new port is used by Watashi Manager inside the container."
 

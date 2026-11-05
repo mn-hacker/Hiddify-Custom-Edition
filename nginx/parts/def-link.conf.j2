@@ -1,3 +1,4 @@
+{# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only) #}
 location = / {
 
 	
@@ -34,7 +35,7 @@ location / {
 	
 }
 {% if hconfigs['first_setup'] and hconfigs['create_easysetup_link']%}
-location /hiddify {	
+location /watashi {	
 		{% set  nextH=exec("printf '%02d' $(($(date '+%H') + 1))") %}
 		{% set  nowDatetime=exec('date "+%Y-%m-%dT(%H|"') %}
 		{% set  TEMP_LINK_VALID_TIME= nowDatetime + nextH + ")"%}

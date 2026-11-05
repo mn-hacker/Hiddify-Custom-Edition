@@ -1,3 +1,4 @@
+{# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only) #}
 {
 	{% set ws_v6 = exec("[ -f /proc/net/if_inet6 ] && echo -n 'true' || echo -n 'false'")=='true' %}
 	{# watashi v12.2.101: the listener is written only when the core that is
@@ -6,7 +7,7 @@
 	   older core must not be able to take every other config down. an
 	   unreadable version is treated as new, because that is what this panel
 	   installs. #}
-	{% set ws_sb_ver = exec("/opt/hiddify-manager/singbox/sing-box version 2>/dev/null | head -1 | awk '{print $3}' | tr -d v").strip() %}
+	{% set ws_sb_ver = exec("/opt/watashi-manager/singbox/sing-box version 2>/dev/null | head -1 | awk '{print $3}' | tr -d v").strip() %}
 	{% set ws_sb_p = (ws_sb_ver ~ '.0.0').split('.') %}
 	{% set ws_sb_num = ((ws_sb_p[0]|int) * 1000 + (ws_sb_p[1]|int)) if ws_sb_ver else 9999 %}
 	{# watashi v12.2.101: snell v6 arrived in sing-box 1.14 and carries no tls
@@ -21,7 +22,7 @@
 			"listen": {% if ws_v6 %}"::"{%else%}"0.0.0.0"{%endif%},
 			"listen_port": {{ port }},
 			"tcp_fast_open": true,
-			{% include '/opt/hiddify-manager/singbox/configs/common/protocols/snell.pj2' %}
+			{% include '/opt/watashi-manager/singbox/configs/common/protocols/snell.pj2' %}
 		},
 		{%endfor%}
 	]

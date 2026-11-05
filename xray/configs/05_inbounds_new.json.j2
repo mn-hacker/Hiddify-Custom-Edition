@@ -1,3 +1,4 @@
+{# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only) #}
 {
     "inbounds":[
         {% for protocol in ['vless','vmess','trojan']%}
@@ -6,11 +7,11 @@
                     {
                     "tag":"v10-{{protocol}}-{{stream}}",
                     "listen": "@@v10-{{protocol}}-{{stream}}", 
-                    {% include '/opt/hiddify-manager/xray/configs/common/protocols/'~protocol~'.pj2' %},
+                    {% include '/opt/watashi-manager/xray/configs/common/protocols/'~protocol~'.pj2' %},
                     
                     "streamSettings": {
                         {% with path=hconfigs['path_'~ protocol]~hconfigs['path_'~stream] %}
-                            {% include '/opt/hiddify-manager/xray/configs/common/streams/'~stream~'.pj2' %},
+                            {% include '/opt/watashi-manager/xray/configs/common/streams/'~stream~'.pj2' %},
                         {%endwith %}
                         
                         "security": "none",

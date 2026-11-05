@@ -1,4 +1,5 @@
-source /opt/hiddify-manager/common/utils.sh
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
+source /opt/watashi-manager/common/utils.sh
 
 # Create nginx user if not exists
 useradd nginx 2>/dev/null || true
@@ -42,5 +43,5 @@ rm -f /etc/nginx/conf.d/xray-base.conf 2>/dev/null
 rm -f /etc/nginx/conf.d/speedtest.conf 2>/dev/null
 
 mkdir -p run
-ln -sf $(pwd)/hiddify-nginx.service /etc/systemd/system/hiddify-nginx.service
-systemctl enable hiddify-nginx.service 2>/dev/null || true
+ln -sf $(pwd)/watashi-nginx.service /etc/systemd/system/watashi-nginx.service
+systemctl enable watashi-nginx.service 2>/dev/null || true

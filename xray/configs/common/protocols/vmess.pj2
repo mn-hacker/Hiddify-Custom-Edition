@@ -1,8 +1,9 @@
+{# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only) #}
 "protocol": "vmess",
 "settings": {
     "clients": [
         {% for u in users %}
-            {"id": "{{ u['uuid'] }}", "email": "{{ u['uuid'] }}@hiddify.com", "alterId": 0},
+            {"id": "{{ u['uuid'] }}", "email": "{{ u['uuid'] }}@watashi.cyou", "alterId": 0},
         {% endfor %}
     ]
 }

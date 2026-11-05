@@ -1,7 +1,8 @@
+{# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only) #}
 {#- watashi v12.2.130cr: "http2 on;" only exists from nginx 1.25.1. An older
     nginx (1.18 on ubuntu 22.04, 1.24 on 24.04, which is what a box gets when
     nginx was already there or nginx.org could not be reached) stops at
-    'unknown directive "http2"', and hiddify-nginx restarts forever. The older
+    'unknown directive "http2"', and watashi-nginx restarts forever. The older
     spelling, http2 as a listen parameter, is understood by every version
     (1.25.1+ only prints a deprecation notice), so it is used whenever the
     version is lower or cannot be read. -#}
@@ -13,9 +14,9 @@
 # HTTP1 UDS listener
 server {
     listen 127.0.0.1:501 proxy_protocol; #HTTP/1.1 server monitor process and enable PROXY protocol reception
-    listen unix:/opt/hiddify-manager/nginx/run/h1.sock proxy_protocol;
+    listen unix:/opt/watashi-manager/nginx/run/h1.sock proxy_protocol;
     server_name _;
-    include /opt/hiddify-manager/nginx/parts/hiddify.conf;
+    include /opt/watashi-manager/nginx/parts/watashi.conf;
     set_real_ip_from unix:;
     real_ip_header proxy_protocol;
 }
@@ -23,36 +24,36 @@ server {
 # HTTP2 UDS listener
 server {
     listen 127.0.0.1:502 proxy_protocol{{ ws_h2_listen }}; #H2C server monitor process and enable PROXY protocol reception
-    listen unix:/opt/hiddify-manager/nginx/run/h2.sock proxy_protocol{{ ws_h2_listen }};
+    listen unix:/opt/watashi-manager/nginx/run/h2.sock proxy_protocol{{ ws_h2_listen }};
 {% if ws_h2_on %}
     http2 on;
 {% endif %}
     server_name _;
     set_real_ip_from unix:;
     real_ip_header proxy_protocol;
-    include /opt/hiddify-manager/nginx/parts/proxy_path.conf;
+    include /opt/watashi-manager/nginx/parts/proxy_path.conf;
     
     # Decoy website
-    include /opt/hiddify-manager/nginx/parts/hiddify.conf;
+    include /opt/watashi-manager/nginx/parts/watashi.conf;
 }
 
 server {
-    listen unix:/opt/hiddify-manager/nginx/run/nginx_cdn_dispatcher.sock;
+    listen unix:/opt/watashi-manager/nginx/run/nginx_cdn_dispatcher.sock;
     set_real_ip_from unix:;
     real_ip_header "X-Real-IP";
-    include /opt/hiddify-manager/nginx/parts/proxy_path.conf;   
+    include /opt/watashi-manager/nginx/parts/proxy_path.conf;   
     # Decoy website
-    include /opt/hiddify-manager/nginx/parts/hiddify.conf;
+    include /opt/watashi-manager/nginx/parts/watashi.conf;
 }
 
 server {
-    listen unix:/opt/hiddify-manager/nginx/run/nginx_cdn_dispatcher_h2.sock{{ ws_h2_listen }};
+    listen unix:/opt/watashi-manager/nginx/run/nginx_cdn_dispatcher_h2.sock{{ ws_h2_listen }};
 {% if ws_h2_on %}
     http2 on;
 {% endif %}
     set_real_ip_from unix:;
     real_ip_header "X-Real-IP";
-    include /opt/hiddify-manager/nginx/parts/proxy_path.conf;   
+    include /opt/watashi-manager/nginx/parts/proxy_path.conf;   
     # Decoy website
-    include /opt/hiddify-manager/nginx/parts/hiddify.conf;
+    include /opt/watashi-manager/nginx/parts/watashi.conf;
 }

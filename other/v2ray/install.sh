@@ -1,4 +1,5 @@
-source /opt/hiddify-manager/common/package_manager.sh
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
+source /opt/watashi-manager/common/package_manager.sh
 install_package shadowsocks-libev
 
 download_package v2ray-plugin v2ray-plugin-linux.tar.gz 

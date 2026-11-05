@@ -1,6 +1,7 @@
 #!/bin/bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 # mtg installer - repaired in watashi v12.2.53
-source /opt/hiddify-manager/common/package_manager.sh
+source /opt/watashi-manager/common/package_manager.sh
 cd "$(dirname "$0")" || exit 1
 
 tg_log() { echo "mtg: $*" >&2; }
@@ -21,7 +22,7 @@ fi
 
 systemctl stop mtproxy.service 2>/dev/null || true
 systemctl disable mtproxy.service 2>/dev/null || true
-mkdir -p /opt/hiddify-manager/log/system
+mkdir -p /opt/watashi-manager/log/system
 
 VERSION=$(get_latest_version mtproxygo "$ARCH")
 if [[ -z "$VERSION" ]]; then

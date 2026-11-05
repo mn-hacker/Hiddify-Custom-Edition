@@ -1,3 +1,4 @@
+{# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only) #}
 tcp_nodelay       on;
 keepalive_timeout 65;
 add_header X-Robots-Tag "noindex, nofollow";
@@ -5,4 +6,4 @@ expires 1y;
 etag off;
 if_modified_since off;
 add_header Cache-Control "public, no-transform";
-alias {{exec('/opt/hiddify-manager/.venv313/bin/python -c "import os,hiddifypanel;print(os.path.dirname(hiddifypanel.__file__),end=\'\')"')}}/static;
+alias {{exec('/opt/watashi-manager/.venv313/bin/python -c "import os,watashipanel;print(os.path.dirname(watashipanel.__file__),end=\'\')"')}}/static;

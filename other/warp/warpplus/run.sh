@@ -1,4 +1,5 @@
 #!/bin/bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 # watashi v12.3.33dev: this file is the one from v12.2.130.49, put back exactly as
 # it was. Everything done to WARP after that version was repair work on a
 # remembered cloudflare address, and it made the node slower and less
@@ -23,7 +24,7 @@
 #      cache folder and reuses it.
 
 cd "$(dirname -- "$0")" || exit 1
-source /opt/hiddify-manager/common/utils.sh
+source /opt/watashi-manager/common/utils.sh
 
 BIN="./warp-plus"
 PORT=3000
@@ -34,7 +35,7 @@ CONF="engine.conf"
 # that a restart lands on the same one. Empty or missing simply means
 # "nothing remembered yet", which is exactly the old behaviour.
 PIN="$CACHE/.watashi-endpoint"
-LOGDIR="${WS_LOG_DIR:-/opt/hiddify-manager/log/system}"
+LOGDIR="${WS_LOG_DIR:-/opt/watashi-manager/log/system}"
 LOG="$LOGDIR/warp.log"
 WAIT=${WS_WARP_WAIT:-40}
 mkdir -p "$LOGDIR" "$CACHE"
@@ -160,7 +161,7 @@ function ws_remember_endpoint() {
     ws_engine_takes_endpoint || return 0
     ep=$(head -n 1 "$PIN" 2>/dev/null | tr -d '[:space:]')
     ws_endpoint_ok "$ep" && return 0
-    ep=$(journalctl -u hiddify-warp.service -n 200 --no-pager 2>/dev/null |
+    ep=$(journalctl -u watashi-warp.service -n 200 --no-pager 2>/dev/null |
         grep -oE '(([0-9]{1,3}\.){3}[0-9]{1,3}|\[[0-9a-fA-F:]+\]):(2408|500|1701|4500|854|880|939|1002|1010|1014|1018|1070|1180|1387|1843|2371|2506|3138|3476|3581|3854|4177|4198|4233|5279|5956|7103|7152|7156|7281|7559|8319|8742|8854|8886)' |
         tail -n 1)
     ws_endpoint_ok "$ep" || return 0
@@ -250,12 +251,12 @@ function warp_trace() {
 
 # Whatever the engine printed. This is the part the old version threw away.
 function engine_log() {
-    journalctl -u hiddify-warp.service -n "${1:-20}" --no-pager 2>/dev/null | sed 's|^|    |'
+    journalctl -u watashi-warp.service -n "${1:-20}" --no-pager 2>/dev/null | sed 's|^|    |'
 }
 
 function explain_failure() {
     local j
-    j=$(journalctl -u hiddify-warp.service -n 80 --no-pager 2>/dev/null)
+    j=$(journalctl -u watashi-warp.service -n 80 --no-pager 2>/dev/null)
     if grep -q '429' <<<"$j"; then
         error "- Cloudflare answered 429 (too many requests) to this server IP."
         error "  Registrations from this IP are rate limited. Wait and try again,"
@@ -276,15 +277,15 @@ function explain_failure() {
 # watashi v12.2.130v: one restart and the wait that goes with it.
 function ws_start_and_wait() {
     local i
-    systemctl restart hiddify-warp.service 2>&1 | sed 's|^|    |'
+    systemctl restart watashi-warp.service 2>&1 | sed 's|^|    |'
     for i in $(seq 1 "$WAIT"); do
         if warp_trace; then
             return 0
         fi
-        if ! systemctl is-active --quiet hiddify-warp.service; then
+        if ! systemctl is-active --quiet watashi-warp.service; then
             # no point waiting on a service that already gave up
             sleep 2
-            systemctl is-active --quiet hiddify-warp.service || break
+            systemctl is-active --quiet watashi-warp.service || break
         fi
         sleep 1
     done
@@ -302,10 +303,10 @@ function ws_can_leave_alone() {
     [ "${WS_WARP_NEW_IP:-0}" = "1" ] && return 1
     [ -f engine.args ] || return 1
     cmp -s engine.args.new engine.args || return 1
-    systemctl is-active --quiet hiddify-warp.service || return 1
+    systemctl is-active --quiet watashi-warp.service || return 1
     # a freshly installed binary must be picked up, so the running service
     # has to be younger than the file it runs.
-    started=$(date -d "$(systemctl show -p ActiveEnterTimestamp --value hiddify-warp.service 2>/dev/null)" +%s 2>/dev/null)
+    started=$(date -d "$(systemctl show -p ActiveEnterTimestamp --value watashi-warp.service 2>/dev/null)" +%s 2>/dev/null)
     binary=$(stat -c %Y "$BIN" 2>/dev/null)
     if [[ "$started" =~ ^[0-9]+$ && "$binary" =~ ^[0-9]+$ && "$binary" -gt "$started" ]]; then
         return 1

@@ -1,3 +1,4 @@
+// watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 /*
      ©CopyRight 2013-2023 by OpenSpeedTest.COM. All Rights Reserved. 
      Official Website : https://OpenSpeedTest.COM | Email: support@openspeedtest.com
@@ -860,9 +861,9 @@ window.onload = function () {
       }
     }
     var osttm = "\u2122";
-    var myname = "Hiddify";
+    var myname = "Watashi";
     var com = ".com";
-    var ost = "Hiddify";
+    var ost = "Watashi";
     function hiEnter(e) {
       if (e.key === "Enter") {
         runTasks();
@@ -1008,7 +1009,7 @@ window.onload = function () {
         if (Status === "SendR") {
           Show.showStatus("All done");
           var dummyElement = document.createElement("div");
-          dummyElement.innerHTML = '<a xlink:href="https://github.com/hiddify/hiddify-manager/wiki/" style="cursor: pointer" target="_blank"></a>';
+          dummyElement.innerHTML = '<a xlink:href="https://watashi.cyou" style="cursor: pointer" target="_blank"></a>';
           var htmlAnchorElement = dummyElement.querySelector("a");
           Show.oDoLiveSpeed.el.textContent = ost;
           var circleSVG = document.getElementById("oDoLiveSpeed");

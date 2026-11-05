@@ -1,4 +1,5 @@
 #!/bin/bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 # watashi v12.2.130bh: this file is the one from v12.2.130.49, put back exactly as
 # it was. Everything done to WARP after that version was repair work on a
 # remembered cloudflare address, and it made the node slower and less
@@ -21,13 +22,13 @@
 # "show" until the job is gone, which is what draws the spinner on the card.
 
 cd "$(dirname -- "$0")" || exit 1
-source /opt/hiddify-manager/common/utils.sh
+source /opt/watashi-manager/common/utils.sh
 
 BIN="./warp-plus"
 PORT=3000
 PROXY="socks5h://127.0.0.1:$PORT"
 CONF="engine.conf"
-UNIT="hiddify-warp.service"
+UNIT="watashi-warp.service"
 JOB="node.job"
 JOBLOG="node.job.log"
 NODE_KEYS="MODE COUNTRY IPV SCAN DNS TEST_URL"

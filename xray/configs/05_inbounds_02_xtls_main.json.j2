@@ -1,3 +1,4 @@
+{# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only) #}
 {
 	{% if 0 and hconfigs['vless_enable'] and hconfigs['xtls_enable'] %}
 		"inbounds": [
@@ -10,7 +11,7 @@
 				"decryption": "none",
 				"clients": [
 						{% for u in users %}
-							{"id": "{{ u['uuid'] }}", "email": "{{ u['uuid'] }}@hiddify.com","flow": "xtls-rprx-vision"},
+							{"id": "{{ u['uuid'] }}", "email": "{{ u['uuid'] }}@watashi.cyou","flow": "xtls-rprx-vision"},
 						{% endfor %}
 				],
 				"fallbacks": [
@@ -25,8 +26,8 @@
 					{
 						"alpn": "h2",
 						"dest": "@dispatcher_h2","xver": 2
-						//"dest":"/opt/hiddify-manager/nginx/run/h2.sock","xver": 2
-						//"dest":"/var/run/hiddify-caddy.sock","xver": 0
+						//"dest":"/opt/watashi-manager/nginx/run/h2.sock","xver": 2
+						//"dest":"/var/run/watashi-caddy.sock","xver": 0
 						//"dest":"1000", "xver": 0
 					},
 					{
@@ -45,11 +46,11 @@
 					"certificates": [
 					{%for d in domains if d['need_valid_ssl']%}
 						{"ocspStapling": 3600, 
-					{% if exec("[ -f /opt/hiddify-manager/ssl/"+d.domain[0:64]+".crt ]&& echo -n 'true' || echo -n 'false'")=='true' %}
-					"certificateFile": "/opt/hiddify-manager/ssl/{{d.domain[0:64]}}.crt", 
-					"keyFile": "/opt/hiddify-manager/ssl/{{d.domain[0:64]}}.crt.key",
+					{% if exec("[ -f /opt/watashi-manager/ssl/"+d.domain[0:64]+".crt ]&& echo -n 'true' || echo -n 'false'")=='true' %}
+					"certificateFile": "/opt/watashi-manager/ssl/{{d.domain[0:64]}}.crt", 
+					"keyFile": "/opt/watashi-manager/ssl/{{d.domain[0:64]}}.crt.key",
 					{%else %}
-					{%set cert=exec("ls /opt/hiddify-manager/ssl/*.crt | tail -1").strip()%}
+					{%set cert=exec("ls /opt/watashi-manager/ssl/*.crt | tail -1").strip()%}
 					"certificateFile": "{{cert}}",
 					"keyFile": "{{cert}}.key",
 					{%endif%}

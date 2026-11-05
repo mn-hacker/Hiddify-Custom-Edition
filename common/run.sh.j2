@@ -1,4 +1,5 @@
-source /opt/hiddify-manager/common/utils.sh
+{# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only) #}
+source /opt/watashi-manager/common/utils.sh
 
 if [ "$MODE" != "docker" ];then
   if [[ '{{hconfigs['country']}}' == 'cn' ]]; then
@@ -113,7 +114,7 @@ allow_port "tcp" {{port}} #panel ports
 # Check if PasswordAuthentication is enabled
 if ! grep -rxq "PasswordAuthentication.*no" /etc/ssh/sshd*; then
   chmod a+r /etc/ssh/sshd*
-  WARNING_MSG="Hiddify! Your server is vulnerable to abuses because PasswordAuthentication is enabled. To secure your server, please switch to key authentication mechanism and turn off PasswordAuthentication in your ssh config file."
+  WARNING_MSG="Watashi! Your server is vulnerable to abuses because PasswordAuthentication is enabled. To secure your server, please switch to key authentication mechanism and turn off PasswordAuthentication in your ssh config file."
   
   # watashi: v12.2.46 - not every image ships /etc/motd, and reading a
   # missing file printed "sed: can't read /etc/motd" during install.
@@ -206,15 +207,15 @@ save_firewall
 #add2iptables "INPUT -p tcp --dport 9000 -j DROP"
 #fi
 {% if hconfigs['auto_update'] %}
-echo "0 3 * * * root $(pwd)/../update.sh --no-gui --no-log" >/etc/cron.d/hiddify_auto_update
+echo "0 3 * * * root $(pwd)/../update.sh --no-gui --no-log" >/etc/cron.d/watashi_auto_update
 # watashi v12.2.109: the init script prints " * Reloading configuration files
 # for periodic command scheduler cron ...done." straight into the install box,
 # where a leading * on a line of its own looks like a warning. the reload is
-# quiet now and cannot abort an apply either; hiddify-panel/install.sh already
+# quiet now and cannot abort an apply either; watashi-panel/install.sh already
 # called it this way, so this only makes the rest of the tree consistent.
 service cron reload >/dev/null 2>&1 || true
 {%else%}
-rm -rf /etc/cron.d/hiddify_auto_update
+rm -rf /etc/cron.d/watashi_auto_update
 service cron reload >/dev/null 2>&1 || true
 {%endif%}
 
@@ -272,7 +273,7 @@ if [ "$MODE" != "docker" ]; then
 "
     done
     # kept so a reboot comes back in the same state as the panel switch
-    printf "%b" "$ws_v6_conf" >/etc/sysctl.d/hiddify-ipv6.conf
+    printf "%b" "$ws_v6_conf" >/etc/sysctl.d/watashi-ipv6.conf
 
 {% if not hconfigs['only_ipv4'] %}
     if [ "$ws_v6_was_off" = "1" ]; then

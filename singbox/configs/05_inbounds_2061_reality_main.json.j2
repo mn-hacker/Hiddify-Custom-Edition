@@ -1,3 +1,4 @@
+{# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only) #}
 
 {%set modes={'special_reality_tcp':'tcp','special_reality_grpc':'grpc'}%}
 {
@@ -18,12 +19,12 @@
 				   are gone from inbounds in sing-box 1.13.0+; 03_routing.json.j2 carries
 				   the sniff and resolve rule actions that replace them. #}
 								{% with flow="xtls-rprx-vision" if stream=='tcp' else "" %}
-					{% include '/opt/hiddify-manager/singbox/configs/common/protocols/'~protocol~'.pj2' %},
+					{% include '/opt/watashi-manager/singbox/configs/common/protocols/'~protocol~'.pj2' %},
 				{%endwith%}
 				"transport": {
 					{% if stream!='tcp' %}
 						{% with path=hconfigs['path_'~ protocol]~hconfigs['path_'~stream] %}
-                            {% include '/opt/hiddify-manager/singbox/configs/common/streams/'~stream~'.pj2' %},
+                            {% include '/opt/watashi-manager/singbox/configs/common/streams/'~stream~'.pj2' %},
                         {%endwith %}
 					{%endif%}
 				},

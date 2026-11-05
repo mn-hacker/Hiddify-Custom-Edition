@@ -1,3 +1,4 @@
+{# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only) #}
 # watashi v12.2.103: the mieru server is configured over its own socket.
 # This file is rendered to run.sh by common/jinja.py before it is run.
 #
@@ -20,12 +21,12 @@
 # 'unknown field "multiplexing"' - so the panel's mieru_multiplexing and
 # mieru_handshake keys belong in the client link, never in this file.
 
-source /opt/hiddify-manager/common/utils.sh
-cd /opt/hiddify-manager/other/mieru
+source /opt/watashi-manager/common/utils.sh
+cd /opt/watashi-manager/other/mieru
 
-MITA=/opt/hiddify-manager/other/mieru/mita
-export MITA_CONFIG_FILE=/opt/hiddify-manager/other/mieru/server.conf.pb
-export MITA_UDS_PATH=/opt/hiddify-manager/other/mieru/mita.sock
+MITA=/opt/watashi-manager/other/mieru/mita
+export MITA_CONFIG_FILE=/opt/watashi-manager/other/mieru/server.conf.pb
+export MITA_UDS_PATH=/opt/watashi-manager/other/mieru/mita.sock
 
 if [ ! -x "$MITA" ]; then
     echo "watashi: the mita binary is not on the disk, mieru was not started"
@@ -73,7 +74,7 @@ cat > server.json <<'WS_MITA_END'
 WS_MITA_END
 chmod 600 server.json
 
-mkdir -p /opt/hiddify-manager/log/system
+mkdir -p /opt/watashi-manager/log/system
 
 # watashi v12.2.114: the same account other/mieru/install.sh creates. An
 # apply on a box that was installed before this round runs here first, and
@@ -123,9 +124,9 @@ if [ "$ws_mita_ready" != "1" ]; then
     # was asked to look at.
     echo "watashi: the mita daemon did not answer on $MITA_UDS_PATH"
     echo "watashi: unit is $(systemctl is-active watashi-mita.service 2>/dev/null), enabled=$(systemctl is-enabled watashi-mita.service 2>/dev/null)"
-    if [ -s /opt/hiddify-manager/log/system/mieru.err.log ]; then
+    if [ -s /opt/watashi-manager/log/system/mieru.err.log ]; then
         echo "watashi: last lines of log/system/mieru.err.log:"
-        tail -5 /opt/hiddify-manager/log/system/mieru.err.log | sed 's/^/watashi:   /'
+        tail -5 /opt/watashi-manager/log/system/mieru.err.log | sed 's/^/watashi:   /'
     fi
     journalctl -u watashi-mita --no-pager -n 10 2>/dev/null | tail -10 | sed 's/^/watashi:   /'
     exit 0
@@ -154,8 +155,8 @@ if ! $MITA apply config server.json; then
     echo "watashi: mita refused the configuration, the running proxy was left alone"
     # watashi v12.2.113: the refusal reason is in mita's own log, so it is
     # copied into the apply log rather than left for a second round trip.
-    if [ -s /opt/hiddify-manager/log/system/mieru.err.log ]; then
-        tail -5 /opt/hiddify-manager/log/system/mieru.err.log | sed 's/^/watashi:   /'
+    if [ -s /opt/watashi-manager/log/system/mieru.err.log ]; then
+        tail -5 /opt/watashi-manager/log/system/mieru.err.log | sed 's/^/watashi:   /'
     fi
     exit 0
 fi

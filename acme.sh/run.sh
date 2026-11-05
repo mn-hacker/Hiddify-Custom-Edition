@@ -1,4 +1,5 @@
-source /opt/hiddify-manager/common/utils.sh
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
+source /opt/watashi-manager/common/utils.sh
 source ./cert_utils.sh
 
 # domains=$(cat ../current.json | jq -r '.domains[] | select(.mode | IN("direct", "cdn", "worker", "relay", "auto_cdn_ip", "old_xtls_direct", "sub_link_only")) | .domain')
@@ -61,7 +62,7 @@ wait
 #
 # A self signed certificate needs no authority at all, so it is simply
 # rewritten. Only a certificate from a real authority is reissued.
-ws_ec_marker=/opt/hiddify-manager/log/system/.watashi-ec-migrated
+ws_ec_marker=/opt/watashi-manager/log/system/.watashi-ec-migrated
 if [ ! -f "$ws_ec_marker" ] && [ "${WS_SKIP_EC_MIGRATION:-0}" != "1" ]; then
     echo "watashi: looking for rsa certificates left by an older build..."
     ws_ec_done=0
@@ -85,6 +86,6 @@ if [ ! -f "$ws_ec_marker" ] && [ "${WS_SKIP_EC_MIGRATION:-0}" != "1" ]; then
     date -u +%FT%TZ >"$ws_ec_marker"
 fi
 
-systemctl reload hiddify-haproxy 2>/dev/null || true
-systemctl reload hiddify-singbox 2>/dev/null || true
-# systemctl reload hiddify-xray
+systemctl reload watashi-haproxy 2>/dev/null || true
+systemctl reload watashi-singbox 2>/dev/null || true
+# systemctl reload watashi-xray

@@ -1,5 +1,6 @@
-source /opt/hiddify-manager/common/utils.sh
-source /opt/hiddify-manager/common/package_manager.sh
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
+source /opt/watashi-manager/common/utils.sh
+source /opt/watashi-manager/common/package_manager.sh
 
 mkdir -p host_key
 version="" #use specific version if needed otherwise it will use the latest

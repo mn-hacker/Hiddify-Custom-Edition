@@ -1,3 +1,4 @@
+{# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only) #}
 {
     "inbounds":[
         {# watashi v12.2.99: mieru was never part of upstream sing-box; only the
@@ -20,7 +21,7 @@
                     {# watashi v12.2.99: sniff, sniff_override_destination and domain_strategy
                        are gone from inbounds in sing-box 1.13.0+; 03_routing.json.j2 carries
                        the sniff and resolve rule actions that replace them. #}
-                    {% include '/opt/hiddify-manager/singbox/configs/common/protocols/mieru.pj2' %},
+                    {% include '/opt/watashi-manager/singbox/configs/common/protocols/mieru.pj2' %},
                     "portBindings": [ { "port": {{ ports[0] }}, "protocol": "TCP" } ]
                 },    
             
@@ -31,7 +32,7 @@
                     {# watashi v12.2.99: sniff, sniff_override_destination and domain_strategy
                        are gone from inbounds in sing-box 1.13.0+; 03_routing.json.j2 carries
                        the sniff and resolve rule actions that replace them. #}
-                    {% include '/opt/hiddify-manager/singbox/configs/common/protocols/mieru.pj2' %},
+                    {% include '/opt/watashi-manager/singbox/configs/common/protocols/mieru.pj2' %},
                     "portBindings": [ { "port": {{ udp_ports[0] }}, "protocol": "UDP" } ]
                 },    
             

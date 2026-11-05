@@ -1,4 +1,5 @@
-#!/opt/hiddify-manager/.venv313/bin/python
+#!/opt/watashi-manager/.venv313/bin/python
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 # watashi v12.2.130bh: round bf read the WARP IPv4/IPv6 setting here and locked the
 # outbound to one family. WARP went back to the v12.2.130.49 version, which
 # has no such setting, so this file is the plain one again.
@@ -49,7 +50,7 @@ from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 import traceback
 from urllib.parse import quote
 
-with open("/opt/hiddify-manager/current.json") as f:
+with open("/opt/watashi-manager/current.json") as f:
     configs = json.load(f)
     configs["chconfigs"] = {int(k): v for k, v in configs["chconfigs"].items()}
     configs["hconfigs"] = configs["chconfigs"][0]
@@ -73,7 +74,7 @@ def b64encode(s):
         s = s.encode("utf-8")
     return base64.b64encode(s).decode("utf-8")
 
-env_paths = ["/", "/opt/hiddify-manager/singbox/configs/"]
+env_paths = ["/", "/opt/watashi-manager/singbox/configs/"]
 env = Environment(loader=FileSystemLoader(env_paths))
 def render(template_path):
     try:
@@ -126,8 +127,8 @@ def render_j2_templates(*start_paths):
 
     # Dirs to ignore from Jinja2 rendering
     exclude_dirs = [
-        "/opt/hiddify-manager/.venv",
-        "/opt/hiddify-manager/hiddify-panel/src/",
+        "/opt/watashi-manager/.venv",
+        "/opt/watashi-manager/watashi-panel/src/",
     ]
 
     # Collect all the template paths to render
@@ -147,7 +148,7 @@ def render_j2_templates(*start_paths):
     # for t in templates_to_render:
     #     render(t)
 
-start_path = "/opt/hiddify-manager/"
+start_path = "/opt/watashi-manager/"
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "apply_users":
         # watashi v12.2.62: other/amnezia belongs on this list. apply_users is

@@ -1,5 +1,6 @@
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 # bash download_wgcf.sh
-source /opt/hiddify-manager/common/package_manager.sh
+source /opt/watashi-manager/common/package_manager.sh
 install_package wireguard-tools
 download_package wgcf wgcf
 if [ "$?" == "0"  ] || ! is_installed ./wgcf; then

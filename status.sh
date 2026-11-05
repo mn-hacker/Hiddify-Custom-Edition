@@ -1,4 +1,5 @@
 #!/bin/bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 cd $( dirname -- "$0"; )
 source ./common/utils.sh
 
@@ -13,7 +14,7 @@ function main(){
     # SINGBOX_NEW_CONFIG_ERROR=$?
     
     
-    # systemctl status --no-pager hiddify-nginx hiddify-xray hiddify-singbox hiddify-haproxy|cat
+    # systemctl status --no-pager watashi-nginx watashi-xray watashi-singbox watashi-haproxy|cat
     
     if [[ $(hconfig "warp_mode") != "disable" ]];then
         echo -e "\n----------------------------------------------------------------"

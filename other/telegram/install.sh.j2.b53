@@ -1,3 +1,0 @@
-bash disable.sh
-
-cd tgo && bash install.sh

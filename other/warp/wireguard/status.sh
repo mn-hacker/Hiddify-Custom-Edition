@@ -1,5 +1,6 @@
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 cd $( dirname -- "$0"; )
-source /opt/hiddify-manager/common/utils.sh
+source /opt/watashi-manager/common/utils.sh
 
 function main(){
 

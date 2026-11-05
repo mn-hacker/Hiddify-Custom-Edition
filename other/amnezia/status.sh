@@ -1,3 +1,4 @@
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 # watashi: the separate AmneziaWG system v12.2.62
 # watashi v12.2.130an: the panel could say the unit was running and nothing more.
 # Every question that matters when a handshake never arrives is asked
@@ -9,7 +10,7 @@
 cd "$(dirname "$0")" || exit 0
 source ./awg_utils.sh
 
-LOG=/opt/hiddify-manager/log/system/amnezia-status.log
+LOG=/opt/watashi-manager/log/system/amnezia-status.log
 mkdir -p "$(dirname "$LOG")" >/dev/null 2>&1
 
 say() { echo "$*"; echo "$*" >>"$LOG" 2>/dev/null || true; }

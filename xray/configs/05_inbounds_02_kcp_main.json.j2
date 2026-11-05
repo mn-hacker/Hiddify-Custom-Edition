@@ -1,3 +1,4 @@
+{# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only) #}
 {
     {% if hconfigs['vless_enable'] and hconfigs['kcp_enable'] %}
         "inbounds": [
@@ -9,7 +10,7 @@
                 "settings": {
                 "clients": [
                 {% for u in users %}
-                    {"id": "{{ u['uuid'] }}", "email": "{{ u['uuid'] }}@hiddify.com"},
+                    {"id": "{{ u['uuid'] }}", "email": "{{ u['uuid'] }}@watashi.cyou"},
                 {% endfor %}
                 ],
                 "decryption": "none",

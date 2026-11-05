@@ -1,3 +1,4 @@
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 
 # --- Watashi v12.2.70 : a brand new box very often starts with no TERM at
 # all, and the skin switched itself off in that case, so the very first
@@ -9,9 +10,9 @@ if [ -t 1 ]; then
     esac
 fi
 # --- Watashi v12.2.37 : one skin for every box the terminal draws ---
-# watashi v12.2.130i: on a bare server this file runs from /tmp/hiddify, so the
+# watashi v12.2.130i: on a bare server this file runs from /tmp/watashi, so the
 # skin is looked for there as well instead of only in the installed folder.
-WS_TUI_CANDIDATES="/opt/hiddify-manager/common/watashi_tui.sh $(dirname "${BASH_SOURCE[0]}")/watashi_tui.sh /tmp/hiddify/watashi_tui.sh"
+WS_TUI_CANDIDATES="/opt/watashi-manager/common/watashi_tui.sh $(dirname "${BASH_SOURCE[0]}")/watashi_tui.sh /tmp/watashi/watashi_tui.sh"
 WS_TUI_FILE=""
 for ws_cand in $WS_TUI_CANDIDATES; do
     if [ -f "$ws_cand" ]; then
@@ -23,15 +24,13 @@ export WS_TUI_FILE
 if [ -f "$WS_TUI_FILE" ]; then
     source "$WS_TUI_FILE"
 fi
-export venv_path="/opt/hiddify-manager/.venv313"
+export venv_path="/opt/watashi-manager/.venv313"
 
 function get_commit_version() {
     json_data=$(curl -sL -H "Accept: application/json" "https://github.com/mn-hacker/$1/commits/main.atom")
     latest_commit_date=$(echo "$json_data" | jq -r '.payload.commitGroups[0].commits[0].committedDate')
-    # xml_data=$(curl -sl "https://github.com/hiddify/$1/commits/main.atom")
-    # latest_commit_date=$(echo "$xml_data" | grep -m 1 '<updated>' | awk -F'>|<' '{print $3}')
-    # COMMIT_URL=$(curl -s https://api.github.com/repos/hiddify/$1/git/refs/heads/main | jq -r .object.url)
-    # latest_commit_date=$(curl -s $COMMIT_URL | jq -r .committer.date)
+    # watashi v12.3.40dev: four commented-out lines that read the commit date
+    # from the old upstream account were removed; nothing used them.
     echo "${latest_commit_date:5:11}"
 }
 
@@ -105,20 +104,20 @@ function get_release_version() {
     echo ${VERSION:-""}
 }
 
-function hiddifypanel_path() {
+function watashipanel_path() {
     activate_python_venv
-    /opt/hiddify-manager/.venv313/bin/python -c "import os,hiddifypanel;print(os.path.dirname(hiddifypanel.__file__),end='')" 2>&1 || echo "panel is not installed yet."
+    /opt/watashi-manager/.venv313/bin/python -c "import os,watashipanel;print(os.path.dirname(watashipanel.__file__),end='')" 2>&1 || echo "panel is not installed yet."
 }
 function get_installed_panel_version() {
     activate_python_venv
-    version=$(cat "$(hiddifypanel_path)/VERSION" 2>/dev/null)
+    version=$(cat "$(watashipanel_path)/VERSION" 2>/dev/null)
     if [ -z "$version" ]; then
         version="-"
     fi
     echo $version
 }
 function get_installed_config_version() {
-    version=$(cat /opt/hiddify-manager/VERSION 2>/dev/null)
+    version=$(cat /opt/watashi-manager/VERSION 2>/dev/null)
 
     if [ -z "$version" ]; then
         version="-"
@@ -300,7 +299,7 @@ function is_installed_package() {
 # System Resource Management
 # ============================================================
 
-APT_LOCK_FILE="/tmp/hiddify_apt.lock"
+APT_LOCK_FILE="/tmp/watashi_apt.lock"
 # watashi v12.3.31b: the swap used to be a fixed 2G for anything under 2048MB
 # of RAM. The size now follows the RAM (rounded to the nearest GB, since a
 # "2GB" box reports ~1950MB): 1GB or less gets 2GB, 2/3/4GB get the same
@@ -495,7 +494,7 @@ function is_installed() {
     return 0
 }
 
-function msg_with_hiddify() {
+function msg_with_watashi() {
     # the name stays on purpose, six places in the tree call it
     if declare -F ws_sign >/dev/null 2>&1; then
         case "$1" in
@@ -563,7 +562,7 @@ function install_python() {
 }
 function create_python_venv() {
     if [ "${USE_VENV}" = "310" ]; then
-        export venv_path="/opt/hiddify-manager/.venv/"
+        export venv_path="/opt/watashi-manager/.venv/"
         if [ ! -d "$venv_path" ]; then
             install_package python3.10-venv
             python3.10 -m venv "$venv_path"
@@ -583,7 +582,7 @@ function activate_python_venv() {
     create_python_venv
     if [ -z "$VIRTUAL_ENV" ]; then
         if [ "${USE_VENV}" = "310" ]; then
-            export venv_path="/opt/hiddify-manager/.venv"    
+            export venv_path="/opt/watashi-manager/.venv"    
         fi
         source "${venv_path}/bin/activate"
     fi
@@ -598,8 +597,8 @@ function install_python310() {
     export USE_VENV=310
     # region install python3.10 system-widely
     rm -rf /usr/lib/python3/dist-packages/blinker*
-    if ! is_installed /opt/hiddify-manager/.venv/bin/python3.10 ;then
-        rm -rf /opt/hiddify-manager/.venv/
+    if ! is_installed /opt/watashi-manager/.venv/bin/python3.10 ;then
+        rm -rf /opt/watashi-manager/.venv/
     fi
     if ! python3.10 --version &>/dev/null; then
         echo "Python 3.10 is not installed. "
@@ -626,7 +625,7 @@ function install_python310() {
     # endregion
 
 }
-function check_hiddify_panel() {
+function check_watashi_panel() {
     if [ "$MODE" != "apply_users" ]; then
         reload_all_configs >/dev/null
         
@@ -637,20 +636,20 @@ function check_hiddify_panel() {
         fi
         echo -e "\n\n"
 
-        bash /opt/hiddify-manager/status.sh
-        bash /opt/hiddify-manager/common/logo.ico
+        bash /opt/watashi-manager/status.sh
+        bash /opt/watashi-manager/common/logo.ico
 
         install_package qrencode
         # watashi: clean slate for the QR
         printf '\033[0m'
-        center_text "$(qrencode -t utf8 -m 2 $(cat /opt/hiddify-manager/current.json | jq -r '.panel_links[]' | tail -n 1))"
+        center_text "$(qrencode -t utf8 -m 2 $(cat /opt/watashi-manager/current.json | jq -r '.panel_links[]' | tail -n 1))"
         echo ""
         # watashi v12.2.84: the mark is drawn just above, one name is enough
         center_text $'\t\033[92mFinished! The panel is up and breathing.\033[0m'
         
         echo -e "\n"
         echo "Please open the following link in the browser for client setup:"
-        cat /opt/hiddify-manager/current.json | jq -r '.panel_links[]' | while read -r link; do
+        cat /opt/watashi-manager/current.json | jq -r '.panel_links[]' | while read -r link; do
             if [[ $link == http://* ]]; then
                 link="[insecure] $link"
                 error "  $link"
@@ -664,10 +663,10 @@ function check_hiddify_panel() {
 
         done
 
-        # (cd hiddify-panel && python3 -m hiddifypanel admin-links)
+        # (cd watashi-panel && python3 -m watashipanel admin-links)
         
-        for s in hiddify-xray hiddify-singbox hiddify-nginx hiddify-haproxy mysql; do
-            [ $s == "hiddify-xray" ] && [ "$(hconfig 'core_type')" != "xray" ] && continue
+        for s in watashi-xray watashi-singbox watashi-nginx watashi-haproxy mysql; do
+            [ $s == "watashi-xray" ] && [ "$(hconfig 'core_type')" != "xray" ] && continue
             s=${s##*/}
             s=${s%%.*}
             for i in $(seq 1 10); do
@@ -677,7 +676,7 @@ function check_hiddify_panel() {
                     if [ $i -eq 10 ]; then
                         error "important service $s is not activated after 10 seconds"
                         error "Installation Failed!"
-                        echo "32" >/opt/hiddify-manager/log/error.lock
+                        echo "32" >/opt/watashi-manager/log/error.lock
                         exit 32
                     fi
                     warning "an important service $s is not activating yet"
@@ -1013,7 +1012,7 @@ function show_progress_window() {
 
 
 function log_dir() {
-    LOG_DIR="/opt/hiddify-manager/log/system"
+    LOG_DIR="/opt/watashi-manager/log/system"
     mkdir -p "$LOG_DIR" >/dev/null 2>&1
     echo $LOG_DIR
 }
@@ -1023,7 +1022,7 @@ function log_file() {
 }
 
 function set_lock() {
-    LOCK_DIR="/opt/hiddify-manager/log"
+    LOCK_DIR="/opt/watashi-manager/log"
     mkdir -p "$LOCK_DIR" >/dev/null 2>&1
     LOCK_FILE=$LOCK_DIR/$1.lock
     if [[ -f $LOCK_FILE && $(($(date +%s) - $(cat $LOCK_FILE))) -lt 120 ]]; then
@@ -1034,14 +1033,14 @@ function set_lock() {
 }
 
 function remove_lock() {
-    LOCK_DIR="/opt/hiddify-manager/log"
+    LOCK_DIR="/opt/watashi-manager/log"
     LOCK_FILE=$LOCK_DIR/$1.lock
     rm -f $LOCK_FILE >/dev/null 2>&1
 }
 
 
 function hconfig() {
-    local json_file="/opt/hiddify-manager/current.json"
+    local json_file="/opt/watashi-manager/current.json"
     local key=$1
     local default_value=${2:-""}
     
@@ -1064,22 +1063,22 @@ function hconfig() {
     return 0
 }
 #TODO: check functionality when not using the venv
-function hiddify-panel-run() {
+function watashi-panel-run() {
     local user=$(whoami)
-    local base_command="cd /opt/hiddify-manager/hiddify-panel/; source ${venv_path}/bin/activate && $@"
+    local base_command="cd /opt/watashi-manager/watashi-panel/; source ${venv_path}/bin/activate && $@"
     local command=""
 
-    if [ "$user" == "hiddify-panel" ]; then
+    if [ "$user" == "watashi-panel" ]; then
         command="$base_command"
     else
-        command="su hiddify-panel -c \"$base_command\""
+        command="su watashi-panel -c \"$base_command\""
     fi
 
     eval "$command"
 }
 
-function hiddify-panel-cli() {
-  hiddify-panel-run "python3 -m hiddifypanel $*"
+function watashi-panel-cli() {
+  watashi-panel-run "python3 -m watashipanel $*"
 }
 # region installer utils
 function checkOS() {
@@ -1119,19 +1118,19 @@ function disable_panel_services() {
     echo "Stopping panel services for update..."
     
     # Stop panel services
-    systemctl stop hiddify-panel.service 2>/dev/null || true
-    systemctl stop hiddify-panel-background-tasks.service 2>/dev/null || true
+    systemctl stop watashi-panel.service 2>/dev/null || true
+    systemctl stop watashi-panel-background-tasks.service 2>/dev/null || true
     
     # Kill any remaining panel processes
-    pkill -9 -f 'hiddifypanel' 2>/dev/null || true
-    pkill -9 -f 'gunicorn.*hiddify' 2>/dev/null || true
+    pkill -9 -f 'watashipanel' 2>/dev/null || true
+    pkill -9 -f 'gunicorn.*watashi' 2>/dev/null || true
     
     # Clear Python bytecode cache to ensure new code is loaded
-    find /opt/hiddify-manager/.venv313/lib -name "*.pyc" -delete 2>/dev/null || true
-    find /opt/hiddify-manager/.venv313/lib -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+    find /opt/watashi-manager/.venv313/lib -name "*.pyc" -delete 2>/dev/null || true
+    find /opt/watashi-manager/.venv313/lib -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
     
-    # Clear uv/pip cache for hiddifypanel to force fresh download
-    rm -rf /root/.cache/uv/wheels/*hiddifypanel* 2>/dev/null || true
+    # Clear uv/pip cache for watashipanel to force fresh download
+    rm -rf /root/.cache/uv/wheels/*watashipanel* 2>/dev/null || true
     
     echo "Panel services stopped and cache cleared"
 }
@@ -1208,9 +1207,9 @@ function check_venv_compatibility() {
     esac
 }
 
-function hiddify-http-api(){
-    api_path=$(jq -r '.api_path' /opt/hiddify-manager/current.json)
-    api_key=$(jq -r '.api_key' /opt/hiddify-manager/current.json)
+function watashi-http-api(){
+    api_path=$(jq -r '.api_path' /opt/watashi-manager/current.json)
+    api_key=$(jq -r '.api_key' /opt/watashi-manager/current.json)
     
 
     if [ -z "$api_path" ] || [ -z "$api_key" ]; then
@@ -1218,7 +1217,7 @@ function hiddify-http-api(){
         return 1
     fi
     temp_file=$(mktemp)
-    http_status=$(curl -s -o $temp_file -w "%{http_code}" http://localhost:9000/${api_path}/api/v2/$1 --header "Hiddify-API-Key: ${api_key}")
+    http_status=$(curl -s -o $temp_file -w "%{http_code}" http://localhost:9000/${api_path}/api/v2/$1 --header "Watashi-API-Key: ${api_key}")
     cat $temp_file
     rm $temp_file
     if [ "$http_status" -ne 200 ];then
@@ -1231,7 +1230,7 @@ function hiddify-http-api(){
 }
 
 function reload_all_configs(){
-    # watashi v12.2.130bi: "hiddify-http-api ... > current.json" made bash
+    # watashi v12.2.130bi: "watashi-http-api ... > current.json" made bash
     # truncate current.json before the function ran, and the very first thing
     # that function does is read the api path and the api key out of that same
     # file. So the fast API path could never succeed: it always read an empty
@@ -1246,14 +1245,14 @@ function reload_all_configs(){
     # could explain the failure - the panel's own traceback - was destroyed,
     # and then the message asked the owner to keep a log that did not exist.
     # Two real faults hid behind this for a whole release.
-    local target=/opt/hiddify-manager/current.json
-    local errlog=/opt/hiddify-manager/log/system/panel-configs.err.log
+    local target=/opt/watashi-manager/current.json
+    local errlog=/opt/watashi-manager/log/system/panel-configs.err.log
     local tmp
     mkdir -p "$(dirname "$errlog")" 2>/dev/null
     : >"$errlog" 2>/dev/null
     tmp=$(mktemp /tmp/watashi-current.XXXXXX) || return 1
-    if ! hiddify-http-api admin/all-configs/ >"$tmp" 2>>"$errlog" || ! jq -e '.users' "$tmp" >/dev/null 2>&1; then
-        if ! hiddify-panel-cli all-configs >"$tmp" 2>>"$errlog" || ! jq -e '.users' "$tmp" >/dev/null 2>&1; then
+    if ! watashi-http-api admin/all-configs/ >"$tmp" 2>>"$errlog" || ! jq -e '.users' "$tmp" >/dev/null 2>&1; then
+        if ! watashi-panel-cli all-configs >"$tmp" 2>>"$errlog" || ! jq -e '.users' "$tmp" >/dev/null 2>&1; then
             echo "watashi: the panel returned no usable configuration, so $target was left untouched" >&2
             echo "watashi: this is what the panel said, the whole of it is in $errlog" >&2
             tail -n 30 "$errlog" >&2
@@ -1269,21 +1268,21 @@ function reload_all_configs(){
 
 
 
-set_files_in_folder_readable_to_hiddify_common_group() {
+set_files_in_folder_readable_to_watashi_common_group() {
     # Ensure paths with spaces or special characters are handled correctly
     file=$1
     find "$file" -type d -exec chmod u+rx,g+rx,o-rwx {} \;  # Directories get rwx for owner, rw- for group
     find "$file" -type f -exec chmod 640 {} \;  # Files get rw- for owner and group
-    find "$file" -exec chown :hiddify-common {} \;
-    # Handle parent directories if the parent is not "hiddify-manager"
+    find "$file" -exec chown :watashi-common {} \;
+    # Handle parent directories if the parent is not "watashi-manager"
     # Resolve the absolute path of the input
     
     parent=$(realpath "$file")
 
-    while [[ $(basename "$parent") != "hiddify-manager" && "$parent" != "/" ]]; do
+    while [[ $(basename "$parent") != "watashi-manager" && "$parent" != "/" ]]; do
         echo "Setting permissions on $parent"
         chmod u+rx,g+rx "$parent"  # Set permissions on the parent
-        chown :hiddify-common "$parent"  # Change ownership to the group
+        chown :watashi-common "$parent"  # Change ownership to the group
         parent=$(dirname "$parent")  # Move to the next parent directory
     done
 }
@@ -1338,7 +1337,7 @@ function get_public_ipv6() {
 # "sqlalchemy<3.0.0" with 2.1, which deleted orm.attributes.ScalarAttributeImpl,
 # that leftover copy broke - and flask-admin imports it under "except
 # ImportError", which does not catch an AttributeError. The panel then could not
-# be imported at all and hiddify-panel.service spun in a restart loop.
+# be imported at all and watashi-panel.service spun in a restart loop.
 #
 # pyproject now pins sqlalchemy below 2.1, which is the real fix. This is the
 # second layer, for the day something else drags 2.1 back in: a package the
@@ -1408,8 +1407,8 @@ sys.exit(0)
 # reports a restart or a non-active state with the tail of its error log.
 # It only warns, an install must never fail because of it.
 function ws_check_background_tasks() {
-    local unit=hiddify-panel-background-tasks
-    local err=/opt/hiddify-manager/log/system/hiddify_panel_background_tasks.err.log
+    local unit=watashi-panel-background-tasks
+    local err=/opt/watashi-manager/log/system/watashi_panel_background_tasks.err.log
     systemctl is-enabled $unit >/dev/null 2>&1 || return 0
     local before=$(systemctl show $unit -p NRestarts --value 2>/dev/null)
     sleep "${1:-20}"
@@ -1424,51 +1423,26 @@ function ws_check_background_tasks() {
     return 0
 }
 
-# watashi v12.2.130ch: every server that upgrades still carries the retired
-# hiddify-cli service, its unit file, its folder and its user. systemd keeps
-# restarting a unit nobody ships any more, so it is stopped and removed here,
-# once, and a stamp keeps the next upgrade quiet. Everything is guarded: a
-# server that never had it simply writes the stamp and moves on. WS_ROOT,
-# WS_SYSTEMD_DIR and WS_SYSTEMD_LIB exist so the round CH test can drive this
+# watashi v12.2.130ch: panel files a newer release stopped shipping, removed by
+# ws_drop_retired_templates below. WS_ROOT exists so a test can drive it
 # against a throwaway tree instead of the real machine.
+# watashi v12.3.40dev: ws_retire_watashi_cli is gone. The rename turned it
+# into a search for a service that never existed under the new name; the old
+# CLI service, its unit, folder and account are retired by
+# common/watashi_legacy.sh migrate, under the name they really had.
 WS_RETIRED_TEMPLATES="templates/a.html templates/fake.html templates/static.html templates/lte-master.html templates/master.html templates/admin-layout.html templates/flaskadmin-layout.html templates/donation.html templates/macros.html templates/admin.ht.old templates/admin-layout.html.b51 panel/commercial/templates/configc.html panel/commercial/templates/parent_dash.html panel/user/templates/new.html panel/user/templates/redirect_to_new_format.html panel/user/templates/home panel/admin/ProxyStatsAdmin.py panel/admin/templates/proxy_stats.html"
-
-function ws_retire_hiddify_cli() {
-    local root="${WS_ROOT:-/opt/hiddify-manager}"
-    local stamp="$root/log/system/.watashi-cli-retired"
-    [ -f "$stamp" ] && return 0
-    local did=0
-    if systemctl list-unit-files 2>/dev/null | grep -q '^hiddify-cli\.service'; then
-        systemctl stop hiddify-cli 2>/dev/null || true
-        systemctl disable hiddify-cli 2>/dev/null || true
-        did=1
-    fi
-    rm -f "${WS_SYSTEMD_DIR:-/etc/systemd/system}/hiddify-cli.service" \
-          "${WS_SYSTEMD_LIB:-/lib/systemd/system}/hiddify-cli.service" 2>/dev/null
-    systemctl daemon-reload 2>/dev/null || true
-    systemctl reset-failed hiddify-cli 2>/dev/null || true
-    if [ -d "$root/other/hiddify-cli" ]; then
-        rm -rf "$root/other/hiddify-cli"
-        did=1
-    fi
-    id hiddify-cli >/dev/null 2>&1 && userdel hiddify-cli 2>/dev/null
-    mkdir -p "$(dirname "$stamp")" 2>/dev/null
-    date -u +%FT%TZ >"$stamp" 2>/dev/null
-    [ "$did" = 1 ] && echo "watashi: the hiddify-cli service was retired and removed"
-    return 0
-}
 
 # watashi v12.2.130ch: pip installs the panel package but never deletes a file a
 # newer release stopped shipping, so the old flask-admin layouts would sit in
 # site-packages forever. They are named here and removed from wherever the
 # panel actually lives.
 function ws_drop_retired_templates() {
-    local root="${WS_ROOT:-/opt/hiddify-manager}" base gone=0 f where
+    local root="${WS_ROOT:-/opt/watashi-manager}" base gone=0 f where
     # two places carry the same files: the installed package, and the source
     # tree the next upgrade installs from. Cleaning only the first would let
     # the very next update put every retired file straight back.
-    base=$(python -c 'import os,hiddifypanel;print(os.path.dirname(hiddifypanel.__file__))' 2>/dev/null)
-    for where in "$base" "$root/hiddify-panel/src/hiddifypanel"; do
+    base=$(python -c 'import os,watashipanel;print(os.path.dirname(watashipanel.__file__))' 2>/dev/null)
+    for where in "$base" "$root/watashi-panel/src/watashipanel"; do
         [ -n "$where" ] && [ -d "$where" ] || continue
         for f in $WS_RETIRED_TEMPLATES; do
             if [ -e "$where/$f" ]; then
@@ -1476,16 +1450,34 @@ function ws_drop_retired_templates() {
             fi
         done
     done
-    [ -e "$root/other/hiddify-cli" ] && rm -rf "$root/other/hiddify-cli" && gone=$((gone + 1))
     [ "$gone" -gt 0 ] && echo "watashi: $gone retired files were removed"
     return 0
 }
 
+# watashi v12.3.40dev: right after a server is moved over from the old name,
+# the panel folder can still hold the previous release's source under the new
+# path, with a pyproject that builds a package of the old name. Installing that
+# would put the wrong package into the venv and leave watashipanel missing, so
+# the source has to say it is ours before anything is installed from it.
+function ws_panel_source_ok() {
+    local src="${1:-/opt/watashi-manager/watashi-panel/src}"
+    [ -f "$src/pyproject.toml" ] || return 1
+    grep -Eq '^name[[:space:]]*=[[:space:]]*"watashipanel"' "$src/pyproject.toml" || return 1
+    [ -f "$src/watashipanel/__init__.py" ] || return 1
+    return 0
+}
+
 function ws_install_panel_from_source() {
-    local src="${1:-/opt/hiddify-manager/hiddify-panel/src}"
+    local src="${1:-/opt/watashi-manager/watashi-panel/src}"
     if [ ! -f "$src/pyproject.toml" ] && [ ! -f "$src/setup.py" ]; then
         echo "watashi: no panel source at $src, leaving the panel alone"
         return 1
+    fi
+    # watashi v12.3.40dev: 2 means "not yet", the new source arrives later in
+    # this run and is installed then (see ws_panel_source_ok above).
+    if ! ws_panel_source_ok "$src"; then
+        echo "watashi: the panel source at $src is from before the rename, it is installed once the new files are unpacked"
+        return 2
     fi
     activate_python_venv 2>/dev/null || true
     if command -v uv >/dev/null 2>&1; then
@@ -1497,10 +1489,9 @@ function ws_install_panel_from_source() {
     fi
     ws_heal_sqlalchemy_utils
     ws_heal_celery_redis
-    ws_retire_hiddify_cli
     ws_drop_retired_templates
-    python -c "import hiddifypanel" >/dev/null 2>&1 \
-        || { echo "watashi: the panel was installed but cannot be imported"; python -c "import hiddifypanel" 2>&1 | tail -n 25; return 1; }
+    python -c "import watashipanel" >/dev/null 2>&1 \
+        || { echo "watashi: the panel was installed but cannot be imported"; python -c "import watashipanel" 2>&1 | tail -n 25; return 1; }
     echo "watashi: the panel was installed from $src"
 }
 
@@ -1509,19 +1500,19 @@ function ws_install_panel_from_source() {
 # very same range as net.ipv4.ip_local_port_range, so an outgoing connection
 # of apt, curl or acme.sh can be sitting on a service port at the exact
 # moment a core starts. That is how a clean install ended with
-# hiddify-singbox failed on "listen tcp 0.0.0.0:15118: bind: address already
+# watashi-singbox failed on "listen tcp 0.0.0.0:15118: bind: address already
 # in use" while nothing held that port a second later. The ports we listen on
 # are handed to net.ipv4.ip_local_reserved_ports, the knob that takes them
 # out of the ephemeral pool, so the kernel can never lend one out again.
 function ws_reserve_ports() {
-    local ports list file="/etc/sysctl.d/hiddify-reserved.conf" count
+    local ports list file="/etc/sysctl.d/watashi-reserved.conf" count
     ports=$(printf '%s\n' $WS_RESERVED | grep -E '^[0-9]+$' | awk '$1 > 1024 && $1 < 65536' | sort -n -u)
     [ -n "$ports" ] || return 0
     list=$(printf '%s,' $ports)
     list=${list%,}
     count=$(printf '%s\n' $ports | wc -l)
     if [ ! -f "$file" ] || ! grep -qx "net.ipv4.ip_local_reserved_ports = $list" "$file"; then
-        printf '# written by hiddify-manager, watashi v12.2.130bz. do not edit by hand.\nnet.ipv4.ip_local_reserved_ports = %s\n' "$list" >"$file"
+        printf '# written by watashi-manager, watashi v12.2.130bz. do not edit by hand.\nnet.ipv4.ip_local_reserved_ports = %s\n' "$list" >"$file"
         echo "watashi: $count service ports were taken out of the ephemeral range"
     fi
     sysctl -q -w "net.ipv4.ip_local_reserved_ports=$list" 2>/dev/null || true

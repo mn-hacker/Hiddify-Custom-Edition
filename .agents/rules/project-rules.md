@@ -1,6 +1,7 @@
 ---
 trigger: always_on
 ---
+<!-- watashi v12.3.40dev: paths, repositories and the push folder follow the project rename (watashi-panel, watashipanel, Watashi-Manager, watashi-panel repo) -->
 
 # 📜 قوانین پروژه Watashi Manager
 
@@ -11,10 +12,10 @@ trigger: always_on
 ## قانون اول: به‌روزرسانی نسخه (Version Bump)
 هنگام تغییر نسخه پنل (چه بتا و چه ریلیز)، حتماً باید **۴ فایل زیر هم‌زمان** آپدیت شوند و دقیقاً همان خط مربوطه تغییر کند:
 1. `VERSION` (در روت اصلی یا مسیر مربوطه)
-2. `hiddifypanel/VERSION` (در مسیر `hiddify-panel/src/hiddifypanel/VERSION`)
-3. `hiddify-panel/src/hiddifypanel/VERSION.py` 
+2. `watashipanel/VERSION` (در مسیر `watashi-panel/src/watashipanel/VERSION`)
+3. `watashi-panel/src/watashipanel/VERSION.py` 
    - *نکته مهم:* در این فایل علاوه بر تغییر شماره نسخه، باید تاریخ و ساعت ریلیز (`__release_date__` و `__release_time__`) نیز به‌روزرسانی شود.
-4. `pyproject.toml` (در مسیر `hiddify-panel/src/pyproject.toml`)
+4. `pyproject.toml` (در مسیر `watashi-panel/src/pyproject.toml`)
 
 ---
 
@@ -28,10 +29,11 @@ trigger: always_on
 
 ## قانون سوم: مخازن گیتهاب (Repositories)
 تمام مخازن گیتهاب مربوط به این پروژه متعلق به اکانت `mn-hacker` هستند. من همیشه باید از این مسیرها استفاده کنم:
-- **پروژه اصلی (نسخه‌ها و بتاها اینجا ساخته می‌شوند):** `https://github.com/mn-hacker/Hiddify-Custom-Edition`
-- **ساب‌ماژول پنل:** `https://github.com/mn-hacker/hiddifypanel`
-- **کاستوم سینگ‌باکس:** `https://github.com/mn-hacker/Hiddify-Custom-SingBox`
-- **سایر پروژه‌های مرتبط:** `Hiddify-Custom-Core`، `ray2sing` و `tailscale` روی همین اکانت.
+- **پروژه اصلی (نسخه‌ها و بتاها اینجا ساخته می‌شوند):** `https://github.com/mn-hacker/Watashi-Manager`
+- **ساب‌ماژول پنل (مسیر `watashi-panel/src`، برنچ `dev`):** `https://github.com/mn-hacker/watashi-panel`
+- **کاستوم سینگ‌باکس:** `https://github.com/mn-hacker/Watashi-Custom-SingBox`
+- **وارپ:** `https://github.com/mn-hacker/Watashi-Warp`
+- **سایر پروژه‌های مرتبط:** `ray2sing`، `tailscale`، `watashi-app` و `Watashi-AmneziaWG-go` روی همین اکانت.
 
 ---
 
@@ -40,7 +42,7 @@ trigger: always_on
 
 ```powershell
 # مرحله ۱: پوش ساب‌ماژول پنل
-cd d:\Downloads\Watashi-Manager\hiddify-panel\src
+cd d:\Downloads\Watashi-Manager\watashi-panel\src
 git add -A
 git commit -m "نسخه و توضیحات"
 git push origin dev
@@ -62,11 +64,11 @@ git push origin v0.0.0b
 ## قانون پنجم: ترجمه‌ها (Translations)
 تغییرات مربوط به زبان‌ها باید با دقت کامل در فایل‌های زیر انجام شوند:
 
-1. **فایل‌های JSON (۷ فایل در `translations.i18n/*.json`):**
+1. **فایل‌های JSON (در `translations.i18n/*.json`؛ الان ۴ فایل: en, fa, ru, zh):**
    - دارای `description` و `label`.
    - کلیدها همیشه باید به ترتیب الفبایی باشند.
 
-2. **فایل‌های PO (۶ فایل در `translations/*/LC_MESSAGES/messages.po`):**
+2. **فایل‌های PO (در `translations/*/LC_MESSAGES/messages.po`؛ الان ۴ فایل: en, fa, ru, zh):**
    - زبان `fr` فایل po ندارد.
    - فرمت به صورت `msgid` و `msgstr` و پیشوند `config.` رعایت شود.
    - ترتیب کلیدها الفبایی و دارای کامنت ویژگی (`#`) باشد.

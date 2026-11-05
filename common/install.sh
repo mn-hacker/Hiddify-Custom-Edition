@@ -1,4 +1,5 @@
 #!/bin/bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 cd $(dirname -- "$0")
 source utils.sh
 
@@ -11,8 +12,8 @@ if [ "$DO_NOT_INSTALL" != "true" ]; then
 fi
 activate_python_venv
 
-groupadd -f hiddify-common
-usermod -aG hiddify-common root
+groupadd -f watashi-common
+usermod -aG watashi-common root
 
 systemctl unmask --now systemd-resolved.service 2>/dev/null || true
 systemctl enable --now systemd-resolved >/dev/null 2>&1
@@ -25,7 +26,7 @@ if ! nslookup google.com &> /dev/null; then
 fi
 
 
-ln -sf $(pwd)/sysctl.conf /etc/sysctl.d/hiddify.conf
+ln -sf $(pwd)/sysctl.conf /etc/sysctl.d/watashi.conf
 
 if [ "${MODE}" != "docker" ];then
   sysctl --system > /dev/null
@@ -70,8 +71,8 @@ bash google-bbr.sh > /dev/null
 
 
 # Reboot cron - only start services, don't full reinstall
-echo "@reboot root /opt/hiddify-manager/install.sh --check-only --no-gui --no-log >> /opt/hiddify-manager/log/system/reboot.log 2>&1" >/etc/cron.d/hiddify_reinstall_on_reboot
-echo "@daily root /opt/hiddify-manager/common/daily_actions.sh >> /opt/hiddify-manager/log/system/daily_actions.log 2>&1" >/etc/cron.d/hiddify_daily_memory_release
+echo "@reboot root /opt/watashi-manager/install.sh --check-only --no-gui --no-log >> /opt/watashi-manager/log/system/reboot.log 2>&1" >/etc/cron.d/watashi_reinstall_on_reboot
+echo "@daily root /opt/watashi-manager/common/daily_actions.sh >> /opt/watashi-manager/log/system/daily_actions.log 2>&1" >/etc/cron.d/watashi_daily_memory_release
 # watashi v12.2.109: same reload banner as in common/run.sh.j2, printed during
 # the install itself; kept quiet and non fatal.
 service cron reload >/dev/null 2>&1 || true
@@ -82,12 +83,12 @@ fi
 
 update-locale LANG=C.UTF-8
 
-echo "hiddify-panel ALL=(root) NOPASSWD: /opt/hiddify-manager/common/commander.py" >/etc/sudoers.d/hiddify
+echo "watashi-panel ALL=(root) NOPASSWD: /opt/watashi-manager/common/commander.py" >/etc/sudoers.d/watashi
 
-ln -sf /opt/hiddify-manager/menu.sh /usr/bin/hiddify
+ln -sf /opt/watashi-manager/menu.sh /usr/bin/watashi
 
 systemctl disable --now rpcbind.socket >/dev/null 2>&1
 systemctl disable --now rpcbind >/dev/null 2>&1
 
-# Setup logrotate for Hiddify logs
+# Setup logrotate for Watashi logs
 bash setup_logrotate.sh >/dev/null 2>&1

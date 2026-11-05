@@ -1,6 +1,7 @@
-source /opt/hiddify-manager/common/utils.sh
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
+source /opt/watashi-manager/common/utils.sh
 
-ln -sf $(pwd)/hiddify-ssh-liberty-bridge.service /etc/systemd/system/hiddify-ssh-liberty-bridge.service
+ln -sf $(pwd)/watashi-ssh-liberty-bridge.service /etc/systemd/system/watashi-ssh-liberty-bridge.service
 
 chown -R liberty-bridge host_key
 
@@ -36,5 +37,5 @@ EOF
 chown liberty-bridge:liberty-bridge .env
 chmod 600 .env
 
-systemctl enable hiddify-ssh-liberty-bridge
-systemctl restart hiddify-ssh-liberty-bridge
+systemctl enable watashi-ssh-liberty-bridge
+systemctl restart watashi-ssh-liberty-bridge

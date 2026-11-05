@@ -1,5 +1,6 @@
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 
-SERVER_WG_NIC=hiddifywg
+SERVER_WG_NIC=watashiwg
 
 add_number_to_ipv4() {
     local ip="$1"

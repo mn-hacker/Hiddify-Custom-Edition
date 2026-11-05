@@ -1,0 +1,24 @@
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
+[Unit]
+Description=Xray Service
+Documentation=https://github.com/xtls
+After=network.target nss-lookup.target
+
+[Service]
+User=root
+#CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
+#AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
+#NoNewPrivileges=true
+ExecStartPre=/opt/watashi-manager/xray/pre-start.sh
+ExecStart=/opt/watashi-manager/xray/bin/xray run -confdir /opt/watashi-manager/xray/configs/
+RestartSec=3
+#ExecReload=/bin/sh -c "/opt/watashi-manager/xray/bin/xray run -test -confdir /opt/watashi-manager/xray/configs/ && systemctl restart watashi-xray"
+Restart=always
+#RestartPreventExitStatus=23
+#StandardOutput=file:/opt/watashi-manager/log/system/xray.out.log
+#StandardError=file:/opt/watashi-manager/log/system/xray.err.log
+LimitNOFILE=infinity
+OOMScoreAdjust=100
+
+[Install]
+WantedBy=multi-user.target

@@ -1,3 +1,4 @@
+{# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only) #}
 {
 	{# watashi v12.2.130t: the port was printed straight into the json. A missing or
 	   empty shadowsocks2022_port wrote "listen_port":, which is not json at
@@ -22,7 +23,7 @@
 				{# watashi v12.2.99: sniff, sniff_override_destination and domain_strategy
 				   are gone from inbounds in sing-box 1.13.0+; 03_routing.json.j2 carries
 				   the sniff and resolve rule actions that replace them. #}
-								{% include '/opt/hiddify-manager/singbox/configs/common/protocols/ss.pj2' %},
+								{% include '/opt/watashi-manager/singbox/configs/common/protocols/ss.pj2' %},
 				{% include "includes/multiplex.json.pj2"%}
 			}
 		]

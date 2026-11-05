@@ -1,4 +1,5 @@
 #!/bin/bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 cd $( dirname -- "$0"; )
 
 # Stop existing service gracefully
@@ -49,7 +50,7 @@ if systemctl is-active --quiet mtproxy.service; then
     echo "MTProxy (mtg) started successfully!"
     systemctl status mtproxy --no-pager
 else
-    echo "MTProxy failed to start. Check logs at /opt/hiddify-manager/log/system/telegram.err.log"
-    cat /opt/hiddify-manager/log/system/telegram.err.log 2>/dev/null | tail -20
+    echo "MTProxy failed to start. Check logs at /opt/watashi-manager/log/system/telegram.err.log"
+    cat /opt/watashi-manager/log/system/telegram.err.log 2>/dev/null | tail -20
     exit 1
 fi

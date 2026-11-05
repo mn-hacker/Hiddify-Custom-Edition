@@ -1,11 +1,12 @@
 #!/bin/bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 
 # Rathole Core Installer
 # This script installs the rathole binary for tunnel management
 
 set -e
 
-RATHOLE_DIR="/opt/hiddify-manager/other/rathole"
+RATHOLE_DIR="/opt/watashi-manager/other/rathole"
 RATHOLE_URL="https://github.com/Musixal/rathole-tunnel/raw/main/core/rathole.zip"
 
 echo "Installing Rathole..."
@@ -31,9 +32,9 @@ unzip -o rathole.zip
 if [ -f "$TMP_DIR/rathole" ]; then
     cp "$TMP_DIR/rathole" "$RATHOLE_DIR/rathole"
     chmod +x "$RATHOLE_DIR/rathole"
-    # Make directory writable for hiddify-panel to create config files
+    # Make directory writable for watashi-panel to create config files
     chmod 755 "$RATHOLE_DIR"
-    chown -R hiddify-panel:hiddify-panel "$RATHOLE_DIR" 2>/dev/null || chmod 777 "$RATHOLE_DIR"
+    chown -R watashi-panel:watashi-panel "$RATHOLE_DIR" 2>/dev/null || chmod 777 "$RATHOLE_DIR"
     echo "Rathole installed successfully!"
 else
     echo "Error: rathole binary not found in archive"

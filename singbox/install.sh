@@ -1,8 +1,9 @@
-source /opt/hiddify-manager/common/utils.sh
-source /opt/hiddify-manager/common/package_manager.sh
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
+source /opt/watashi-manager/common/utils.sh
+source /opt/watashi-manager/common/package_manager.sh
 rm -rf configs/*.template 2>/dev/null || true
 
-# latest= #$(get_release_version hiddify-sing-box)
+# latest= #$(get_release_version watashi-sing-box)
 # watashi v12.2.98: this file used to keep a pin of its own. an empty
 # version made download_package ask common/packages.lock for its newest
 # singbox line, so a core that had just been upgraded through the panel
@@ -10,7 +11,7 @@ rm -rf configs/*.template 2>/dev/null || true
 # happened to hold. common/core_registry.conf is the one place that
 # blesses a version now. if the lock has never heard of that version the
 # hash is fetched once, here, instead of the install failing.
-CM_SH=/opt/hiddify-manager/common/core_manager.sh
+CM_SH=/opt/watashi-manager/common/core_manager.sh
 version=$(bash "$CM_SH" default singbox 2>/dev/null | tail -1)
 if [ -z "$version" ]; then
     version=$(get_latest_version singbox "$(detect_arch)")
@@ -55,11 +56,11 @@ if [ "$?" == "0"  ] || ! is_installed ./sing-box; then
     rm -rf sb.tar.gz sing-box-* 2>/dev/null || true
     chown root:root sing-box 2>/dev/null || exit 3
     chmod +x sing-box || exit 4
-    ln -sf /opt/hiddify-manager/singbox/sing-box /usr/bin/sing-box
+    ln -sf /opt/watashi-manager/singbox/sing-box /usr/bin/sing-box
     rm geosite.db 2>/dev/null || true
     set_installed_version singbox "$version" "$(detect_arch)"
 fi
 
 # Enable service
-ln -sf $(pwd)/hiddify-singbox.service /etc/systemd/system/hiddify-singbox.service 2>/dev/null || true
-systemctl enable hiddify-singbox.service 2>/dev/null || true
+ln -sf $(pwd)/watashi-singbox.service /etc/systemd/system/watashi-singbox.service 2>/dev/null || true
+systemctl enable watashi-singbox.service 2>/dev/null || true

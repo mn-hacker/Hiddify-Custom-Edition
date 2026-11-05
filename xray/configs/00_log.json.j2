@@ -1,3 +1,4 @@
+{# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only) #}
 {
         "log": {
                 "loglevel": "{{hconfigs['log_level'].lower()}}",
@@ -7,7 +8,7 @@
                         "access": "none",
                         "dnsLog": false,
                 {%elif hconfigs.get('access_log_enable', False) or hconfigs.get('user_limit_enable', False)%}
-                        "access": "/opt/hiddify-manager/log/xray_access.log",
+                        "access": "/opt/watashi-manager/log/xray_access.log",
                 {%endif%}
                 "logid": true,
                 "header": true,

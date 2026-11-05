@@ -1,6 +1,7 @@
 #!/bin/bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 cd $(dirname -- "$0")
-source /opt/hiddify-manager/common/utils.sh
+source /opt/watashi-manager/common/utils.sh
 
 install_package mariadb-server
 
@@ -22,26 +23,26 @@ if [ ! -f "mysql_pass" ]; then
     if sudo mysql -e "SELECT 1" 2>/dev/null; then
         echo "Connected to MySQL via sudo socket auth"
         sudo mysql <<MYSQL_SCRIPT
--- Create hiddifypanel user and database
-CREATE DATABASE IF NOT EXISTS hiddifypanel CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-DROP USER IF EXISTS 'hiddifypanel'@'localhost';
-CREATE USER 'hiddifypanel'@'localhost' IDENTIFIED BY '$random_password';
-GRANT ALL PRIVILEGES ON hiddifypanel.* TO 'hiddifypanel'@'localhost';
-GRANT ALL PRIVILEGES ON *.* TO 'hiddifypanel'@'localhost' WITH GRANT OPTION;
+-- Create watashipanel user and database
+CREATE DATABASE IF NOT EXISTS watashipanel CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+DROP USER IF EXISTS 'watashipanel'@'localhost';
+CREATE USER 'watashipanel'@'localhost' IDENTIFIED BY '$random_password';
+GRANT ALL PRIVILEGES ON watashipanel.* TO 'watashipanel'@'localhost';
+GRANT ALL PRIVILEGES ON *.* TO 'watashipanel'@'localhost' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 MYSQL_SCRIPT
-        echo "MySQL user 'hiddifypanel' created successfully"
+        echo "MySQL user 'watashipanel' created successfully"
     elif mysql -u root -e "SELECT 1" 2>/dev/null; then
         echo "Connected to MySQL via root without password"
         mysql -u root <<MYSQL_SCRIPT
-CREATE DATABASE IF NOT EXISTS hiddifypanel CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-DROP USER IF EXISTS 'hiddifypanel'@'localhost';
-CREATE USER 'hiddifypanel'@'localhost' IDENTIFIED BY '$random_password';
-GRANT ALL PRIVILEGES ON hiddifypanel.* TO 'hiddifypanel'@'localhost';
-GRANT ALL PRIVILEGES ON *.* TO 'hiddifypanel'@'localhost' WITH GRANT OPTION;
+CREATE DATABASE IF NOT EXISTS watashipanel CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+DROP USER IF EXISTS 'watashipanel'@'localhost';
+CREATE USER 'watashipanel'@'localhost' IDENTIFIED BY '$random_password';
+GRANT ALL PRIVILEGES ON watashipanel.* TO 'watashipanel'@'localhost';
+GRANT ALL PRIVILEGES ON *.* TO 'watashipanel'@'localhost' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 MYSQL_SCRIPT
-        echo "MySQL user 'hiddifypanel' created successfully"
+        echo "MySQL user 'watashipanel' created successfully"
     else
         echo "ERROR: Cannot connect to MySQL. Trying with skip-grant-tables..."
         systemctl stop mariadb
@@ -49,11 +50,11 @@ MYSQL_SCRIPT
         sleep 5
         mysql <<MYSQL_SCRIPT
 FLUSH PRIVILEGES;
-CREATE DATABASE IF NOT EXISTS hiddifypanel CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-DROP USER IF EXISTS 'hiddifypanel'@'localhost';
-CREATE USER 'hiddifypanel'@'localhost' IDENTIFIED BY '$random_password';
-GRANT ALL PRIVILEGES ON hiddifypanel.* TO 'hiddifypanel'@'localhost';
-GRANT ALL PRIVILEGES ON *.* TO 'hiddifypanel'@'localhost' WITH GRANT OPTION;
+CREATE DATABASE IF NOT EXISTS watashipanel CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+DROP USER IF EXISTS 'watashipanel'@'localhost';
+CREATE USER 'watashipanel'@'localhost' IDENTIFIED BY '$random_password';
+GRANT ALL PRIVILEGES ON watashipanel.* TO 'watashipanel'@'localhost';
+GRANT ALL PRIVILEGES ON *.* TO 'watashipanel'@'localhost' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 MYSQL_SCRIPT
         pkill -9 mysqld
@@ -63,8 +64,8 @@ MYSQL_SCRIPT
     fi
     
     # Verify the user was created
-    if mysql -u hiddifypanel -p"$random_password" -e "SELECT 1" 2>/dev/null; then
-        echo "SUCCESS: MySQL user 'hiddifypanel' verified!"
+    if mysql -u watashipanel -p"$random_password" -e "SELECT 1" 2>/dev/null; then
+        echo "SUCCESS: MySQL user 'watashipanel' verified!"
     else
         echo "WARNING: Could not verify MySQL user creation"
     fi

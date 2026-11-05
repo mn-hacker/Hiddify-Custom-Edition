@@ -1,20 +1,21 @@
-source /opt/hiddify-manager/common/utils.sh
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
+source /opt/watashi-manager/common/utils.sh
 if ! is_installed redis-server; then
     add-apt-repository -y universe
     install_package redis-server
 fi
-ln -sf $(pwd)/hiddify-redis.service /etc/systemd/system/hiddify-redis.service >/dev/null 2>&1
-systemctl enable hiddify-redis
+ln -sf $(pwd)/watashi-redis.service /etc/systemd/system/watashi-redis.service >/dev/null 2>&1
+systemctl enable watashi-redis
 systemctl daemon-reload >/dev/null 2>&1
 
 # Ensure log directories exist with proper permissions
 mkdir -p /var/log/redis
-mkdir -p /opt/hiddify-manager/log/system
+mkdir -p /opt/watashi-manager/log/system
 chown -R redis:redis /var/log/redis
 chmod -R 755 /var/log/redis
 
-touch /opt/hiddify-manager/log/system/redis-server.log
-chown redis:redis /opt/hiddify-manager/log/system/redis-server.log
+touch /opt/watashi-manager/log/system/redis-server.log
+chown redis:redis /opt/watashi-manager/log/system/redis-server.log
 chown -R redis:redis .
 chmod 600 redis.conf
 
@@ -45,12 +46,12 @@ if ! grep -q "^requirepass" "redis.conf"; then
     echo "requirepass $random_password" >>redis.conf   
     systemctl disable --now redis-server >/dev/null 2>&1
     pkill -9 redis-server
-    systemctl restart hiddify-redis
+    systemctl restart watashi-redis
 fi
 
 
 
 # Apply config changes (maxmemory, etc.) on every (re)install so redis picks them up
-systemctl restart hiddify-redis >/dev/null 2>&1
+systemctl restart watashi-redis >/dev/null 2>&1
 
-# systemctl reload hiddify-redis
+# systemctl reload watashi-redis

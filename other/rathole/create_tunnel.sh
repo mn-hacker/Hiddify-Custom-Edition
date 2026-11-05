@@ -1,4 +1,5 @@
 #!/bin/bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 
 # Rathole Tunnel Creator
 # Creates tunnel configuration and systemd service files
@@ -8,7 +9,7 @@
 
 set -e
 
-RATHOLE_DIR="/opt/hiddify-manager/other/rathole"
+RATHOLE_DIR="/opt/watashi-manager/other/rathole"
 SERVICE_DIR="/etc/systemd/system"
 
 TYPE="$1"

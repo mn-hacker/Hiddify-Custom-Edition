@@ -1,4 +1,5 @@
 #!/bin/bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 # ============================================================
 #  Watashi Manager - terminal skin
 #  Every colour, box, banner and menu that the terminal side
@@ -552,9 +553,9 @@ function ws_progress_window() {
     # window that shows an install is drawn by us on a bare server too.
     local prog=""
     local ws_progress_prog=""
-    for ws_progress_prog in "/opt/hiddify-manager/common/watashi_progress.py" \
+    for ws_progress_prog in "/opt/watashi-manager/common/watashi_progress.py" \
         "$(dirname "${BASH_SOURCE[0]}")/watashi_progress.py" \
-        "/tmp/hiddify/watashi_progress.py"; do
+        "/tmp/watashi/watashi_progress.py"; do
         if [ -f "$ws_progress_prog" ]; then
             prog="$ws_progress_prog"
             break

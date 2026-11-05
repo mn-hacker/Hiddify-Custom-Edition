@@ -1,7 +1,8 @@
 #!/bin/bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 # Singbox test script - updated for 1.12+
 
-systemctl restart hiddify-singbox
+systemctl restart watashi-singbox
 
 for CONFIG_FILE in $(find tests/ -name "*.json"); do
     echo ""
@@ -22,4 +23,4 @@ for CONFIG_FILE in $(find tests/ -name "*.json"); do
     kill -9 $pid
 done
 
-systemctl restart hiddify-singbox
+systemctl restart watashi-singbox

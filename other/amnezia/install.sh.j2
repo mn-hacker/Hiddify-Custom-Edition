@@ -1,3 +1,4 @@
+{# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only) #}
 # watashi: the separate AmneziaWG system v12.2.62
 # This file is rendered to install.sh by common/jinja.py before it is run.
 
@@ -52,7 +53,7 @@ ws_awg_say "warning: plain wireguard is on as well and this panel still gives bo
 # watashi v12.2.130an: amnezia has a key pair of its own from db version 158 on.
 # Until the panel has been restarted once the interface falls back to
 # the wireguard key, which means one identity for two tunnels.
-ws_awg_say "warning: this panel has no amnezia key pair yet, so the interface is being built with the plain wireguard key. restart hiddify-panel once so the database reaches version 158, then apply again."
+ws_awg_say "warning: this panel has no amnezia key pair yet, so the interface is being built with the plain wireguard key. restart watashi-panel once so the database reaches version 158, then apply again."
 {% endif %}
 
 if ! ws_awg_headers_disguised "{{ hconfigs['amnezia_h1'] }}" "{{ hconfigs['amnezia_h2'] }}" "{{ hconfigs['amnezia_h3'] }}" "{{ hconfigs['amnezia_h4'] }}"; then

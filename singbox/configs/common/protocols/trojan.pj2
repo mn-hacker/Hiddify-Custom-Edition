@@ -1,6 +1,7 @@
+{# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only) #}
 "type": "trojan",
 "users": [
     {% for u in users %}
-        {"name": "{{ u['uuid'] }}@hiddify.com", "password": "{{ u['uuid'] }}"},
+        {"name": "{{ u['uuid'] }}@watashi.cyou", "password": "{{ u['uuid'] }}"},
     {% endfor%}
 ]

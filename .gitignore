@@ -1,8 +1,9 @@
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 log
 dump.rdb
-hiddify_usages.json
+watashi_usages.json
 docker-data
-Hiddify Orginal
+Watashi Orginal
 tmp
 .kiro
 Theme/

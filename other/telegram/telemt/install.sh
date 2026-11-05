@@ -1,10 +1,11 @@
 #!/bin/bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 # telemt installer - watashi v12.2.53
-source /opt/hiddify-manager/common/package_manager.sh
+source /opt/watashi-manager/common/package_manager.sh
 cd "$(dirname "$0")" || exit 1
 
 TM_FALLBACK="3.4.24"
-TM_SEEN="/opt/hiddify-manager/log/system/telemt.downloads.log"
+TM_SEEN="/opt/watashi-manager/log/system/telemt.downloads.log"
 
 tm_log() { echo "telemt: $*" >&2; }
 
@@ -34,7 +35,7 @@ if [[ -z "$ARCH" ]]; then
     exit 2
 fi
 
-mkdir -p /opt/hiddify-manager/log/system
+mkdir -p /opt/watashi-manager/log/system
 mkdir -p /var/lib/telemt/tlsfront
 systemctl stop telemt.service 2>/dev/null || true
 
@@ -42,7 +43,7 @@ PKG_ARCH=$(tm_pkg_arch)
 TARBALL="telemt.tar.gz"
 rm -f "$TARBALL"
 PINNED=0
-grep -q "^telemt|" /opt/hiddify-manager/common/packages.lock 2>/dev/null && PINNED=1
+grep -q "^telemt|" /opt/watashi-manager/common/packages.lock 2>/dev/null && PINNED=1
 
 if [[ "$PINNED" == "1" ]]; then
     VERSION=$(get_latest_version telemt "$PKG_ARCH")

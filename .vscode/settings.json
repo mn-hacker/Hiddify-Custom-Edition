@@ -1,9 +1,9 @@
 {
     "python.analysis.extraPaths": [
-        "./hiddify-panel/src"
+        "./watashi-panel/src"
     ],
     
-    "python.envFile": "/opt/hiddify-manager/.venv313",
+    "python.envFile": "/opt/watashi-manager/.venv313",
     "autopep8.args": [
         "--max-line-length", "200",
     ],

@@ -1,4 +1,5 @@
 #!/bin/bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 cd $(dirname -- "$0")
 source cert_utils.sh
 # watashi v12.2.49: this path is a deliberate request from the panel, so it
@@ -18,10 +19,10 @@ rc=$?
 # the button replaced a certificate the clients could not use, an hour of
 # "still broken" is not acceptable, so xray is restarted, and only then.
 if [ "${WS_SSL_REISSUE:-0}" = "1" ] && [ "$WS_CERT_RESULT" = "ok" ] && [ "${WS_CERT_WAS_REAL:-0}" != "1" ]; then
-    if grep -rqsF "/opt/hiddify-manager/ssl/$1.crt" /opt/hiddify-manager/xray/configs/ 2>/dev/null &&
-        systemctl is-active --quiet hiddify-xray 2>/dev/null; then
+    if grep -rqsF "/opt/watashi-manager/ssl/$1.crt" /opt/watashi-manager/xray/configs/ 2>/dev/null &&
+        systemctl is-active --quiet watashi-xray 2>/dev/null; then
         echo "watashi: restarting xray so it serves the new certificate of $1 now"
-        systemctl restart hiddify-xray 2>/dev/null || echo "watashi: xray did not restart, it picks the certificate up within the hour"
+        systemctl restart watashi-xray 2>/dev/null || echo "watashi: xray did not restart, it picks the certificate up within the hour"
     fi
 fi
 exit $rc

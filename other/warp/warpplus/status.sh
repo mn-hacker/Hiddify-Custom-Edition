@@ -1,17 +1,18 @@
 #!/bin/bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 # watashi: warp v12.2.128.1
 #
 # Everything an operator needs to judge WARP in one screen, written to the
 # manager log folder so the menu's log viewer shows it like every other log.
 
 cd "$(dirname -- "$0")" || exit 1
-source /opt/hiddify-manager/common/utils.sh
+source /opt/watashi-manager/common/utils.sh
 
 BIN="./warp-plus"
 PORT=3000
 PROXY="socks5h://127.0.0.1:$PORT"
 CONF="engine.conf"
-LOGDIR="${WS_LOG_DIR:-/opt/hiddify-manager/log/system}"
+LOGDIR="${WS_LOG_DIR:-/opt/watashi-manager/log/system}"
 
 # The trace through the panel's own proxy is the only real evidence, so it
 # is taken first and every later line is allowed to rely on it.
@@ -38,9 +39,9 @@ function is_carrying() {
 # the whole journal would report failures from before a fix was applied.
 function failures_since_start() {
     local since
-    since=$(systemctl show -p ActiveEnterTimestamp --value hiddify-warp.service 2>/dev/null)
+    since=$(systemctl show -p ActiveEnterTimestamp --value watashi-warp.service 2>/dev/null)
     if [ -n "$since" ]; then
-        journalctl -u hiddify-warp.service --since "$since" --no-pager 2>/dev/null |
+        journalctl -u watashi-warp.service --since "$since" --no-pager 2>/dev/null |
             grep -c 'connection test failed'
     else
         echo 0
@@ -64,7 +65,7 @@ function main() {
         grep -vE '^\s*#|^\s*$' "$CONF" | sed 's|^|      |'
     fi
 
-    if systemctl is-active --quiet hiddify-warp.service; then
+    if systemctl is-active --quiet watashi-warp.service; then
         success "  - Service: running"
         # A running service is not proof of a working tunnel, so the engine's
         # readiness loop is reported too. But it is only worth mentioning
@@ -81,7 +82,7 @@ function main() {
         fi
     else
         error "  - Service: NOT running"
-        journalctl -u hiddify-warp.service -n 15 --no-pager 2>/dev/null | sed 's|^|      |'
+        journalctl -u watashi-warp.service -n 15 --no-pager 2>/dev/null | sed 's|^|      |'
     fi
 
     warning "  - Network:"

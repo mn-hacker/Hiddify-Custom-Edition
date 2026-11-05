@@ -1,8 +1,9 @@
+{# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only) #}
 frontend in-tcpmode
     {% for port in (["80"] + hconfigs['http_ports'].split(',')) | unique%}
     bind :{{port}},:::{{port}} v4v6 tfo
     {%endfor%}
-    bind abns@https_in_ssl tfo accept-proxy ssl crt /opt/hiddify-manager/ssl/ alpn h2,http/1.1,h3 allow-0rtt
+    bind abns@https_in_ssl tfo accept-proxy ssl crt /opt/watashi-manager/ssl/ alpn h2,http/1.1,h3 allow-0rtt
     acl h2 ssl_fc_alpn -i h2
     acl h3 ssl_fc_alpn -i h3
 
@@ -20,9 +21,9 @@ frontend in-tcpmode
 
     use_backend generate_204 if { path -i /{{hconfigs['proxy_path_client']}}/generate_204 }
     use_backend generate_204 if { path -i /{{hconfigs['proxy_path']}}/generate_204 }
-    use_backend hiddifypanel if { path_beg /{{hconfigs['proxy_path_client']}}/  }
-    use_backend hiddifypanel if { path_beg /{{hconfigs['proxy_path_admin']}}/ hiddifypanel }
-    use_backend hiddifypanel if { path_beg /{{hconfigs['proxy_path']}}/ hiddifypanel }
+    use_backend watashipanel if { path_beg /{{hconfigs['proxy_path_client']}}/  }
+    use_backend watashipanel if { path_beg /{{hconfigs['proxy_path_admin']}}/ watashipanel }
+    use_backend watashipanel if { path_beg /{{hconfigs['proxy_path']}}/ watashipanel }
 
     {%for d in domain if d['mode']=='sub_link_only'%} 
         use_backend to_panel_only if { hdr(host) -i d['domain'] }

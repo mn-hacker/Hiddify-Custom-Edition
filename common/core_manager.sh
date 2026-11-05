@@ -1,4 +1,5 @@
 #!/bin/bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 # watashi v12.2.50: the core manager.
 #
 # every core of this panel (xray, sing-box, mtg, wgcf, ssh-liberty-bridge,
@@ -15,7 +16,7 @@
 #   bash common/core_manager.sh rollback xray
 #   bash common/core_manager.sh json
 
-WS_ROOT=${WS_ROOT:-/opt/hiddify-manager}
+WS_ROOT=${WS_ROOT:-/opt/watashi-manager}
 CM_DIR=${CM_DIR:-$WS_ROOT/common}
 CM_REGISTRY=${CM_REGISTRY:-$CM_DIR/core_registry.conf}
 CM_LOCK=${CM_LOCK:-$CM_DIR/packages.lock}

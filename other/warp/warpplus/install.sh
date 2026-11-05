@@ -1,12 +1,13 @@
 #!/bin/bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 # watashi: warp v12.2.128
 #
-# Installs the WARP engine (warp-plus) and registers the hiddify-warp unit.
+# Installs the WARP engine (warp-plus) and registers the watashi-warp unit.
 #
 # Why this replaced the wgcf installer: the old script probed the binary with
 # "wgcf --version", a flag wgcf does not have. The probe always failed, the
 # script exited 1 before installing the unit, and that is why journalctl had
-# no entries at all for hiddify-warp while the panel kept saying WARP is not
+# no entries at all for watashi-warp while the panel kept saying WARP is not
 # working. warp-plus reports its version with a subcommand, which is the
 # command stored in the registry, and it is checked here the same way.
 #
@@ -14,13 +15,13 @@
 # start time, inside its cache directory, so installing is safe to re-run.
 
 cd "$(dirname -- "$0")" || exit 1
-source /opt/hiddify-manager/common/utils.sh
-source /opt/hiddify-manager/common/package_manager.sh
+source /opt/watashi-manager/common/utils.sh
+source /opt/watashi-manager/common/package_manager.sh
 
 BIN="./warp-plus"
-UNIT_SRC="hiddify-warp.service"
-UNIT_DST="${WS_UNIT_DIR:-/etc/systemd/system}/hiddify-warp.service"
-LOGDIR="${WS_LOG_DIR:-/opt/hiddify-manager/log/system}"
+UNIT_SRC="watashi-warp.service"
+UNIT_DST="${WS_UNIT_DIR:-/etc/systemd/system}/watashi-warp.service"
+LOGDIR="${WS_LOG_DIR:-/opt/watashi-manager/log/system}"
 mkdir -p "$LOGDIR" cache
 
 if [[ "$(hconfig warp_mode disable)" == "disable" ]]; then
@@ -221,7 +222,7 @@ if ! cmp -s "$UNIT_SRC" "$UNIT_DST"; then
     install -m 644 "$UNIT_SRC" "$UNIT_DST" || exit 1
 fi
 systemctl daemon-reload
-systemctl enable hiddify-warp.service >/dev/null 2>&1
+systemctl enable watashi-warp.service >/dev/null 2>&1
 
 # 3) anything from the older backends would fight over the same port or the
 # default route, and that is exactly what used to make WARP look broken.

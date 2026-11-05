@@ -1,11 +1,12 @@
 #!/bin/bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 
 # Rathole Core Uninstaller
 # This script removes the rathole binary and related files
 
 set -e
 
-RATHOLE_DIR="/opt/hiddify-manager/other/rathole"
+RATHOLE_DIR="/opt/watashi-manager/other/rathole"
 
 echo "Uninstalling Rathole..."
 

@@ -1,6 +1,7 @@
+{# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only) #}
 {
 	{% set ws_v6 = exec("[ -f /proc/net/if_inet6 ] && echo -n 'true' || echo -n 'false'")=='true' %}
-		{% set ws_cert_any = exec("ls /opt/hiddify-manager/ssl/*.crt 2>/dev/null | tail -1").strip() %}
+		{% set ws_cert_any = exec("ls /opt/watashi-manager/ssl/*.crt 2>/dev/null | tail -1").strip() %}
 		{# watashi v12.2.100: with no certificate on the box the tls block
 		   below was written with an empty path, and a missing certificate
 		   is fatal for sing-box, so the whole core refused to start and
@@ -49,7 +50,7 @@
 				{%endif%}
 				"users": [
 					{% for u in users %}
-						{"name": "{{ u['uuid'] }}@hiddify.com", "password": "{{ u['uuid'] }}"},
+						{"name": "{{ u['uuid'] }}@watashi.cyou", "password": "{{ u['uuid'] }}"},
 					{% endfor%}
 				],
 				"masquerade": "http://{{domain}}:80/",
@@ -59,9 +60,9 @@
 					"alpn": ["h3"],
 					"min_version": "1.2",
 					"max_version": "1.3",
-					{% if exec("[ -f /opt/hiddify-manager/ssl/"+domain[0:64]+".crt ] && echo -n 'true' || echo -n 'false'")=='true' %}
-					"certificate_path": "/opt/hiddify-manager/ssl/{{domain[0:64]}}.crt",
-					"key_path": "/opt/hiddify-manager/ssl/{{domain[0:64]}}.crt.key",
+					{% if exec("[ -f /opt/watashi-manager/ssl/"+domain[0:64]+".crt ] && echo -n 'true' || echo -n 'false'")=='true' %}
+					"certificate_path": "/opt/watashi-manager/ssl/{{domain[0:64]}}.crt",
+					"key_path": "/opt/watashi-manager/ssl/{{domain[0:64]}}.crt.key",
 					{%else %}
 					{# watashi v12.2.100: an empty certificate_path is fatal ("missing
 					   certificate") and one fatal inbound stops the whole core, so the

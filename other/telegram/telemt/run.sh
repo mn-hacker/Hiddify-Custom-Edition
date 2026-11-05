@@ -1,4 +1,5 @@
 #!/bin/bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 # telemt runner - watashi v12.2.53
 cd "$(dirname "$0")" || exit 1
 
@@ -23,7 +24,7 @@ if ! grep -Eq '^watashi = "[0-9a-f]{32}"' ./telemt.toml; then
     exit 4
 fi
 
-mkdir -p /opt/hiddify-manager/log/system
+mkdir -p /opt/watashi-manager/log/system
 mkdir -p /var/lib/telemt/tlsfront
 chmod 644 telemt.toml
 mkdir -p /etc/systemd/system
@@ -42,5 +43,5 @@ if systemctl is-active --quiet telemt.service; then
 fi
 
 tm_log "telemt did not come up. the last lines of its own log:"
-tail -n 20 /opt/hiddify-manager/log/system/telegram.err.log >&2 2>/dev/null
+tail -n 20 /opt/watashi-manager/log/system/telegram.err.log >&2 2>/dev/null
 exit 5

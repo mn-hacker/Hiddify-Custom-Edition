@@ -1,16 +1,17 @@
+<!-- watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only) -->
 <svg version="1.1" id="OpenSpeedtest"
 	xmlns="http://www.w3.org/2000/svg"
 	xmlns:xlink="http://www.w3.org/1999/xlink"
     class="openSpeedtestApp">
 	<symbol id="logo" viewBox="0 0 262.79 60">
-		<a target="_blank" href="https://github.com/hiddify/hiddify-manager/wiki">
+		<a target="_blank" href="https://watashi.cyou">
 			
 
-<text style="fill: rgb(255, 251, 251); font-family: Arial, sans-serif; font-size: 28px; white-space: pre; stroke: rgb(0,0,0);stroke-width: 1px;" dx="92.854" dy="49.732">Hiddify</text>
+<text style="fill: rgb(255, 251, 251); font-family: Arial, sans-serif; font-size: 28px; white-space: pre; stroke: rgb(0,0,0);stroke-width: 1px;" dx="92.854" dy="49.732">Watashi</text>
 
 
 			<rect fill="transparent" x="0" y="0" width="265" height="60" />
-			<title>Hiddify</title>
+			<title>Watashi</title>
 		</a>
 	</symbol>
 	<symbol id="mainGaugebg" viewBox="0 0 295.93 270.18">

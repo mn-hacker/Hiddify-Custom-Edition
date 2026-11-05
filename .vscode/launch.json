@@ -9,18 +9,18 @@
             "args": []
         },
         {
-            "name": "Run HiddifyPanel and Server (apply config and run flask)",
+            "name": "Run WatashiPanel and Server (apply config and run flask)",
             "type": "debugpy",
             "request": "launch",
             "module": "flask",
-            "preLaunchTask": "build-hiddify-manager",
-            "cwd": "${workspaceFolder}/hiddify-panel/src/",
+            "preLaunchTask": "build-watashi-manager",
+            "cwd": "${workspaceFolder}/watashi-panel/src/",
             "env": {
                 "FLASK_APP": "wsgi.py",
                 "FLASK_DEBUG": "1",
-                "HIDDIFY_CFG_PATH": "/opt/hiddify-manager/hiddify-panel/app.cfg",
+                "WATASHI_CFG_PATH": "/opt/watashi-manager/watashi-panel/app.cfg",
             },
-            "python": "/opt/hiddify-manager/.venv313/bin/python",
+            "python": "/opt/watashi-manager/.venv313/bin/python",
             "args": [
                 "run",
                 // "--no-debugger",
@@ -35,18 +35,18 @@
             "justMyCode": true
         },
         {
-            "name": "Run HiddifyPanel Only (make sure to apply config before)",
+            "name": "Run WatashiPanel Only (make sure to apply config before)",
             "type": "debugpy",
             "request": "launch",
             "module": "flask",
             "preLaunchTask": "stop panel service",
-            "cwd": "${workspaceFolder}/hiddify-panel/src/",
+            "cwd": "${workspaceFolder}/watashi-panel/src/",
             "env": {
                 "FLASK_APP": "wsgi.py",
                 "FLASK_DEBUG": "1",
-                "HIDDIFY_CFG_PATH": "/opt/hiddify-manager/hiddify-panel/app.cfg",
+                "WATASHI_CFG_PATH": "/opt/watashi-manager/watashi-panel/app.cfg",
             },
-            "python": "/opt/hiddify-manager/.venv313/bin/python",
+            "python": "/opt/watashi-manager/.venv313/bin/python",
             "args": [
                 "run",
                 // "--no-debugger",
@@ -63,7 +63,7 @@
         {
             "name": "Apply Config Only",
             "type": "debugpy",
-            "preLaunchTask": "build-hiddify-manager",
+            "preLaunchTask": "build-watashi-manager",
             "request": "launch",
             "args": [
                 "-c",

@@ -1,3 +1,4 @@
+{# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only) #}
 {# watashi v12.2.100: sing-box refuses to start when a 2022 key is not
    exactly as long as the method asks for. the failure is fatal ("bad key")
    and one refused inbound takes the whole core down, so every other config
@@ -34,7 +35,7 @@
 "users": [
 {% for u in ws_ss_users %}
     {%- set ws_u_key = (u['uuid'].replace('-','') ~ ws_ss_zero)[:ws_ss_size] %}
-    {"name": "{{ u['uuid'] }}@hiddify.com", "password": "{{ ws_u_key|b64encode}}"},
+    {"name": "{{ u['uuid'] }}@watashi.cyou", "password": "{{ ws_u_key|b64encode}}"},
 {% endfor%}
 {% if not ws_ss_users %}
     {"name": "watashi-no-active-user@invalid", "password": "{{ ws_ss_dead|b64encode}}"},

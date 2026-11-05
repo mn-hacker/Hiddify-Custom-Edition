@@ -1,10 +1,11 @@
+<!-- watashi v12.3.40dev: the old project name was taken out of this file; the credit line to the upstream engine stays -->
 <div align="center">
 
 <img src="assets/watashi-banner.svg?v=3" alt="Watashi Manager" width="880">
 
-[![Release](https://img.shields.io/github/v/release/mn-hacker/Hiddify-Custom-Edition?style=for-the-badge&color=7c3aed&label=RELEASE)](https://github.com/mn-hacker/Hiddify-Custom-Edition/releases)
-[![Last commit](https://img.shields.io/github/last-commit/mn-hacker/Hiddify-Custom-Edition?style=for-the-badge&color=f59e0b&label=LAST%20COMMIT)](https://github.com/mn-hacker/Hiddify-Custom-Edition/commits)
-[![Stars](https://img.shields.io/github/stars/mn-hacker/Hiddify-Custom-Edition?style=for-the-badge&color=22d3ee)](https://github.com/mn-hacker/Hiddify-Custom-Edition/stargazers)
+[![Release](https://img.shields.io/github/v/release/mn-hacker/Watashi-Manager?style=for-the-badge&color=7c3aed&label=RELEASE)](https://github.com/mn-hacker/Watashi-Manager/releases)
+[![Last commit](https://img.shields.io/github/last-commit/mn-hacker/Watashi-Manager?style=for-the-badge&color=f59e0b&label=LAST%20COMMIT)](https://github.com/mn-hacker/Watashi-Manager/commits)
+[![Stars](https://img.shields.io/github/stars/mn-hacker/Watashi-Manager?style=for-the-badge&color=22d3ee)](https://github.com/mn-hacker/Watashi-Manager/stargazers)
 [![License](https://img.shields.io/badge/LICENSE-GPL--3.0-10b981?style=for-the-badge)](LICENSE)
 
 [![Xray](https://img.shields.io/badge/Xray--core-26.2.2-3b82f6?style=for-the-badge)](https://github.com/XTLS/Xray-core)
@@ -111,8 +112,8 @@ What separates Watashi from the usual panel is that **everything a human touches
 The next milestones, in the order they are being built.
 
 **`Watashi identity`** — the service layer becomes ours
-- [ ] Rename every unit from the inherited `hiddify-*` names to **`watashi-*`**, with aliases kept so existing installs keep working.
-- [ ] Panel, installer, updater, status and menu scripts all speaking the same name.
+- [x] Every service, folder, package, database and system user carries the **`watashi-*`** name (v12.3.40dev); a server that is updated is moved over automatically.
+- [x] Panel, installer, updater, status and menu scripts all speaking the same name.
 
 **`Link Studio`** — the customer page becomes yours
 - [ ] An admin page to design the customer page without touching code: brand line, which config cards appear, which apps are offered per platform, support and bot links, section toggles, default skin and language.
@@ -137,10 +138,10 @@ The next milestones, in the order they are being built.
 
 | Channel | Command |
 | :-- | :-- |
-| **Stable** | <code>bash <(curl -Ls https://raw.githubusercontent.com/mn-hacker/Hiddify-Custom-Edition/main/common/download.sh)</code> |
-| **Beta** | <code>bash <(curl -Ls https://raw.githubusercontent.com/mn-hacker/Hiddify-Custom-Edition/main/common/download.sh) beta</code> |
-| **Update** | <code>cd /opt/hiddify-manager && bash update.sh</code> |
-| **Uninstall** | <code>cd /opt/hiddify-manager && bash uninstall.sh</code> |
+| **Stable** | <code>bash <(curl -Ls https://raw.githubusercontent.com/mn-hacker/Watashi-Manager/main/common/download.sh)</code> |
+| **Beta** | <code>bash <(curl -Ls https://raw.githubusercontent.com/mn-hacker/Watashi-Manager/main/common/download.sh) beta</code> |
+| **Update** | <code>cd /opt/watashi-manager && bash update.sh</code> |
+| **Uninstall** | <code>cd /opt/watashi-manager && bash uninstall.sh</code> |
 
 **Requirements**
 
@@ -155,7 +156,7 @@ The next milestones, in the order they are being built.
 The installer prints your admin link when it finishes. If you ever lose it, open the management menu:
 
 ```bash
-cd /opt/hiddify-manager && bash menu.sh
+cd /opt/watashi-manager && bash menu.sh
 ```
 
 ---
@@ -163,13 +164,12 @@ cd /opt/hiddify-manager && bash menu.sh
 ## Project layout
 
 ```text
-Hiddify-Custom-Edition/
-├─ hiddify-panel/     ← the web panel and the Watashi Theme
+Watashi-Manager/
+├─ watashi-panel/     ← the web panel and the Watashi Theme
 ├─ xray/              ← Xray-core service and configs
 ├─ singbox/           ← sing-box service and configs
 ├─ haproxy/           ← traffic and TLS front door
 ├─ nginx/             ← web service and domains
-├─ hiddify-cli/       ← command line client
 ├─ common/            ← shared install and runtime scripts
 ├─ operations/        ← backup and scheduled work
 ├─ Theme/             ← design sources of the Watashi Theme
@@ -185,7 +185,7 @@ Hiddify-Custom-Edition/
 | :-- | :-- |
 | Telegram channel | [Watashi Manager](https://t.me/Watashi_Manager) |
 | Maintainer | [シングル (MNHACKER)](https://t.me/MNHACKER) |
-| Bug reports | [GitHub Issues](https://github.com/mn-hacker/Hiddify-Custom-Edition/issues) |
+| Bug reports | [GitHub Issues](https://github.com/mn-hacker/Watashi-Manager/issues) |
 
 ## Credits and license
 

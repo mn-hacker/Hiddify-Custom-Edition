@@ -1,5 +1,6 @@
 #!/bin/bash
-# watashi v12.3.33dev: warp-plus launcher for hiddify-warp.service
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
+# watashi v12.3.33dev: warp-plus launcher for watashi-warp.service
 #
 # What changed from v12.2.130:
 #   - warp-plus is no longer exec'd (so this script stays alive as the
@@ -9,7 +10,7 @@
 #   - SIGTERM/SIGINT are forwarded to both child processes so the service
 #     stops cleanly without leaving orphan processes.
 
-cd /opt/hiddify-manager/other/warp/warpplus || exit 1
+cd /opt/watashi-manager/other/warp/warpplus || exit 1
 
 ARGS_FILE="engine.args"
 WATCHDOG="./watchdog.sh"

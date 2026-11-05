@@ -1,5 +1,6 @@
-source /opt/hiddify-manager/common/utils.sh
-source /opt/hiddify-manager/common/package_manager.sh
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
+source /opt/watashi-manager/common/utils.sh
+source /opt/watashi-manager/common/package_manager.sh
 
 # watashi v12.2.130aa: the simple-obfs package draws a password in its postinst with
 # pwgen, which ubuntu does not install on its own; without it the install log
@@ -11,7 +12,7 @@ install_package shadowsocks-libev
 # watashi v12.3.36dev: simple-obfs, the package that carries obfs-server, was
 # dropped from Ubuntu after 24.04 (Launchpad publishes it up to noble only).
 # On 26.04 "apt install shadowsocks-libev simple-obfs" failed as a whole, so
-# obfs-server never existed and hiddify-ss-faketls stayed dead in the panel.
+# obfs-server never existed and watashi-ss-faketls stayed dead in the panel.
 # apt is still asked first, on any release that has the package; otherwise
 # the noble build pinned in common/packages.lock is fetched, its sha256 is
 # checked, and apt installs it so its dependencies (libcork16, libev4t64,
@@ -51,8 +52,8 @@ ws_install_simple_obfs
 chmod 600 *.service* 2>/dev/null || true
 
 # Only link service file if it exists (generated from jinja template)
-if [ -f "$(pwd)/hiddify-ss-faketls.service" ]; then
-    ln -sf $(pwd)/hiddify-ss-faketls.service /etc/systemd/system/hiddify-ss-faketls.service
+if [ -f "$(pwd)/watashi-ss-faketls.service" ]; then
+    ln -sf $(pwd)/watashi-ss-faketls.service /etc/systemd/system/watashi-ss-faketls.service
 fi
 
 systemctl disable --now ss-faketls.service > /dev/null 2>&1 || true

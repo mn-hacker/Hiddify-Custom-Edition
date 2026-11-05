@@ -1,19 +1,19 @@
 #!/bin/bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 # Watashi v12.2.37 : only the words on screen changed here
 # watashi: install pass v12.2.44
 cd $(dirname -- "$0")
+# watashi v12.3.40dev: a server that still sits under the old folder name (the
+# files of this release were unpacked over an older install) is moved to the
+# new names first; the move then runs this script again from the new folder.
+# The old "/opt/...-server" and "/opt/...-config" folder fixes that stood here
+# are part of that move now.
+if [ -f ./common/watashi_legacy.sh ] && bash ./common/watashi_legacy.sh needed; then
+    exec bash ./common/watashi_legacy.sh migrate "$@"
+fi
 source ./common/utils.sh
 NAME="0-install"
 LOG_FILE="$(log_file $NAME)"
-# Fix the installation directory
-if [ ! -d "/opt/hiddify-manager/" ] && [ -d "/opt/hiddify-server/" ]; then
-    mv /opt/hiddify-server /opt/hiddify-manager
-    ln -s /opt/hiddify-manager /opt/hiddify-server
-fi
-if [ ! -d "/opt/hiddify-manager/" ] && [ -d "/opt/hiddify-config/" ]; then
-    mv /opt/hiddify-config/ /opt/hiddify-manager/
-    ln -s /opt/hiddify-manager /opt/hiddify-config
-fi
 
 export DEBIAN_FRONTEND=noninteractive
 if [ "$(id -u)" -ne 0 ]; then
@@ -23,32 +23,40 @@ fi
 
 # Handle --check-only mode (for reboot)
 if [[ " $@ " == *" --check-only "* ]]; then
+    # watashi v12.3.40dev: when the server went down in the middle of the move
+    # from the old name, the proxies of the old install are still the ones
+    # serving and the new ones were never set up; only the full install that
+    # was cut off can finish that, so it runs now instead of the quick start.
+    if [ -s /var/lib/watashi-legacy/deferred ] && [ -f ./common/watashi_legacy.sh ]; then
+        echo "The move from the old name was not finished, running the full install"
+        exec bash ./common/watashi_legacy.sh migrate --no-gui --no-log
+    fi
     echo "Running in check-only mode (post-reboot service start)"
     echo "Starting critical services after reboot..."
     
     # Phase 1: Start Redis first (required by panel)
-    systemctl start hiddify-redis 2>/dev/null || true
+    systemctl start watashi-redis 2>/dev/null || true
     sleep 1
     
     # Phase 2: Start panel
-    systemctl start hiddify-panel 2>/dev/null || true
+    systemctl start watashi-panel 2>/dev/null || true
     sleep 1
     
     # Phase 3: Start background tasks (requires panel and redis)
     # watashi v12.3.35dev: reset-failed, the unit has a start limit now
-    systemctl reset-failed hiddify-panel-background-tasks 2>/dev/null || true
-    systemctl start hiddify-panel-background-tasks 2>/dev/null || true
+    systemctl reset-failed watashi-panel-background-tasks 2>/dev/null || true
+    systemctl start watashi-panel-background-tasks 2>/dev/null || true
     
     # Phase 4: Start proxy services
-    systemctl start hiddify-nginx 2>/dev/null || true
-    systemctl start hiddify-haproxy 2>/dev/null || true
-    systemctl start hiddify-xray 2>/dev/null || true
-    systemctl start hiddify-singbox 2>/dev/null || true
+    systemctl start watashi-nginx 2>/dev/null || true
+    systemctl start watashi-haproxy 2>/dev/null || true
+    systemctl start watashi-xray 2>/dev/null || true
+    systemctl start watashi-singbox 2>/dev/null || true
     
     # Phase 5: Start optional services if enabled
-    systemctl start hiddify-warp 2>/dev/null || true
-    systemctl start hiddify-ssh-liberty-bridge 2>/dev/null || true
-    # watashi v12.2.130ch: hiddify-cli is retired
+    systemctl start watashi-warp 2>/dev/null || true
+    systemctl start watashi-ssh-liberty-bridge 2>/dev/null || true
+    # watashi v12.2.130ch: the CLI service of the old name is retired
 
     
     # Start rathole if installed
@@ -67,8 +75,8 @@ function main() {
     export PROGRESS_ACTION="Installing..."
     if [ "$MODE" == "apply_users" ];then
         export DO_NOT_INSTALL="true"
-    elif [ -d "/hiddify-data-default/" ] && [ -z "$(ls -A /hiddify-data/ 2>/dev/null)" ]; then
-        cp -r /hiddify-data-default/* /hiddify-data/
+    elif [ -d "/watashi-data-default/" ] && [ -z "$(ls -A /watashi-data/ 2>/dev/null)" ]; then
+        cp -r /watashi-data-default/* /watashi-data/
     fi
     if [ "$DO_NOT_INSTALL" == "true" ];then
         PROGRESS_ACTION="Applying..."
@@ -101,7 +109,7 @@ function main() {
         fi
         
         update_progress "${PROGRESS_ACTION}" "Watashi Panel" 12
-        install_run hiddify-panel  # No & - sequential
+        install_run watashi-panel  # No & - sequential
     fi
     
     if [ "$DO_NOT_RUN" != "true" ];then
@@ -114,6 +122,10 @@ function main() {
     
     if [ "$MODE" != "apply_users" ]; then
         bash ./other/deprecated/remove_deprecated.sh
+        # watashi v12.3.40dev: on a server moved over from the old name its
+        # proxies kept serving until now; they make way here, right before the
+        # new ones below take over their ports.
+        bash ./common/watashi_legacy.sh stop-old
         
         # ============================================================
         # PHASE 2: More sequential apt installations
@@ -147,7 +159,7 @@ function main() {
         install_run other/telegram $(hconfig "telegram_enable")
         install_run other/ssfaketls $(hconfig "ssfaketls_enable")
         install_run other/ssh $(hconfig "ssh_server_enable")
-        # watashi v12.2.130ch: other/hiddify-cli is retired
+        # watashi v12.2.130ch: the CLI service of the old name (its folder under other/) is retired
         # watashi v12.2.103: mieru is served by mita, not by sing-box.
         install_run other/mieru $(hconfig "mieru_enable")
 
@@ -203,9 +215,9 @@ function main() {
     # active does nothing, so the panel could carry on with the configuration
     # it read before this install.
     if [ "$MODE" != "apply_users" ]; then
-        systemctl restart hiddify-panel
+        systemctl restart watashi-panel
     else
-        systemctl start hiddify-panel
+        systemctl start watashi-panel
     fi
     update_progress "${PROGRESS_ACTION}" "Done" 100
     
@@ -213,9 +225,9 @@ function main() {
 
 function clean_files() {
     rm -rf log/system/xray*
-    rm -rf /opt/hiddify-manager/xray/configs/*.json
-    rm -rf /opt/hiddify-manager/singbox/configs/*.json
-    rm -rf /opt/hiddify-manager/haproxy/*.cfg
+    rm -rf /opt/watashi-manager/xray/configs/*.json
+    rm -rf /opt/watashi-manager/singbox/configs/*.json
+    rm -rf /opt/watashi-manager/haproxy/*.cfg
     find ./ -type f -name "*.template" -delete
 }
 
@@ -302,10 +314,10 @@ else
     error_code=$?
     if [[ $error_code != "0" ]]; then
         # echo less -r -P"Installation Failed! Press q to exit" +G "$log_file"
-        msg_with_hiddify "Installation Failed! $error_code"
+        msg_with_watashi "Installation Failed! $error_code"
     else
-        msg_with_hiddify "The installation has successfully completed."
-        check_hiddify_panel $@ |& tee -a $LOG_FILE
+        msg_with_watashi "The installation has successfully completed."
+        check_watashi_panel $@ |& tee -a $LOG_FILE
     fi
 fi
 

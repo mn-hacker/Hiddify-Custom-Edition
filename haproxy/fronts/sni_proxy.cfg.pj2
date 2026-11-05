@@ -1,3 +1,4 @@
+{# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only) #}
 frontend https-in
     
     {% for port in (["443"] + hconfigs['tls_ports'].split(',')) | unique %}
@@ -15,7 +16,7 @@ frontend https-in
         use_backend to_https_in_http_mode if { req.ssl_sni -i {{d['domain']}} } 
     {%endfor%} 
     
-    acl is_cdn src -f /opt/hiddify-manager/haproxy/iplists/cloudflare.lst -f /opt/hiddify-manager/haproxy/iplists/arvan.lst -f /opt/hiddify-manager/haproxy/iplists/cloudfront.lst
+    acl is_cdn src -f /opt/watashi-manager/haproxy/iplists/cloudflare.lst -f /opt/watashi-manager/haproxy/iplists/arvan.lst -f /opt/watashi-manager/haproxy/iplists/cloudfront.lst
     use_backend to_https_in_ssl if is_cdn
     
     

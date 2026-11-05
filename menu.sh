@@ -1,27 +1,29 @@
 #!/bin/bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 # cd "$(dirname -- "$0")"
-cd /opt/hiddify-manager/
+cd /opt/watashi-manager/
 source common/utils.sh
 
-sed -i "s|/opt/hiddify-config/menu.sh|/opt/hiddify-manager/menu.sh|g" ~/.bashrc
-sed -i "s|/opt/hiddify-server/menu.sh|/opt/hiddify-manager/menu.sh|g" ~/.bashrc
+# watashi v12.3.40dev: the menu lines of the older folder names in ~/.bashrc are
+# rewritten by common/watashi_legacy.sh when a server moves to the new name.
 
-if [[ $(grep "/opt/hiddify-manager/menu.sh" ~/.bashrc | wc -l) > 0 ]]; then
-    sed -i "s|/opt/hiddify-manager/menu.sh||g" ~/.bashrc
-    sed -i "s|cd /opt/hiddify-manager/||g" ~/.bashrc
-    echo "/opt/hiddify-manager/menu.sh" >>~/.bashrc
-    echo "cd /opt/hiddify-manager/" >>~/.bashrc
+if [[ $(grep "/opt/watashi-manager/menu.sh" ~/.bashrc | wc -l) > 0 ]]; then
+    sed -i "s|/opt/watashi-manager/menu.sh||g" ~/.bashrc
+    sed -i "s|cd /opt/watashi-manager/||g" ~/.bashrc
+    echo "/opt/watashi-manager/menu.sh" >>~/.bashrc
+    echo "cd /opt/watashi-manager/" >>~/.bashrc
 fi
 
 
 if ! grep -rxq "PasswordAuthentication.*no" /etc/ssh/sshd*; then
-    # @hiddify/@iam54r1n4 make a better message with a link to why should disable pass-auth
+    # watashi v12.3.40dev: an upstream to-do note addressed to two upstream
+    # developers stood here; it was dropped with the old name.
     WARNING_MSG="Your server is vulnerable to abuses because PasswordAuthentication is enabled. To secure your server, please switch to key authentication mechanism and turn off PasswordAuthentication in your ssh config file."
     whiptail --title "WARNING" --msgbox "$WARNING_MSG" 10 78
 fi
 #PACKAGE_MODE=$(get_package_mode)
-#LATEST_CONFIG_VERSION=$(get_release_version hiddify-manager)
-#LATEST_PANEL_VERSION=$(get_release_version hiddifypanel)
+#LATEST_CONFIG_VERSION=$(get_release_version Watashi-Manager)
+#LATEST_PANEL_VERSION=$(get_release_version watashipanel)
 
 
 # if [[ "$PACKAGE_MODE" == "develop" ]] || [[ "$CURRENT_CONFIG_VERSION" == "$LATEST_CONFIG_VERSION" && "$CURRENT_PANEL_VERSION" == "$LATEST_PANEL_VERSION" ]]; then
@@ -127,7 +129,6 @@ function menu() {
     "advanced")
         OPTIONS=(
             warp "Check Warp Status"
-            add_remote "Add remote assistant access to this server"
             remove_remote "Remove remote assistant access to this server"
             enable "show this menu on start up"
             disable "disable this menu"
@@ -138,13 +139,13 @@ function menu() {
         CHOICE=$(whiptail --clear --backtitle "$BACKTITLE" --title "$TITLE" --menu "$MENU" $HEIGHT $WIDTH $CHOICE_HEIGHT "${OPTIONS[@]}" 3>&1 1>&2 2>&3)
         case $CHOICE in
         "enable")
-            echo "/opt/hiddify-manager/menu.sh" >>~/.bashrc
-            echo "cd /opt/hiddify-manager/" >>~/.bashrc
+            echo "/opt/watashi-manager/menu.sh" >>~/.bashrc
+            echo "cd /opt/watashi-manager/" >>~/.bashrc
             NEED_KEY=0
             ;;
         "disable")
-            sed -i "s|/opt/hiddify-manager/menu.sh||g" ~/.bashrc
-            sed -i "s|cd /opt/hiddify-manager/||g" ~/.bashrc
+            sed -i "s|/opt/watashi-manager/menu.sh||g" ~/.bashrc
+            sed -i "s|cd /opt/watashi-manager/||g" ~/.bashrc
             NEED_KEY=0
             ;;
         "uninstall")
@@ -175,9 +176,10 @@ function menu() {
                 NEED_KEY=0
             fi
             ;;
-        "add_remote")
-            bash common/add_remote_assistant.sh
-            ;;
+        # watashi v12.3.40dev: "Add remote assistant access" is gone. It put
+        # the upstream team's ssh key into root's authorized_keys, a way into
+        # this server for people outside this project. Removing that key, for
+        # a server where it was added before, is still offered.
         "remove_remote")
             bash common/remove_remote_assistant.sh
             ;;
@@ -218,13 +220,13 @@ function menu() {
         ;;
     "admin")
         source common/utils.sh
-        check_hiddify_panel
+        check_watashi_panel
         declare -F ws_flush_keys >/dev/null 2>&1 && ws_flush_keys
         read -p "Press 'r' to reset admin password or press any other key to return to the main menu: " -n 1 key
         echo  # This adds a newline for better output readability
         if [[ "$key" == 'r' ]]; then
             echo "reseting owner password..."
-            hiddify-panel-cli reset-owner-password
+            watashi-panel-cli reset-owner-password
         fi
         NEED_KEY=0
         ;;

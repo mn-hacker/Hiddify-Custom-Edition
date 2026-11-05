@@ -1,0 +1,37 @@
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
+[Unit]
+Description=Watashi WARP (warp-plus engine)
+After=network-online.target nss-lookup.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/watashi-manager/other/warp/warpplus/
+ExecStart=/bin/bash /opt/watashi-manager/other/warp/warpplus/engine-start.sh
+Restart=always
+RestartSec=5
+LimitNOFILE=65536
+
+# watashi v12.2.130: memory guard.
+# warp mode uses ~50-80 MB, gool (warp-in-warp) doubles that.
+# 256 MB gives comfortable headroom; adjust down on RAM-tight servers.
+MemoryMax=256M
+MemorySwapMax=0
+
+# Kill the process group cleanly so the tunnel closes before the
+# restart, avoiding a brief period where the socks port is open but
+# forwarding nothing.
+KillMode=control-group
+KillSignal=SIGTERM
+TimeoutStopSec=10
+
+# Prevent a runaway engine from eating the whole machine.
+CPUQuota=80%
+
+# Score the OOM killer so this service is sacrificed before other
+# panel services if the machine runs genuinely out of memory.
+OOMScoreAdjust=300
+
+[Install]
+WantedBy=multi-user.target

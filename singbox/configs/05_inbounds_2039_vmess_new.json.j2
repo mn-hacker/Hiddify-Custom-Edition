@@ -1,3 +1,4 @@
+{# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only) #}
 {
 	{% if hconfigs['vmess_enable'] and hconfigs['tcp_enable'] %}
 		"inbounds": [
@@ -12,7 +13,7 @@
 								"type": "vmess",
 				"users": [
 					{% for u in users %}
-						{"uuid": "{{ u['uuid'] }}", "name": "{{ u['uuid'] }}@hiddify.com", "alterId": 0},
+						{"uuid": "{{ u['uuid'] }}", "name": "{{ u['uuid'] }}@watashi.cyou", "alterId": 0},
 					{% endfor%}
 				],
 				"transport": {

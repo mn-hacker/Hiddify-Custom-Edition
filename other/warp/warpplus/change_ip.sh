@@ -1,4 +1,5 @@
 #!/bin/bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 # watashi: warp v12.2.128
 #
 # A new WARP IP. warp-plus keeps its identity and its generated profile in the
@@ -10,7 +11,7 @@
 # one restores the previous cache if nothing better was found.
 
 cd "$(dirname -- "$0")" || exit 1
-source /opt/hiddify-manager/common/utils.sh
+source /opt/watashi-manager/common/utils.sh
 
 CACHE="cache"
 BACKUP="cache.backup"

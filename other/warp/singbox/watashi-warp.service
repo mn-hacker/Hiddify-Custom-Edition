@@ -1,0 +1,20 @@
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
+[Unit]
+Description=Watashi WARP (sing-box WireGuard endpoint)
+After=network-online.target nss-lookup.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/watashi-manager/other/warp/singbox/
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_NET_RAW
+AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_NET_RAW
+ExecStart=/opt/watashi-manager/singbox/sing-box run -c warp-singbox.json
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=5
+LimitNOFILE=infinity
+
+[Install]
+WantedBy=multi-user.target

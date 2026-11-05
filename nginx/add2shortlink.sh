@@ -1,4 +1,5 @@
 #!/bin/bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 cd $( dirname -- "$0"; )
 real_url=$1
 short_code=$2
@@ -7,4 +8,4 @@ item="location ~* ^/$short_code(/)?$ {return 302 $real_url;}"
 echo $item
 echo $item>>./parts/short-link.conf
 echo "sed -i '/\/$short_code(/d' ./parts/short-link.conf"| at now + $min min
-systemctl reload hiddify-nginx.service
+systemctl reload watashi-nginx.service

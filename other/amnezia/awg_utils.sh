@@ -1,3 +1,4 @@
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 # watashi: the separate AmneziaWG system v12.2.62
 #
 # AmneziaWG is run by its own daemon here, not inside the sing-box core. The
@@ -12,7 +13,7 @@ SERVER_AWG_NIC=watashi-awg
 AWG_DIR=/etc/amnezia/amneziawg
 AWG_CONF="$AWG_DIR/$SERVER_AWG_NIC.conf"
 AWG_UNIT="awg-quick@$SERVER_AWG_NIC"
-AWG_LOG=/opt/hiddify-manager/log/system/amnezia.log
+AWG_LOG=/opt/watashi-manager/log/system/amnezia.log
 
 # awg-quick keeps wg-quick's rule for interface names:
 #     ^[a-zA-Z0-9_=+.-]{1,15}$

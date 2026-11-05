@@ -1,13 +1,14 @@
 #!/bin/bash
-#ln -sf $(pwd)/hiddify-warp.service /etc/systemd/system/hiddify-warp.service
-source /opt/hiddify-manager/common/utils.sh
-systemctl disable hiddify-warp.service >/dev/null 2>&1
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
+#ln -sf $(pwd)/watashi-warp.service /etc/systemd/system/watashi-warp.service
+source /opt/watashi-manager/common/utils.sh
+systemctl disable watashi-warp.service >/dev/null 2>&1
 
 function check_wireguard_connection() {
   echo "Checking WARP ..."
   if ! [ -f "wgcf-account.toml" ]; then
     mv wgcf-account.toml wgcf-account.toml.backup
-    ./wgcf register --accept-tos -m hiddify -n $(hostname) >/dev/null 2>&1
+    ./wgcf register --accept-tos -m watashi -n $(hostname) >/dev/null 2>&1
   fi
   ./wgcf update >/dev/null 2>&1 || return $?
   generate_warp_config

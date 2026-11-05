@@ -1,9 +1,10 @@
+{# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only) #}
 
 user  nginx;
 worker_processes  auto;
 worker_rlimit_nofile 65535;
 
-# error_log  /opt/hiddify-manager/log/system/nginx.err.log notice;
+# error_log  /opt/watashi-manager/log/system/nginx.err.log notice;
 {%if hconfigs['log_level']=="CRITICAL"%}
 error_log off;
 {%else%}
@@ -12,7 +13,7 @@ error_log stderr warn;
 
 
 
-pid        /run/hiddify-nginx.pid;
+pid        /run/watashi-nginx.pid;
 
 
 events {
@@ -33,7 +34,7 @@ http {
 
     #
     {%if hconfigs['log_level']=="TRACE"%}
-    access_log  /opt/hiddify-manager/log/system/nginx-access.log  main;
+    access_log  /opt/watashi-manager/log/system/nginx-access.log  main;
     {%else%}
     access_log off;
     {%endif%}
@@ -90,5 +91,5 @@ http {
     open_file_cache_min_uses 2;
     open_file_cache_errors on;
 
-    include /opt/hiddify-manager/nginx/conf.d/*.conf;
+    include /opt/watashi-manager/nginx/conf.d/*.conf;
 }

@@ -1,4 +1,5 @@
 #!/bin/bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 # watashi v12.3.33dev: warp watchdog
 #
 # Runs beside warp-plus (started by engine-start.sh).
@@ -23,7 +24,7 @@
 #   watchdog.sh <warp_plus_pid>
 
 WARP_PID="${1:-0}"
-DIR="/opt/hiddify-manager/other/warp/warpplus"
+DIR="/opt/watashi-manager/other/warp/warpplus"
 CACHE="$DIR/cache"
 PIN="$CACHE/.watashi-endpoint"
 PROXY="socks5h://127.0.0.1:3000"

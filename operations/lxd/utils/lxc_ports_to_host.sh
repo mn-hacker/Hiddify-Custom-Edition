@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 
 DIR_PATH=$(dirname "${BASH_SOURCE[0]}")/
 MODE="advanced" # Set the mode (can be 'basic' or 'advanced')
-LXC_CONTAINER_NAME="Hiddify-on-LXC"
-CSV_FILE="hiddify_service_ports_in_use.csv"
+LXC_CONTAINER_NAME="Watashi-on-LXC"
+CSV_FILE="watashi_service_ports_in_use.csv"
 
 set -e
 if [ ! -f "${DIR_PATH}${CSV_FILE}" ]; then
     USER_CREATED_CSV="0"
-    bash ${DIR_PATH}hiddify_ports_to_csv.sh
+    bash ${DIR_PATH}watashi_ports_to_csv.sh
 fi
 
 # Remove all bound ports

@@ -1,3 +1,4 @@
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 # watashi: the certificate engine was rebuilt in v12.2.49
 #
 # what was wrong before:
@@ -15,11 +16,11 @@ restricted_tlds=("af" "by" "cu" "er" "gn" "ir" "kp" "lr" "ru" "ss" "su" "sy" "zw
 shopt -s expand_aliases
 
 source ./lib/acme.sh.env
-source /opt/hiddify-manager/common/utils.sh
+source /opt/watashi-manager/common/utils.sh
 
-WS_ACME_HOME="${WS_ACME_HOME:-/opt/hiddify-manager/acme.sh}"
-WS_SSL_DIR="${WS_SSL_DIR:-/opt/hiddify-manager/ssl}"
-WS_ACME_LOG="${WS_ACME_LOG:-/opt/hiddify-manager/log/system/acme.log}"
+WS_ACME_HOME="${WS_ACME_HOME:-/opt/watashi-manager/acme.sh}"
+WS_SSL_DIR="${WS_SSL_DIR:-/opt/watashi-manager/ssl}"
+WS_ACME_LOG="${WS_ACME_LOG:-/opt/watashi-manager/log/system/acme.log}"
 WS_STATE_DIR="${WS_STATE_DIR:-$WS_ACME_HOME/lib/data/watashi}"
 WS_RETRY_HOURS="${WS_RETRY_HOURS:-6}"
 # watashi v12.3.39dev: one number for "time to renew". A certificate is kept while it
@@ -28,7 +29,7 @@ WS_RETRY_HOURS="${WS_RETRY_HOURS:-6}"
 # uses the same number, so both sides agree on what "still good" means.
 WS_RENEW_DAYS="${WS_RENEW_DAYS:-30}"
 # watashi v12.3.39dev: the nginx part that opens the challenge path.
-WS_CHALLENGE_CONF="${WS_CHALLENGE_CONF:-/opt/hiddify-manager/nginx/parts/acme.conf}"
+WS_CHALLENGE_CONF="${WS_CHALLENGE_CONF:-/opt/watashi-manager/nginx/parts/acme.conf}"
 # watashi v12.2.130ax: this said 2048, so every certificate on every watashi server was
 # RSA. An RSA 2048 signature costs the cpu ten to twenty times what an
 # ecdsa P-256 signature costs, and haproxy signs once per tls handshake.
@@ -69,10 +70,12 @@ is_ok_domain_zerossl() {
 
 # List of Certificate Authorities to try (in order of preference)
 # Format: "server_name|description"
+# watashi v12.3.40dev: Buypass is off the list. Its free ACME service (Buypass
+# Go SSL) was shut down, so every try against it only failed and added to the
+# time a domain without a certificate waits for the next authority.
 CA_SERVERS=(
     "letsencrypt|Let's Encrypt"
     "zerossl|ZeroSSL"
-    "buypass|Buypass"
     "google|Google Trust Services"
 )
 
@@ -186,7 +189,7 @@ function ws_http_challenge_prepare() {
         echo "$me" >"$holders/$me"
         if [ "$(cat "$WS_CHALLENGE_CONF" 2>/dev/null)" != "$want" ]; then
             echo "$want" >"$WS_CHALLENGE_CONF"
-            systemctl reload hiddify-nginx 2>/dev/null || systemctl restart hiddify-nginx 2>/dev/null || true
+            systemctl reload watashi-nginx 2>/dev/null || systemctl restart watashi-nginx 2>/dev/null || true
         fi
     ) 9>"$WS_STATE_DIR/challenge.lock"
 }
@@ -227,7 +230,7 @@ function ws_challenge_reachable() {
 
 # watashi v12.2.130j: what the next log needs in order to explain a dead port 80.
 function ws_port80_report() {
-    echo "  hiddify-nginx: $(systemctl is-active hiddify-nginx 2>/dev/null)"
+    echo "  watashi-nginx: $(systemctl is-active watashi-nginx 2>/dev/null)"
     echo "  listening on 80: $(ss -ltnp 2>/dev/null | grep -c ':80 ')"
 }
 
@@ -251,7 +254,7 @@ function ws_http_challenge_cleanup() {
         done
         if [ -n "$(tr -d '[:space:]' <"$WS_CHALLENGE_CONF" 2>/dev/null)" ]; then
             echo "" >"$WS_CHALLENGE_CONF"
-            systemctl reload hiddify-nginx 2>/dev/null || true
+            systemctl reload watashi-nginx 2>/dev/null || true
         fi
     ) 9>"$WS_STATE_DIR/challenge.lock"
 }
@@ -356,7 +359,7 @@ function try_get_cert_with_ca() {
         # cannot be used at all, so a failed probe must not be what stops the request.
         if ! ws_challenge_reachable "$DOMAIN"; then
             echo "The challenge file could not be read over port 80 yet, restarting the web server..."
-            systemctl restart hiddify-nginx 2>/dev/null || true
+            systemctl restart watashi-nginx 2>/dev/null || true
             sleep 3
             if ! ws_challenge_reachable "$DOMAIN"; then
                 echo "WARNING: the challenge file still cannot be read here."
@@ -423,7 +426,7 @@ function try_get_cert_with_ca() {
 # had a chance to reissue anything.
 function ws_install_cert() {
     local DOMAIN=$1
-    local reload="systemctl reload hiddify-haproxy 2>/dev/null || true; systemctl reload hiddify-singbox 2>/dev/null || true"
+    local reload="systemctl reload watashi-haproxy 2>/dev/null || true; systemctl reload watashi-singbox 2>/dev/null || true"
     if acme.sh --install-cert -d "$DOMAIN" "${WS_ACME_ECC[@]}" \
         --fullchainpath "$WS_SSL_DIR/$DOMAIN.crt" \
         --keypath "$WS_SSL_DIR/$DOMAIN.crt.key" \
@@ -723,7 +726,7 @@ function ws_challenge_public() {
 }
 
 function ws_get_cert_now() {
-    cd /opt/hiddify-manager/acme.sh/
+    cd /opt/watashi-manager/acme.sh/
     source ./lib/acme.sh.env
 
     DOMAIN=$1
@@ -878,7 +881,7 @@ function ws_get_cert_now() {
     # .crt.key.bk. haproxy loads every file it finds in that folder, so a left
     # over copy became a certificate with no private key and took every bind
     # down at once. The copies live outside the folder haproxy reads now.
-    ws_ssl_bk="/opt/hiddify-manager/log/ssl-backup"
+    ws_ssl_bk="/opt/watashi-manager/log/ssl-backup"
     mkdir -p "$ws_ssl_bk" 2>/dev/null || true
     # any copy left in ssl/ by an older build goes to the same place
     for stray in "$ssl_cert_path"/*.bk "$ssl_cert_path"/*.bk.key "$ssl_cert_path"/*.crt.bk.key; do
@@ -968,7 +971,7 @@ function ws_get_cert_now() {
 
     # Cleanup
     ws_http_challenge_cleanup
-    systemctl reload hiddify-haproxy 2>/dev/null || true
+    systemctl reload watashi-haproxy 2>/dev/null || true
 
     echo "watashi: $DOMAIN got its certificate from ${winner:-a self signed fallback} (previous certificate had $days_left days left)"
     if [ $cert_obtained -eq 1 ]; then
@@ -989,7 +992,7 @@ function ws_get_cert_now() {
 }
 
 function get_self_signed_cert() {
-    cd /opt/hiddify-manager/acme.sh/
+    cd /opt/watashi-manager/acme.sh/
     local d=$1
     # watashi v12.2.49: replace_variables.sh and old callers can pass junk
     if ! ws_valid_domain "$d"; then
@@ -1000,9 +1003,9 @@ function get_self_signed_cert() {
         echo "Domain length exceeds 64 characters. Truncating to the first 64 characters."
         d="${d:0:64}"
     fi
-    mkdir -p /opt/hiddify-manager/ssl
-    local certificate="/opt/hiddify-manager/ssl/$d.crt"
-    local private_key="/opt/hiddify-manager/ssl/$d.crt.key"
+    mkdir -p /opt/watashi-manager/ssl
+    local certificate="/opt/watashi-manager/ssl/$d.crt"
+    local private_key="/opt/watashi-manager/ssl/$d.crt.key"
     local current_date=$(date +%s)
     local generate_new_cert=0
     # Check if the certificate file exists

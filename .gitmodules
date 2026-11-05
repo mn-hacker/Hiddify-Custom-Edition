@@ -1,3 +1,4 @@
-[submodule "hiddify-panel/src"]
-	path = hiddify-panel/src
-	url = https://github.com/mn-hacker/hiddifypanel.git
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
+[submodule "watashi-panel/src"]
+	path = watashi-panel/src
+	url = https://github.com/mn-hacker/watashi-panel.git

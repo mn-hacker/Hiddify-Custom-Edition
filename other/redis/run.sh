@@ -1,1 +1,2 @@
-systemctl start hiddify-redis
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
+systemctl start watashi-redis

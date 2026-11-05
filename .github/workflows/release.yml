@@ -1,3 +1,4 @@
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 name: Create Release
 
 on:
@@ -21,17 +22,17 @@ jobs:
   #     - uses: actions/checkout@v2
   #     - name: Install project
   #       run: |
-  #         sudo mkdir /opt/hiddify-manager
-  #         sudo cp -r * /opt/hiddify-manager/
-  #         cd /opt/hiddify-manager/
+  #         sudo mkdir /opt/watashi-manager
+  #         sudo cp -r * /opt/watashi-manager/
+  #         cd /opt/watashi-manager/
   #         sudo bash install.sh
   #     - name: check working
   #       env:
-  #         SQLALCHEMY_DATABASE_URI: sqlite:////opt/hiddify-manager/hiddify-panel/database.db
+  #         SQLALCHEMY_DATABASE_URI: sqlite:////opt/watashi-manager/watashi-panel/database.db
   #       run: |
-  #         cd /opt/hiddify-manager/
+  #         cd /opt/watashi-manager/
   #         grep -q -e '-----Finished!-----' log/system/0-install.log 
-  #         cd hiddify-panel;hiddifypanel all-configs
+  #         cd watashi-panel;watashipanel all-configs
 
 
   release:
@@ -55,25 +56,26 @@ jobs:
           sudo apt install -y zip
       - name: Verify submodule
         run: |
-          echo "Checking hiddify-panel/src contents..."
-          ls -la hiddify-panel/src/ || echo "src is empty!"
-          if [ ! -f "hiddify-panel/src/pyproject.toml" ]; then
+          echo "Checking watashi-panel/src contents..."
+          ls -la watashi-panel/src/ || echo "src is empty!"
+          if [ ! -f "watashi-panel/src/pyproject.toml" ]; then
             echo "Submodule not found, cloning manually..."
-            rm -rf hiddify-panel/src
-            git clone --depth 1 https://github.com/mn-hacker/hiddifypanel.git hiddify-panel/src
+            rm -rf watashi-panel/src
+            git clone --depth 1 https://github.com/mn-hacker/watashi-panel.git watashi-panel/src
           fi
           echo "Panel source files:"
-          ls -la hiddify-panel/src/
+          ls -la watashi-panel/src/
       - name: zip
         run: |
             # Make shell scripts and Python files executable
             find . -name "*.sh" -exec chmod +x {} \;
             find . -name "*.py" -exec chmod +x {} \;
             # Remove .git folders from submodule to reduce size
-            rm -rf hiddify-panel/src/.git
-            zip -r hiddify-manager.zip . -x ".*" -x "*/.*"
-            cp hiddify-manager.zip hiddify-config.zip 
-            cp hiddify-manager.zip hiddify-server.zip 
+            rm -rf watashi-panel/src/.git
+            zip -r watashi-manager.zip . -x ".*" -x "*/.*"
+            # watashi v12.3.40dev: the two extra copies of the zip under the
+            # names of the oldest upstream releases are no longer made;
+            # nothing of this project ever downloaded them.
       - name: Generate Changelog
         run: |
           chmod +x .github/release_message.sh

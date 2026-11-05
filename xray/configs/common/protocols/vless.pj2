@@ -1,10 +1,11 @@
+{# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only) #}
 "protocol": "vless",
 "settings": {
     "clients": [
         {% for u in users %}
             {
                 "id": "{{ u['uuid'] }}", 
-                "email": "{{ u['uuid'] }}@hiddify.com",
+                "email": "{{ u['uuid'] }}@watashi.cyou",
                 "flow": "{{flow}}"
             },
         {% endfor %}

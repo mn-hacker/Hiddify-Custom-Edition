@@ -1,4 +1,5 @@
 #!/bin/bash
+# watashi v12.3.40dev: the old project name was taken out of this file (names, paths and links only)
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
 cd $( dirname -- "$0"; )
@@ -47,14 +48,14 @@ function main() {
     # is waited on until it really answers "active". Everything else talks to
     # them, so having them in the same parallel wave as their own users is
     # what made the panel answer 503 right after a restart.
-    for ss in mariadb hiddify-redis;do
+    for ss in mariadb watashi-redis;do
         restart_service $ss
     done
 
-    # Restart services and get their status (except hiddify-panel)
+    # Restart services and get their status (except watashi-panel)
     for ss in other/**/*.service **/*.service wg-quick@warp mtproto-proxy.service mtproxy.service;do
         case "$ss" in
-            hiddify-panel*|*hiddify-redis*|mariadb)
+            watashi-panel*|*watashi-redis*|mariadb)
                 continue
                 ;;
             wg-quick@warp)
@@ -64,13 +65,13 @@ function main() {
         restart_service $ss &
     done
     wait
-    # Restart hiddify-panel separately from others
-    for ss in hiddify-panel hiddify-panel-background-tasks;do
+    # Restart watashi-panel separately from others
+    for ss in watashi-panel watashi-panel-background-tasks;do
         restart_service $ss &
     done
     wait
 
-    # watashi v12.2.130ch: hiddify-cli is retired, nothing to restart here
+    # watashi v12.2.130ch: the CLI service of the old name is retired, nothing to restart here
     echo -e "----------------------------------------------------------------\n"
 }
 mkdir -p log/system/

@@ -1,3 +1,4 @@
+<!-- watashi v12.3.40dev: this changelog is kept as it was written. The names in it (hiddify-*, /opt/hiddify-manager, hiddifypanel) are the names used before v12.3.40dev. -->
 # Changelog
 
 
