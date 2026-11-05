@@ -418,13 +418,27 @@ def node(action: str, key: str, value: str):
 #   apply   the saved rows are put on the server (xray/custom_apply.sh), as a job
 #           of its own; a second apply while one runs asks it for another round
 #   status  how the last apply ended, whether one runs, and the end of its log
-WS_CUSTOM_ACTIONS = ('test', 'apply', 'retry', 'status')
+WS_CUSTOM_ACTIONS = ('test', 'test-singbox', 'apply', 'retry', 'status')  # watashi v12.3.42dev: test-singbox
 WS_CUSTOM_FILE = '05_inbounds_90_custom.json'
 WS_CUSTOM_TAG_RE = re.compile(r'^custom-[0-9]{1,9}$')
 WS_CUSTOM_CERT_RE = re.compile(r'^/opt/watashi-manager/ssl/[A-Za-z0-9._-]{1,253}$')
 WS_CUSTOM_MAX = 262144
 WS_CUSTOM_STATUS = os.path.join(WATASHI_DIR, 'log/custom_inbounds.status')
 WS_CUSTOM_PENDING = os.path.join(WATASHI_DIR, 'log/custom_inbounds.pending')
+# watashi v12.3.42dev: the sing-box side of the Inbounds page.
+#   test-singbox  a candidate file of hand built sing-box inbounds (stdin) is
+#                 checked by the real sing-box next to every other sing-box
+#                 config of this server. ShadowTLS is two inbounds, custom-N and
+#                 its inner custom-N-in, and the only one that may hand its
+#                 connections on (detour), to its own inner inbound only.
+WS_SB_CUSTOM_TAG_RE = re.compile(r'^custom-[0-9]{1,9}(-in)?$')
+WS_SB_CUSTOM_TYPES = ('hysteria2', 'tuic', 'anytls', 'naive', 'shadowtls', 'shadowsocks', 'snell')
+# a hand built inbound takes the panel's certificate of a domain and nothing
+# else: no certificate of its own, no ACME, no client certificates to read
+WS_SB_CUSTOM_FORBIDDEN = ('acme', 'certificate', 'key', 'client_certificate', 'client_certificate_path',
+                          'client_certificate_public_key_sha256')
+# Hysteria2 may look like a site, but never serve a folder of this server
+WS_SB_MASQUERADE_RE = re.compile(r'^https?://[^\s"]{1,250}$')
 
 
 def ws_custom_candidate(text: str) -> dict:
@@ -455,8 +469,78 @@ def ws_custom_candidate(text: str) -> dict:
     return data
 
 
+def ws_sb_custom_candidate(text: str) -> dict:
+    """watashi v12.3.42dev: a sing-box candidate, checked again here: the panel
+    is not trusted to have."""
+    import json
+    assert len(text) <= WS_CUSTOM_MAX, "Error: the candidate is too large"
+    data = json.loads(text)
+    assert isinstance(data, dict) and set(data) <= {'inbounds'}, "Error: the candidate is not an inbounds file"
+    inbounds = data.get('inbounds') or []
+    assert isinstance(inbounds, list) and len(inbounds) <= 100, "Error: the candidate has too many inbounds"
+    tags = [str(one.get('tag', '')) if isinstance(one, dict) else '' for one in inbounds]
+    assert len(set(tags)) == len(tags), "Error: two hand built inbounds have the same tag"
+
+    def walk(node):
+        if isinstance(node, dict):
+            for key, value in node.items():
+                assert key not in WS_SB_CUSTOM_FORBIDDEN, f"Error: {key} is not allowed in a hand built inbound"
+                if key in ('certificate_path', 'key_path'):
+                    assert isinstance(value, str) and WS_CUSTOM_CERT_RE.match(value) and '..' not in value, \
+                        "Error: a certificate of a hand built inbound has to be one of the panel's certificates"
+                if key == 'masquerade':
+                    assert isinstance(value, str) and WS_SB_MASQUERADE_RE.match(value), \
+                        "Error: masquerade can only be the http:// or https:// address of a site"
+                walk(value)
+        elif isinstance(node, list):
+            for value in node:
+                walk(value)
+
+    for inbound in inbounds:
+        assert isinstance(inbound, dict), "Error: an inbound is not an object"
+        tag = str(inbound.get('tag', ''))
+        assert WS_SB_CUSTOM_TAG_RE.match(tag), "Error: a hand built inbound is tagged custom-<number>"
+        assert inbound.get('type') in WS_SB_CUSTOM_TYPES, "Error: this inbound type cannot be built by hand"
+        if 'detour' in inbound:
+            assert inbound.get('type') == 'shadowtls' and inbound['detour'] == tag + '-in' and inbound['detour'] in tags, \
+                "Error: only ShadowTLS hands its connections on, and only to its own inner inbound"
+        walk(inbound)
+    return data
+
+
+def ws_sb_name_inbounds(text: str, folder: str) -> str:
+    """watashi v12.3.42dev: sing-box names an inbound by its place in the merged
+    config (inbound[12]) or in its file (inbounds[0]); the tag says which one."""
+    import json
+    merged, per_file = [], {}
+    for name in sorted(os.listdir(folder)):
+        if not name.endswith('.json'):
+            continue
+        try:
+            with open(os.path.join(folder, name)) as handle:
+                found = json.load(handle).get('inbounds') or []
+            tags = [str(one.get('tag') or '') if isinstance(one, dict) else '' for one in found]
+        except Exception:
+            return text  # a file it cannot read would shift every place after it
+        per_file[name] = tags
+        merged.extend(tags)
+
+    def whole(match):
+        place = int(match.group(1))
+        return f'inbound[{merged[place]}]' if place < len(merged) and merged[place] else match.group(0)
+
+    def in_file(match):
+        tags = per_file.get(os.path.basename(match.group(1))) or []
+        place = int(match.group(2))
+        return f'{match.group(1)}: inbounds[{tags[place]}]' if place < len(tags) and tags[place] else match.group(0)
+
+    text = re.sub(r'inbound\[(\d+)\]', whole, text)
+    return re.sub(r'(\S+\.json): inbounds\[(\d+)\]', in_file, text)
+
+
 @cli.command('custom-inbounds')
-@click.option('--action', '-a', type=str, help='test, apply, retry or status', required=True)
+# watashi v12.3.42dev: test-singbox tries the sing-box rows with sing-box itself
+@click.option('--action', '-a', type=str, help='test, test-singbox, apply, retry or status', required=True)
 def custom_inbounds(action: str):
     import json
     import tempfile
@@ -474,6 +558,23 @@ def custom_inbounds(action: str):
             done = subprocess.run([os.path.join(WATASHI_DIR, 'xray/bin/xray'), 'run', '-test', '-confdir', tmp],
                                   capture_output=True, text=True, timeout=60)
         print((done.stdout or '') + (done.stderr or ''))
+        raise SystemExit(0 if done.returncode == 0 else 1)
+    if action == 'test-singbox':
+        # watashi v12.3.42dev: the same for a sing-box candidate, with sing-box check
+        data = ws_sb_custom_candidate(click.get_text_stream('stdin').read(WS_CUSTOM_MAX + 1))
+        configs = os.path.join(WATASHI_DIR, 'singbox/configs')
+        with tempfile.TemporaryDirectory(prefix='watashi-custom-') as tmp:
+            for one in glob.glob(os.path.join(configs, '*.json')):
+                if os.path.basename(one) != WS_CUSTOM_FILE:
+                    shutil.copy(one, tmp)
+            with open(os.path.join(tmp, WS_CUSTOM_FILE), 'w') as handle:
+                json.dump(data, handle)
+            done = subprocess.run([os.path.join(WATASHI_DIR, 'singbox/sing-box'), 'check', '-C', tmp],
+                                  capture_output=True, text=True, timeout=60, cwd=tmp)
+            said = (done.stdout or '') + (done.stderr or '')
+            if done.returncode != 0:
+                said = ws_sb_name_inbounds(said, tmp)
+        print(said)
         raise SystemExit(0 if done.returncode == 0 else 1)
     if action in ('apply', 'retry'):
         # retry: the inbounds the last apply took out get another chance

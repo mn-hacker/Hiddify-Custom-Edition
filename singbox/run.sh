@@ -74,8 +74,24 @@ ws_sb_clear_start_limit() {
 	return 0
 }
 
+# watashi v12.3.42dev: the hand built sing-box inbounds of the advanced mode
+# are checked before sing-box reloads or restarts and once more after it did
+# (singbox/custom_guard.sh). Whatever sing-box refuses is taken out of their
+# file, so the panel's own inbounds start no matter what was built by hand.
+# Without such inbounds both calls return at once.
+bash /opt/watashi-manager/singbox/custom_guard.sh pre
+WS_SINCE=$(date +%s)
+
 # Start singbox service
 if systemctl list-unit-files watashi-singbox.service &>/dev/null; then
+	# watashi v12.3.42dev: an apply of the Inbounds page restarts sing-box on
+	# purpose, after its config passed the check. Those starts must not spend
+	# the five starts in 300 seconds the unit keeps for crashes
+	# (StartLimitBurst), or the sixth save inside five minutes finds sing-box
+	# held down by systemd and its rows taken out for nothing.
+	if [ "$MODE" == "custom" ]; then
+		systemctl reset-failed watashi-singbox.service 2>/dev/null || true
+	fi
 	if systemctl is-active --quiet watashi-singbox.service; then
 		# watashi v12.2.105: a reload only sends SIGHUP, so a core that was
 		# replaced on disk keeps running its old code and refuses every inbound
@@ -109,6 +125,10 @@ if systemctl list-unit-files watashi-singbox.service &>/dev/null; then
 			# not enough to be sure the old key is gone from memory.
 			echo "watashi: the user list changed, restarting the core so removed users lose access" >&2
 			systemctl restart watashi-singbox.service
+		elif [ "$MODE" == "custom" ]; then
+			# watashi v12.3.42dev: the Inbounds page applies its rows with a real
+			# start, so the start check of the unit (custom_guard.sh boot) sees them
+			systemctl restart watashi-singbox.service
 		else
 			systemctl reload watashi-singbox.service 2>/dev/null || systemctl restart watashi-singbox.service
 		fi
@@ -122,6 +142,9 @@ if systemctl list-unit-files watashi-singbox.service &>/dev/null; then
 			tail -3 /tmp/watashi-singbox-start.log >&2
 		fi
 	fi
+	# watashi v12.3.42dev: a hand built inbound sing-box did not start with is
+	# taken out here, and sing-box starts again without it
+	bash /opt/watashi-manager/singbox/custom_guard.sh post "$WS_SINCE"
 else
 	echo "watashi-singbox.service not installed yet"
 fi

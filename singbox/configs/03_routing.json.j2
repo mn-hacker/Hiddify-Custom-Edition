@@ -249,6 +249,20 @@
         {
           "outbound": "blackhole", "ip_is_private": true
         }
+        {# watashi v12.3.42dev: where the traffic of a hand built sing-box inbound
+           (advanced mode) goes when no rule above took it, the same last step
+           the xray rows get in xray/configs/03_routing.json.j2. Every block rule
+           and site list above applies to them exactly as to the panel's own. A
+           ShadowTLS row routes from its inner inbound, so both tags are named.
+           WARP is left out while it is off. #}
+        {% for ci in (custom_inbounds | default([])) if ci.get('core') == 'singbox' and ci['active'] and ci['outbound'] in ('direct', 'warp') %}
+        {% if ci['outbound'] == 'direct' or hconfigs['warp_mode'] != 'disable' %}
+        ,{
+          "inbound": ["{{ ci['tag'] }}", "{{ ci['tag'] }}-in"],
+          "outbound": {% if ci['outbound'] == 'warp' %}"WARP"{% else %}"freedom"{% endif %}
+        }
+        {% endif %}
+        {% endfor %}
         // {// Block BitTorrent protocol
         //   "type": "field", "outboundTag": "blackhole", "protocol": ["bittorrent"]
         // },

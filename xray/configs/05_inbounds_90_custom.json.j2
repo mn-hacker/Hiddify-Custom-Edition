@@ -8,8 +8,10 @@
    row never takes the panel's own inbounds down with it.
    A Shadowsocks inbound needs at least one user to start at all, so with no
    user it is left out until there is one. #}
+{# watashi v12.3.42dev: the rows of the sing-box protocols are written by
+   singbox/configs/05_inbounds_90_custom.json.j2, not here #}
 {% set ws_rows = [] %}
-{% for ci in (custom_inbounds | default([])) if ci['active'] and ci['inbound_json'] %}
+{% for ci in (custom_inbounds | default([])) if ci['active'] and ci['inbound_json'] and ci.get('core', 'xray') == 'xray' %}
 {% if ci['protocol'] != 'shadowsocks' or users %}{% set ws_x = ws_rows.append(ci) %}{% endif %}
 {% endfor %}
 {

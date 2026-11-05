@@ -15,6 +15,10 @@ User=root
 WorkingDirectory=/opt/watashi-manager/singbox
 #CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_NET_RAW
 #AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_NET_RAW
+# watashi v12.3.42dev: a hand built inbound whose certificate is gone or whose
+# port another program took is taken out before sing-box starts, at every start
+# (a reboot, a crash, an apply), so it cannot keep sing-box down.
+ExecStartPre=-/bin/bash /opt/watashi-manager/singbox/custom_guard.sh boot
 ExecStart=/opt/watashi-manager/singbox/sing-box run -C /opt/watashi-manager/singbox/configs
 ExecReload=/bin/kill -HUP $MAINPID
 # watashi v12.2.106: on-failure, not always. a clean stop stays stopped.

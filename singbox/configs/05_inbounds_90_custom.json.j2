@@ -1,0 +1,51 @@
+{# watashi v12.3.42dev: the sing-box inbounds built by hand on the Inbounds page
+   (advanced mode): Hysteria2, TUIC, AnyTLS, Naive, ShadowTLS, Shadowsocks 2022
+   and Snell. Every row arrives from the panel as finished sing-box JSON
+   (hutils/proxy/custom.py, build_singbox_inbound): a list of one inbound, or of
+   two for ShadowTLS, with markers where the users go. So this file does one
+   thing: it puts the users of the panel in, exactly the way ws_sb_clients_of
+   writes them for the test before a save. Their name is uuid@watashi.cyou,
+   the label singbox/configs/01_api.json.j2 counts the traffic of.
+   singbox/custom_guard.sh takes a row out again when sing-box will not take
+   it, so a broken row never takes the panel's own inbounds down with it.
+   With no user at all the rows are left out: a Shadowsocks 2022 inbound with an
+   empty user list would let in anyone who has its server key. #}
+{% set ws_users = users | selectattr('uuid') | list %}
+{% set ws_rows = [] %}
+{% for ci in (custom_inbounds | default([])) if ci.get('core') == 'singbox' and ci['active'] and ci['inbound_json'] %}
+{% if ws_users %}{% set ws_x = ws_rows.append(ci) %}{% endif %}
+{% endfor %}
+{% set ws_zero = '00000000000000000000000000000000' %}
+{
+{% if ws_rows %}
+  "inbounds": [
+  {% for ci in ws_rows %}
+    {% set ws_list = [] %}
+    {% set ws_list_in = [] %}
+    {% for u in ws_users %}
+      {% set ws_name = u['uuid'] ~ '@watashi.cyou' %}
+      {% if ci['protocol'] == 'tuic' %}
+        {% set ws_x = ws_list.append({'name': ws_name, 'uuid': u['uuid'], 'password': u['uuid']}) %}
+      {% elif ci['protocol'] == 'naive' %}
+        {% set ws_x = ws_list.append({'username': u['uuid'], 'password': u['uuid']}) %}
+      {% elif ci['protocol'] == 'ss2022' or ci['protocol'] == 'shadowtls' %}
+        {# the user's key is folded from the uuid to the size of the method,
+           the same as hutils/proxy/custom.py ws_ss2022_user_key #}
+        {% set ws_key = ((u['uuid'] | replace('-', '')) ~ ws_zero)[:(ci['ss_key_size'] or 16)] | b64encode %}
+        {% if ci['protocol'] == 'ss2022' %}
+          {% set ws_x = ws_list.append({'name': ws_name, 'password': ws_key}) %}
+        {% else %}
+          {% set ws_x = ws_list.append({'name': ws_name, 'password': u['uuid']}) %}
+          {% set ws_x = ws_list_in.append({'name': ws_name, 'password': ws_key}) %}
+        {% endif %}
+      {% elif ci['protocol'] == 'snell' %}
+        {% set ws_x = ws_list.append({'name': ws_name, 'userkey': u['uuid']}) %}
+      {% else %}
+        {% set ws_x = ws_list.append({'name': ws_name, 'password': u['uuid']}) %}
+      {% endif %}
+    {% endfor %}
+    {{ (ci['inbound_json'] | replace('"@@WS_CLIENTS@@"', ws_list | tojson) | replace('"@@WS_CLIENTS_IN@@"', ws_list_in | tojson))[1:-1] }}{% if not loop.last %},{% endif %}
+  {% endfor %}
+  ]
+{% endif %}
+}

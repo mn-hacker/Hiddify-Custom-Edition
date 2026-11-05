@@ -166,5 +166,9 @@ if __name__ == "__main__":
         # the xray configs alone (xray/custom_apply.sh) instead of every config
         # of the server.
         render_j2_templates(start_path + "xray/")
+    elif len(sys.argv) > 1 and sys.argv[1] == "custom":
+        # watashi v12.3.42dev: since the Inbounds page builds sing-box rows as
+        # well, its apply renders the xray and the sing-box configs together
+        render_j2_templates(start_path + "xray/", start_path + "singbox/")
     else:
         render_j2_templates(start_path)

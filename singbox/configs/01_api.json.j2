@@ -5,7 +5,14 @@
 			"listen": "127.0.0.1:10086",
 			"stats": {
 				"enabled": true,
-				"inbounds": [],
+				{# watashi v12.3.42dev: the hand built sing-box inbounds are counted by tag,
+				   for the traffic the Inbounds page shows per row. A ShadowTLS row
+				   routes, and so counts, from its inner inbound. #}
+				"inbounds": [
+					{% for ci in (custom_inbounds | default([])) if ci.get('core') == 'singbox' and ci['active'] %}
+					"{{ ci['tag'] }}",{% if ci['protocol'] == 'shadowtls' %} "{{ ci['tag'] }}-in",{% endif %}
+					{% endfor %}
+				],
 				"outbounds": ["WARP","freedom","blackhole"],
 				// watashi v12.2.47: sing-box counts traffic against the user *name* the
 				// inbound authenticated. vless/vmess/trojan/hysteria/tuic/ss use
